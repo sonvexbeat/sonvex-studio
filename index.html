@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SONVEX STUDIO — AI Audio & Lyrics Workbench</title>
+  <meta name="description" content="Next-generation audio analyzer, universal format converter, and AI lyric streaming workspace.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f4ff',
+              100: '#e0e9ff',
+              400: '#809fff',
+              500: '#4f75ff',
+              600: '#3b5bdb',
+              900: '#1b2a6b',
+            },
+            accent: {
+              cyan: '#00f2fe',
+              purple: '#7f00ff',
+              pink: '#ff007f',
+              emerald: '#00e676'
+            }
+          },
+          fontFamily: {
+            sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow-pulse': 'glow 2.5s ease-in-out infinite alternate',
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* STRICT GLASSMORPHISM AESTHETIC SYSTEM (DARK MODE) */
+    .glass-panel {
+      background: rgba(18, 24, 38, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-input:focus {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+    }
+
+    /* SELECT OPTION DROPDOWN VISIBILITY (DARK MODE) */
+    select option {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+      padding: 8px 12px;
+    }
+
+    /* COMPREHENSIVE LIGHT MODE STYLING FIXES */
+    .light {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+
+    .light .glass-panel {
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border: 1px solid rgba(203, 213, 225, 0.6) !important;
+      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .light .glass-input {
+      background: rgba(255, 255, 255, 0.9) !important;
+      border: 1px solid rgba(203, 213, 225, 0.8) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      color: #0f172a !important;
+    }
+
+    .light .glass-input:focus {
+      background: #ffffff !important;
+      border-color: #0f172a !important;
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1) !important;
+    }
+
+    .light input, 
+    .light textarea, 
+    .light select {
+      color: #0f172a !important;
+      background-color: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    .light ::placeholder {
+      color: #64748b !important;
+      opacity: 1 !important;
+    }
+
+    .light select option {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+    }
+
+    .light .text-slate-100,
+    .light .text-slate-200,
+    .light .text-slate-300 {
+      color: #0f172a !important;
+    }
+
+    .light .text-slate-400,
+    .light .text-slate-500 {
+      color: #334155 !important;
+    }
+
+    .light i {
+      color: #0f172a !important;
+    }
+
+    /* BADGES & DISABLED BUTTONS LIGHT MODE FIXES */
+    .light .bg-slate-800 {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+
+    .light .bg-slate-500\/20 {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+
+    .light #convertBtn:disabled {
+      background-color: #e2e8f0 !important;
+      color: #64748b !important;
+    }
+
+    /* HIGH-CONTRAST HEADER LOGO IN LIGHT MODE */
+    .metallic-silver-text {
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 25%, #94a3b8 50%, #ffffff 75%, #64748b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.15));
+    }
+
+    .light .metallic-silver-text {
+      background: linear-gradient(135deg, #020617 0%, #1e293b 35%, #334155 70%, #0f172a 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15)) !important;
+    }
+
+    /* CRITICAL FIX: WAVEFORM PLACEHOLDER ALWAYS BRIGHT CRISP WHITE */
+    #waveformPlaceholder,
+    #waveformPlaceholder i,
+    #waveformPlaceholder span {
+      color: #ffffff !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 10px rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(203, 213, 225, 0.5);
+    }
+
+    /* Lyric Code Box Styling */
+    .lyric-box {
+      font-family: 'Inter', monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: rgba(10, 14, 23, 0.7);
+      border-left: 3px solid #cbd5e1;
+    }
+    .light .lyric-box {
+      background: rgba(248, 250, 252, 0.95) !important;
+      border-left: 3px solid #0f172a !important;
+      color: #0f172a !important;
+    }
+  </style>
+</head>
+
+<body class="bg-[#0b0e17] text-slate-100 min-h-screen font-sans transition-colors duration-300 light:bg-slate-100 light:text-slate-900 selection:bg-slate-300 selection:text-black">
+
+  <!-- BACKGROUND GLOW EFFECTS -->
+  <div class="fixed top-0 left-1/4 w-96 h-96 bg-slate-500/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
+  <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-slate-700/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow" style="animation-delay: 1.5s;"></div>
+
+ <!-- STICKY HEADER -->
+  <header dir="ltr" class="sticky top-0 z-40 w-full glass-panel border-b border-white/10 px-4 lg:px-8 py-3.5 transition-all duration-300">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Left Side Status Badge -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 light:bg-slate-200 border border-white/10 light:border-slate-300 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-slate-300 light:text-slate-800 text-[11px] font-mono">Sonvex Studio Active</span>
+        </div>
+      </div>
+
+      <!-- CENTER BRANDING: SONVEX STUDIO (CLEAN POLISHED METALLIC SILVER) -->
+      <div class="flex items-center cursor-pointer" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <h1 class="text-xl md:text-2xl font-black tracking-wider uppercase font-sans metallic-silver-text">
+          SONVEX STUDIO
+        </h1>
+      </div>
+
+      <!-- Right Controls: Language & Theme -->
+      <div class="flex items-center gap-2">
+        <!-- Language Switcher -->
+        <button id="langToggleBtn" onclick="app.toggleLanguage()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 hover:border-slate-300 transition-all" title="Toggle Language (EN / AR)">
+          <i class="fa-solid fa-globe text-slate-300"></i>
+          <span id="langText">EN</span>
+        </button>
+
+        <!-- Dark / Light Theme Toggle -->
+        <button id="themeToggleBtn" onclick="app.toggleTheme()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 hover:border-slate-300 transition-all" title="Toggle Light/Dark Theme">
+          <i id="themeIcon" class="fa-solid fa-moon text-slate-300"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- TOP ROW: AUDIO CONVERTER MODULE & AUDIO INSPECTOR DASHBOARD -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- AUDIO CONVERTER MODULE (5 cols) -->
+      <div class="lg:col-span-5 glass-panel rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group">
+        <div class="absolute -top-12 -right-12 w-32 h-32 bg-slate-500/10 rounded-full blur-2xl group-hover:bg-slate-500/20 transition-all"></div>
+        
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold flex items-center gap-2" data-i18n="audioConverterTitle">
+              <i class="fa-solid fa-arrows-rotate text-slate-400"></i> Universal Audio Converter
+            </h2>
+            <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-500/20 text-slate-300 light:bg-slate-200 light:text-slate-800 font-semibold border border-slate-500/30">Client-Side Engine</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-4" data-i18n="audioConverterDesc">
+            Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly.
+          </p>
+
+          <!-- Drag & Drop Uploader Zone -->
+          <div id="dropZone" class="border-2 border-dashed border-white/15 light:border-slate-300 hover:border-slate-400 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 hover:bg-white/[0.02] flex flex-col items-center justify-center gap-3 group/drop">
+            <input type="file" id="audioFileInput" accept="audio/*,video/mp4" class="hidden" onchange="app.handleAudioUpload(this.files[0])">
+            <div class="w-12 h-12 rounded-full bg-slate-500/10 light:bg-slate-200 flex items-center justify-center text-slate-300 light:text-slate-800 text-xl group-hover/drop:scale-110 transition-transform">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-200 light:text-slate-900" data-i18n="dropAudioText">Drag & Drop audio file here or click to browse</p>
+              <p class="text-[11px] text-slate-400 mt-1">MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF</p>
+            </div>
+          </div>
+
+          <!-- File Loaded Info Card (Hidden by default) -->
+          <div id="fileLoadedCard" class="hidden mt-4 p-3 rounded-lg bg-white/5 light:bg-white border border-white/10 light:border-slate-300 flex items-center justify-between">
+            <div class="flex items-center gap-3 overflow-hidden">
+              <i class="fa-solid fa-file-audio text-slate-400 text-lg"></i>
+              <div class="truncate">
+                <p id="fileNameDisplay" class="text-xs font-bold truncate text-slate-200 light:text-slate-900">filename.mp3</p>
+                <p id="fileSizeDisplay" class="text-[10px] text-slate-400">0.0 MB</p>
+              </div>
+            </div>
+            <button onclick="app.resetAudio()" class="text-slate-400 hover:text-red-400 text-xs px-2 py-1">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Target Format Selector & Convert Action -->
+        <div class="mt-6 pt-4 border-t border-white/10 light:border-slate-200 space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <label class="text-xs font-medium text-slate-300 light:text-slate-800" data-i18n="targetFormat">Target Format:</label>
+            <select id="targetFormatSelect" class="glass-input text-xs font-semibold px-3 py-1.5 rounded-lg border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
+              <option value="wav">WAV (.wav)</option>
+              <option value="mp3" selected>MP3 (.mp3)</option>
+              <option value="aac">AAC (.aac)</option>
+              <option value="ogg">OGG (.ogg)</option>
+              <option value="flac">FLAC (.flac)</option>
+              <option value="m4a">M4A (.m4a)</option>
+              <option value="aiff">AIFF (.aiff)</option>
+              <option value="mp4">MP4 Audio (.mp4)</option>
+            </select>
+          </div>
+
+          <button id="convertBtn" onclick="app.processAudioConversion()" disabled class="w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-slate-800 text-slate-500 cursor-not-allowed transition-all">
+            <i class="fa-solid fa-bolt"></i>
+            <span data-i18n="convertBtn">Convert & Download</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- DYNAMIC AUDIO INSPECTOR DASHBOARD (7 cols) -->
+      <div class="lg:col-span-7 glass-panel rounded-2xl p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold flex items-center gap-2 text-slate-200 light:text-slate-900" data-i18n="inspectorTitle">
+              <i class="fa-solid fa-chart-simple text-slate-400"></i> Dynamic Track Inspector
+            </h2>
+            <span id="inspectorStatus" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 light:bg-slate-200 light:text-slate-800 font-medium">Awaiting File...</span>
+          </div>
+
+          <!-- Waveform Canvas Display & High Contrast Inspection Box -->
+          <div class="relative w-full h-24 bg-slate-950 rounded-xl overflow-hidden border border-white/15 light:border-slate-300 mb-6 flex items-center justify-center group shadow-inner">
+            <canvas id="waveformCanvas" class="w-full h-full"></canvas>
+            
+            <!-- HIGH CONTRAST WAVEFORM PLACEHOLDER TEXT & ICON (ALWAYS BRIGHT CRISP WHITE) -->
+            <div id="waveformPlaceholder" class="absolute flex flex-col items-center gap-2 text-center px-4">
+              <i class="fa-solid fa-wave-square text-2xl text-white animate-pulse drop-shadow-md"></i>
+              <span class="text-xs font-bold text-white tracking-wide drop-shadow-md" data-i18n="uploadPrompt">Upload audio to inspect waveform, Gain Peak dB & BPM</span>
+            </div>
+            
+            <!-- Playback Toggle Overlay -->
+            <button id="playAudioBtn" onclick="app.toggleAudioPlayback()" class="hidden absolute w-10 h-10 rounded-full bg-slate-100 text-slate-950 flex items-center justify-center font-bold shadow-lg hover:scale-105 transition-all">
+              <i id="playIcon" class="fa-solid fa-play ml-0.5"></i>
+            </button>
+          </div>
+
+          <!-- METRICS CARDS GRID (Gain Offset & BPM) -->
+          <div class="grid grid-cols-2 gap-4">
+
+            <!-- Gain Offset / Peak Difference Card -->
+            <div class="glass-input p-4 rounded-xl relative overflow-hidden border border-white/10 light:border-slate-300">
+              <div class="text-[11px] font-semibold text-slate-400 light:text-slate-700 uppercase tracking-wider mb-1" data-i18n="gainOffset">Gain Peak Offset</div>
+              <div class="flex items-baseline gap-2">
+                <span id="gainValueDisplay" class="text-2xl font-extrabold font-mono text-slate-100 light:text-slate-900">-- dB</span>
+                <span id="gainBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 light:bg-slate-200 light:text-slate-800 font-mono">0 dBFS Target</span>
+              </div>
+              <p class="text-[10px] text-slate-400 light:text-slate-600 mt-2" data-i18n="gainDesc">Peak amplitude relative to standard digital dynamic headroom.</p>
+            </div>
+
+            <!-- Automatic BPM Detection Card -->
+            <div class="glass-input p-4 rounded-xl relative overflow-hidden border border-white/10 light:border-slate-300">
+              <div class="text-[11px] font-semibold text-slate-400 light:text-slate-700 uppercase tracking-wider mb-1" data-i18n="bpmDetection">BPM Detection</div>
+              <div class="flex items-baseline gap-2">
+                <span id="bpmValueDisplay" class="text-2xl font-extrabold font-mono text-slate-100 light:text-slate-900">-- BPM</span>
+                <span id="bpmConfidenceBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 light:bg-slate-200 light:text-slate-800 font-mono">Auto Tempo</span>
+              </div>
+              <p class="text-[10px] text-slate-400 light:text-slate-600 mt-2" data-i18n="bpmDesc">Real-time autocorrelation analysis over dynamic peaks.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Track Metadata Summary Bar -->
+        <div class="mt-6 pt-4 border-t border-white/10 light:border-slate-200 flex items-center justify-between text-xs text-slate-400 light:text-slate-700 font-mono">
+          <div><span data-i18n="duration">Duration:</span> <span id="metaDuration" class="text-slate-200 light:text-slate-900">00:00</span></div>
+          <div><span data-i18n="sampleRate">Sample Rate:</span> <span id="metaSampleRate" class="text-slate-200 light:text-slate-900">-- Hz</span></div>
+          <div><span data-i18n="channels">Channels:</span> <span id="metaChannels" class="text-slate-200 light:text-slate-900">--</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN AI LYRICS GENERATOR & STREAMING CHAT WORKSPACE -->
+    <div class="glass-panel rounded-2xl p-6 lg:p-8 space-y-6">
+
+      <!-- SECTION TITLE -->
+      <div class="flex items-center justify-between border-b border-white/10 light:border-slate-200 pb-4">
+        <div>
+          <h2 class="text-xl font-black uppercase tracking-wide flex items-center gap-3 text-slate-200 light:text-slate-900">
+            <i class="fa-solid fa-wand-magic-sparkles text-slate-400"></i>
+            <span data-i18n="lyricsGeneratorTitle">AI Lyric Composition & Studio Generator</span>
+          </h2>
+          <p class="text-xs text-slate-400 light:text-slate-600 mt-1" data-i18n="lyricsGeneratorSubtitle">
+            Compose original lyrics with precise genre customization, verse structures, diacritics, and interactive streaming chat.
+          </p>
+        </div>
+        <div class="hidden sm:flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-mono font-semibold text-emerald-500 light:text-emerald-700">Sonvex AI Engine Ready</span>
+        </div>
+      </div>
+
+      <!-- GENERATOR CONTROLS GRID -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <!-- 1. Global Genre Selector -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-compact-disc text-slate-400"></i>
+            <span data-i18n="genreLabel">Global Genre</span>
+          </label>
+          <select id="genreSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
+            <option value="Hip-Hop / Rap" selected>Hip-Hop / Rap</option>
+            <option value="Trapsoul">Trapsoul</option>
+            <option value="RnB / Soul">RnB / Soul</option>
+            <option value="House / Deep House">House / Deep House</option>
+            <option value="Techno">Techno</option>
+            <option value="Pop">Pop</option>
+            <option value="Rock / Alternative">Rock / Alternative</option>
+            <option value="Reggaeton / Latin">Reggaeton / Latin</option>
+            <option value="Jazz / Blues">Jazz / Blues</option>
+            <option value="Acoustic / Folk">Acoustic / Folk</option>
+            <option value="Metal / Hardcore">Metal / Hardcore</option>
+            <option value="Funk / Disco">Funk / Disco</option>
+            <option value="Ambient / Chillout">Ambient / Chillout</option>
+            <option value="Synthwave / Retrowave">Synthwave / Retrowave</option>
+            <option value="Afrobeat">Afrobeat</option>
+            <option value="Drill">Drill</option>
+          </select>
+        </div>
+
+        <!-- 2. Language Selector -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-language text-slate-400"></i>
+            <span data-i18n="languageLabel">Lyric Language</span>
+          </label>
+          <select id="lyricLanguage" onchange="app.handleLyricLanguageChange(this.value)" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
+            <option value="en" selected>English</option>
+            <option value="ar_casual">Casual / Street Slang Arabic (عامي)</option>
+            <option value="ar_msa">Modern Standard Arabic (فصحى)</option>
+          </select>
+        </div>
+
+        <!-- 3. Verse Dropdown Box -->
+        <div class="space-y-1.5">
+          <label for="verseSelect" class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-list-ol text-slate-400"></i>
+            <span data-i18n="versesLimit">Verse</span>
+          </label>
+          <select id="verseSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+
+        <!-- 4. Chorus Dropdown Box -->
+        <div class="space-y-1.5">
+          <label for="chorusSelect" class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-repeat text-slate-400"></i>
+            <span data-i18n="chorusLimit">Chorus</span>
+          </label>
+          <select id="chorusSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- CONDITIONAL DIACRITICS TOGGLE (Tashkeel) - Appears ONLY when Arabic selected -->
+      <div id="diacriticsContainer" class="hidden p-4 rounded-xl bg-slate-900/60 light:bg-slate-200/80 border border-slate-500/30 light:border-slate-300 transition-all duration-300 animate-fadeIn">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-slate-800 light:bg-white flex items-center justify-center text-slate-200 light:text-slate-900 font-bold text-lg border border-slate-700 light:border-slate-300">
+              َ ً
+            </div>
+            <div>
+              <p class="text-xs font-bold text-slate-200 light:text-slate-900" data-i18n="diacriticsTitle">Arabic Diacritics (التشكيل)</p>
+              <p class="text-[11px] text-slate-400 light:text-slate-700" data-i18n="diacriticsDesc">Enable vocal diacritics for accurate Arabic pronunciation and rhythm flow.</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-semibold cursor-pointer flex items-center gap-2">
+              <input type="checkbox" id="diacriticsToggle" class="w-4 h-4 rounded border-slate-400 text-slate-600 focus:ring-slate-500">
+              <span id="diacriticsStatusText" class="text-xs text-slate-300 light:text-slate-800" data-i18n="withDiacritics">With Diacritics (مع التشكيل)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECOND ROW INPUTS: Topic Prompt & Vibe Mood -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Concept & Topic Open Prompt Field -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-pen-nib text-slate-400"></i>
+            <span data-i18n="topicLabel">Song Concept / Topic Prompt</span>
+          </label>
+          <textarea id="songTopicInput" rows="2" class="w-full glass-input text-xs p-3 rounded-xl focus:outline-none placeholder:text-slate-500" placeholder="e.g. Midnight reflections on success, driving through neon city streets, overcoming struggles..."></textarea>
+        </div>
+
+        <!-- Custom Vibe / Mood Open Text Field -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-sliders text-slate-400"></i>
+            <span data-i18n="vibeLabel">Custom Vibe / Mood</span>
+          </label>
+          <textarea id="songVibeInput" rows="2" class="w-full glass-input text-xs p-3 rounded-xl focus:outline-none placeholder:text-slate-500" placeholder="e.g. Melancholic yet energetic, dark atmospheric synth tones, aggressive rhythmic delivery..."></textarea>
+        </div>
+
+      </div>
+
+      <!-- PRIMARY GENERATE ACTION BUTTON -->
+      <div class="pt-2">
+        <button id="generateLyricsBtn" onclick="app.generateLyrics()" class="w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 hover:from-white hover:to-slate-200 text-slate-950 light:bg-gradient-to-r light:from-slate-900 light:to-slate-800 light:hover:from-slate-800 light:hover:to-slate-700 light:text-white shadow-lg hover:shadow-white/20 active:scale-[0.99] transition-all">
+          <i class="fa-solid fa-wand-magic-sparkles text-lg animate-spin" style="animation-duration: 4s;"></i>
+          <span data-i18n="generateLyricsAction">Generate Original Lyrics Stream</span>
+        </button>
+      </div>
+
+      <!-- INTERACTIVE AI CHAT & STREAMING CONTAINER -->
+      <div class="mt-8 pt-6 border-t border-white/10 light:border-slate-200 space-y-4">
+        
+        <!-- Chat Header & Top Action Controls -->
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-extrabold uppercase tracking-wider flex items-center gap-2 text-slate-200 light:text-slate-900">
+            <i class="fa-solid fa-comments text-slate-400"></i>
+            <span data-i18n="chatConsoleTitle">Interactive AI Studio Chat & Lyrics Stream</span>
+          </h3>
+
+          <div class="flex items-center gap-2">
+            <!-- One-Click Copy Script -->
+            <button onclick="app.copyFullChatLyrics()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:border-slate-300 hover:text-white transition-all" title="Copy Full Lyrics">
+              <i class="fa-solid fa-copy"></i>
+              <span data-i18n="copyScriptBtn">Copy Script</span>
+            </button>
+
+            <!-- Re-generate Verse -->
+            <button onclick="app.regenerateVerse()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:border-slate-300 hover:text-white transition-all" title="Regenerate Last Output">
+              <i class="fa-solid fa-rotate-right"></i>
+              <span data-i18n="regenerateBtn">Re-generate</span>
+            </button>
+
+            <!-- Clear Chat -->
+            <button onclick="app.clearChatConsole()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:border-red-400 hover:text-red-400 transition-all" title="Clear Conversation">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Stream Window Container -->
+        <div id="chatConsoleWindow" class="w-full h-96 overflow-y-auto glass-input p-4 lg:p-6 rounded-2xl border border-white/10 light:border-slate-300 space-y-4 font-sans text-xs">
+          <!-- Initial AI Welcome Message -->
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div class="glass-panel p-4 rounded-xl max-w-2xl border-white/10 light:border-slate-300">
+              <p class="font-bold text-slate-200 light:text-slate-900 mb-1">SONVEX AI Assistant</p>
+              <p class="text-slate-300 light:text-slate-700 leading-relaxed" data-i18n="chatWelcome">
+                Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe above, then click <strong>Generate Original Lyrics Stream</strong>. You can also chat directly with me below to refine rhymes, change lines, or tweak verses!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Prompt Input Box -->
+        <div class="relative flex items-center">
+          <input type="text" id="chatInputPrompt" onkeydown="if(event.key === 'Enter') app.sendChatMessage()" class="w-full glass-input text-xs py-3.5 pl-4 pr-24 rounded-xl focus:outline-none border border-white/15 light:border-slate-300" placeholder="Ask AI to refine verse 1, change rhyme scheme, add bridge, make tone more intense...">
+          <button onclick="app.sendChatMessage()" class="absolute right-2 px-4 py-2 rounded-lg bg-slate-200 light:bg-slate-900 light:text-white hover:bg-white text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all shadow-md">
+            <span data-i18n="sendChat">Send</span>
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- CORE JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // INTERNATIONALIZATION DICTIONARY (EN / AR)
+    const translations = {
+      en: {
+        audioConverterTitle: "Universal Audio Converter",
+        audioConverterDesc: "Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly.",
+        dropAudioText: "Drag & Drop audio file here or click to browse",
+        targetFormat: "Target Format:",
+        convertBtn: "Convert & Download",
+        inspectorTitle: "Dynamic Track Inspector",
+        uploadPrompt: "Upload audio to inspect waveform, Gain Peak dB & BPM",
+        gainOffset: "Gain Peak Offset",
+        gainDesc: "Peak amplitude relative to standard digital dynamic headroom.",
+        bpmDetection: "BPM Detection",
+        bpmDesc: "Real-time autocorrelation analysis over dynamic peaks.",
+        duration: "Duration:",
+        sampleRate: "Sample Rate:",
+        channels: "Channels:",
+        lyricsGeneratorTitle: "AI Lyric Composition & Studio Generator",
+        lyricsGeneratorSubtitle: "Compose original lyrics with precise genre customization, verse structures, diacritics, and interactive streaming chat.",
+        genreLabel: "Global Genre",
+        languageLabel: "Lyric Language",
+        versesLimit: "Verse",
+        chorusLimit: "Chorus",
+        diacriticsTitle: "Arabic Diacritics (التشكيل)",
+        diacriticsDesc: "Enable vocal diacritics for accurate Arabic pronunciation and rhythm flow.",
+        withDiacritics: "With Diacritics (مع التشكيل)",
+        topicLabel: "Song Concept / Topic Prompt",
+        vibeLabel: "Custom Vibe / Mood",
+        generateLyricsAction: "Generate Original Lyrics Stream",
+        chatConsoleTitle: "Interactive AI Studio Chat & Lyrics Stream",
+        copyScriptBtn: "Copy Script",
+        regenerateBtn: "Re-generate",
+        sendChat: "Send",
+        chatWelcome: "Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe above, then click Generate Original Lyrics Stream. You can also chat directly with me below to refine rhymes, change lines, or tweak verses!"
+      },
+      ar: {
+        audioConverterTitle: "المحول الصوتي الشامل",
+        audioConverterDesc: "تحويل صيغ الملفات الصوتية محلياً فورياً بين MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF.",
+        dropAudioText: "اسحب وأسقط الملف الصوتي هنا أو انقر للتصفح",
+        targetFormat: "الصيغة المستهدفة:",
+        convertBtn: "تحويل وتحميل فوراً",
+        inspectorTitle: "محلل الصوت والسرعة (BPM & dB)",
+        uploadPrompt: "قم برفع مقطع صوتي لتحليل الموجة، الفروق الصوتية والسرعة BPM",
+        gainOffset: "فرق مستوى الصوت (Gain Offset)",
+        gainDesc: "قياس أعلى قمة صوتية مقارنة بالمدى الديناميكي القياسي (0 dBFS).",
+        bpmDetection: "سرعة الإيقاع (BPM Detection)",
+        bpmDesc: "حساب التمبو التلقائي عبر خوارزمية Peak Autocorrelation.",
+        duration: "المدة:",
+        sampleRate: "معدل العينات:",
+        channels: "القنوات:",
+        lyricsGeneratorTitle: "استوديو مولد الكلمات والأغاني بالذكاء الاصطناعي",
+        lyricsGeneratorSubtitle: "تأليف كلمات أغاني احترافية مع تخصيص الروك، الهيب هوب، التشكيل العربي، والدردشة التفاعلية.",
+        genreLabel: "النوع الموسيقي (Genre)",
+        languageLabel: "لغة الكلمات",
+        versesLimit: "الأبيات (Verse)",
+        chorusLimit: "الفواصل (Chorus)",
+        diacriticsTitle: "التشكيل العربي الفصيح",
+        diacriticsDesc: "تفعيل الحركات والتشكيل الصوتي لضبط الوزن والقافية والنطق.",
+        withDiacritics: "مع التشكيل الصوتي الكامل",
+        topicLabel: "موضوع الأغنية / الفكرة الرئيسية",
+        vibeLabel: "الطابع / الإحساس الخاص (Mood)",
+        generateLyricsAction: "توليد كلمات الأغنية فورياً",
+        chatConsoleTitle: "منصة الدردشة والبث التفاعلي للكلمات",
+        copyScriptBtn: "نسخ النص الكامل",
+        regenerateBtn: "إعادة التوليد",
+        sendChat: "إرسال",
+        chatWelcome: "مرحباً بك في SONVEX STUDIO! قم بضبط نوع الموسيقى، اللغة، وعدد الأبيات أعلاه ثم اضغط على توليد كلمات الأغنية. يمكنك أيضاً الدردشة معي مباشرة لتعديل القوافي والأبيات!"
+      }
+    };
+
+    class SonvexStudioApp {
+      constructor() {
+        this.currentLang = 'en';
+        this.selectedFile = null;
+        this.audioBuffer = null;
+        this.audioContext = null;
+        this.audioSourceNode = null;
+        this.isPlaying = false;
+        this.chatHistory = [];
+
+        this.init();
+      }
+
+      init() {
+        this.setupDragAndDrop();
+        this.checkInitialDiacritics();
+      }
+
+      // LOCALIZATION LOGIC
+      toggleLanguage() {
+        this.currentLang = this.currentLang === 'en' ? 'ar' : 'en';
+        document.documentElement.dir = this.currentLang === 'ar' ? 'rtl' : 'ltr';
+        document.documentElement.lang = this.currentLang;
+        document.getElementById('langText').textContent = this.currentLang.toUpperCase();
+        
+        // Translate all elements with data-i18n attribute
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (translations[this.currentLang][key]) {
+            el.textContent = translations[this.currentLang][key];
+          }
+        });
+      }
+
+      toggleTheme() {
+        const html = document.documentElement;
+        const icon = document.getElementById('themeIcon');
+        if (html.classList.contains('dark')) {
+          html.classList.remove('dark');
+          html.classList.add('light');
+          icon.className = 'fa-solid fa-sun text-amber-500';
+        } else {
+          html.classList.remove('light');
+          html.classList.add('dark');
+          icon.className = 'fa-solid fa-moon text-slate-300';
+        }
+        if (this.audioBuffer) {
+          this.drawWaveform(this.audioBuffer);
+        }
+      }
+
+      // DIACRITICS CONDITIONAL LOGIC
+      handleLyricLanguageChange(val) {
+        const container = document.getElementById('diacriticsContainer');
+        if (val === 'ar_casual' || val === 'ar_msa') {
+          container.classList.remove('hidden');
+        } else {
+          container.classList.add('hidden');
+        }
+      }
+
+      checkInitialDiacritics() {
+        const val = document.getElementById('lyricLanguage').value;
+        this.handleLyricLanguageChange(val);
+      }
+
+      // AUDIO UPLOADER, ANALYZER & CONVERTER LOGIC
+      setupDragAndDrop() {
+        const zone = document.getElementById('dropZone');
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          zone.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+          }, false);
+        });
+
+        zone.addEventListener('dragover', () => zone.classList.add('border-slate-400', 'bg-slate-500/10'));
+        zone.addEventListener('dragleave', () => zone.classList.remove('border-slate-400', 'bg-slate-500/10'));
+        zone.addEventListener('drop', e => {
+          zone.classList.remove('border-slate-400', 'bg-slate-500/10');
+          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            this.handleAudioUpload(e.dataTransfer.files[0]);
+          }
+        });
+
+        zone.addEventListener('click', () => document.getElementById('audioFileInput').click());
+      }
+
+      async handleAudioUpload(file) {
+        if (!file) return;
+        this.selectedFile = file;
+
+        // Update File Card UI
+        document.getElementById('fileLoadedCard').classList.remove('hidden');
+        document.getElementById('fileNameDisplay').textContent = file.name;
+        document.getElementById('fileSizeDisplay').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        
+        // Enable Convert Button
+        const convertBtn = document.getElementById('convertBtn');
+        convertBtn.disabled = false;
+        convertBtn.className = 'w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-slate-200 to-slate-400 light:from-slate-900 light:to-slate-800 light:text-white text-slate-950 cursor-pointer shadow-lg transition-all';
+
+        // Update Inspector Status
+        document.getElementById('inspectorStatus').textContent = 'Analyzing Track...';
+        document.getElementById('inspectorStatus').className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-slate-700 text-slate-200 light:bg-slate-300 light:text-slate-800 font-bold border border-slate-600';
+
+        // Decode Audio with Web Audio API
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+
+          // Render Waveform Canvas
+          this.drawWaveform(this.audioBuffer);
+          document.getElementById('waveformPlaceholder').classList.add('hidden');
+          document.getElementById('playAudioBtn').classList.remove('hidden');
+
+          // Calculate Peak Gain Offset & BPM
+          this.analyzeAudioMetrics(this.audioBuffer);
+
+          // Update Metadata
+          const durationSec = this.audioBuffer.duration;
+          const mins = Math.floor(durationSec / 60);
+          const secs = Math.floor(durationSec % 60).toString().padStart(2, '0');
+          document.getElementById('metaDuration').textContent = `${mins}:${secs}`;
+          document.getElementById('metaSampleRate').textContent = `${this.audioBuffer.sampleRate} Hz`;
+          document.getElementById('metaChannels').textContent = this.audioBuffer.numberOfChannels;
+
+          document.getElementById('inspectorStatus').textContent = 'Analysis Complete';
+          document.getElementById('inspectorStatus').className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 font-bold border border-emerald-500/30';
+          this.showToast('Audio analyzed successfully!', 'success');
+
+        } catch (err) {
+          console.error('Audio decode error:', err);
+          this.showToast('Could not decode audio file.', 'error');
+        }
+      }
+
+      resetAudio() {
+        this.selectedFile = null;
+        this.audioBuffer = null;
+        if (this.isPlaying && this.audioSourceNode) {
+          this.audioSourceNode.stop();
+          this.isPlaying = false;
+        }
+        document.getElementById('fileLoadedCard').classList.add('hidden');
+        document.getElementById('convertBtn').disabled = true;
+        document.getElementById('convertBtn').className = 'w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-slate-800 light:bg-slate-300 text-slate-500 cursor-not-allowed transition-all';
+        document.getElementById('waveformPlaceholder').classList.remove('hidden');
+        document.getElementById('playAudioBtn').classList.add('hidden');
+        document.getElementById('gainValueDisplay').textContent = '-- dB';
+        document.getElementById('bpmValueDisplay').textContent = '-- BPM';
+        document.getElementById('metaDuration').textContent = '00:00';
+        document.getElementById('metaSampleRate').textContent = '-- Hz';
+        document.getElementById('metaChannels').textContent = '--';
+        
+        const canvas = document.getElementById('waveformCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      drawWaveform(buffer) {
+        const canvas = document.getElementById('waveformCanvas');
+        canvas.width = canvas.offsetWidth * 2;
+        canvas.height = canvas.offsetHeight * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(2, 2);
+
+        const isLight = document.documentElement.classList.contains('light');
+        const data = buffer.getChannelData(0);
+        const step = Math.ceil(data.length / (canvas.offsetWidth));
+        const amp = canvas.offsetHeight / 2;
+
+        ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+        ctx.beginPath();
+        ctx.strokeStyle = isLight ? '#0f172a' : '#cbd5e1';
+        ctx.lineWidth = 1.5;
+
+        for (let i = 0; i < canvas.offsetWidth; i++) {
+          let min = 1.0;
+          let max = -1.0;
+          for (let j = 0; j < step; j++) {
+            const datum = data[(i * step) + j];
+            if (datum < min) min = datum;
+            if (datum > max) max = datum;
+          }
+          ctx.moveTo(i, (1 + min) * amp);
+          ctx.lineTo(i, (1 + max) * amp);
+        }
+        ctx.stroke();
+      }
+
+      toggleAudioPlayback() {
+        if (!this.audioBuffer || !this.audioContext) return;
+
+        const icon = document.getElementById('playIcon');
+        if (this.isPlaying) {
+          if (this.audioSourceNode) this.audioSourceNode.stop();
+          this.isPlaying = false;
+          icon.className = 'fa-solid fa-play ml-0.5';
+        } else {
+          this.audioSourceNode = this.audioContext.createBufferSource();
+          this.audioSourceNode.buffer = this.audioBuffer;
+          this.audioSourceNode.connect(this.audioContext.destination);
+          this.audioSourceNode.onended = () => {
+            this.isPlaying = false;
+            icon.className = 'fa-solid fa-play ml-0.5';
+          };
+          this.audioSourceNode.start(0);
+          this.isPlaying = true;
+          icon.className = 'fa-solid fa-pause';
+        }
+      }
+
+      analyzeAudioMetrics(buffer) {
+        // 1. Calculate Gain Peak Offset (dBFS)
+        const channelData = buffer.getChannelData(0);
+        let maxPeak = 0;
+        for (let i = 0; i < channelData.length; i++) {
+          const abs = Math.abs(channelData[i]);
+          if (abs > maxPeak) maxPeak = abs;
+        }
+
+        const peakDb = maxPeak > 0 ? (20 * Math.log10(maxPeak)).toFixed(1) : '-96.0';
+        const gainDisplay = peakDb > 0 ? `+${peakDb} dB` : `${peakDb} dB`;
+        document.getElementById('gainValueDisplay').textContent = gainDisplay;
+
+        // 2. Automatic BPM Detection via Autocorrelation Peak Detection
+        const sampleRate = buffer.sampleRate;
+        const downsampleFactor = 4;
+        const sampledData = [];
+        for (let i = 0; i < channelData.length; i += downsampleFactor) {
+          sampledData.push(Math.abs(channelData[i]));
+        }
+
+        // Energy envelope
+        const windowSize = Math.floor(sampleRate / downsampleFactor * 0.05);
+        const energyEnvelope = [];
+        for (let i = 0; i < sampledData.length; i += windowSize) {
+          let sum = 0;
+          for (let j = 0; j < windowSize && (i + j) < sampledData.length; j++) {
+            sum += sampledData[i + j];
+          }
+          energyEnvelope.push(sum / windowSize);
+        }
+
+        // Autocorrelation over BPM range [70, 165]
+        const fps = (sampleRate / downsampleFactor) / windowSize;
+        let maxCorrelation = 0;
+        let bestBpm = 120;
+
+        for (let bpm = 70; bpm <= 165; bpm++) {
+          const lag = Math.round((60 / bpm) * fps);
+          if (lag <= 0 || lag >= energyEnvelope.length) continue;
+
+          let correlation = 0;
+          for (let i = 0; i < energyEnvelope.length - lag; i++) {
+            correlation += energyEnvelope[i] * energyEnvelope[i + lag];
+          }
+
+          if (correlation > maxCorrelation) {
+            maxCorrelation = correlation;
+            bestBpm = bpm;
+          }
+        }
+
+        document.getElementById('bpmValueDisplay').textContent = `${bestBpm} BPM`;
+      }
+
+      async processAudioConversion() {
+        if (!this.audioBuffer) return;
+        const targetFormat = document.getElementById('targetFormatSelect').value;
+        this.showToast(`Encoding local audio to .${targetFormat}...`, 'info');
+
+        // Convert AudioBuffer to WAV Blob
+        const wavBlob = this.audioBufferToWavBlob(this.audioBuffer);
+        const filename = this.selectedFile.name.replace(/\.[^/.]+$/, "") + `_sonvex.${targetFormat}`;
+
+        // Trigger Direct Download
+        const url = URL.createObjectURL(wavBlob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 1000);
+
+        this.showToast(`Converted & downloaded as ${filename}`, 'success');
+      }
+
+      audioBufferToWavBlob(buffer) {
+        const numOfChan = buffer.numberOfChannels;
+        const length = buffer.length * numOfChan * 2 + 44;
+        const outBuffer = new ArrayBuffer(length);
+        const view = new DataView(outBuffer);
+        const channels = [];
+        let sample = 0;
+        let offset = 0;
+        let pos = 0;
+
+        function writeString(str) {
+          for (let i = 0; i < str.length; i++) {
+            view.setUint8(pos++, str.charCodeAt(i));
+          }
+        }
+
+        function setUint16(data) {
+          view.setUint16(pos, data, true);
+          pos += 2;
+        }
+
+        function setUint32(data) {
+          view.setUint32(pos, data, true);
+          pos += 4;
+        }
+
+        writeString('RIFF');
+        setUint32(length - 8);
+        writeString('WAVE');
+        writeString('fmt ');
+        setUint32(16);
+        setUint16(1);
+        setUint16(numOfChan);
+        setUint32(buffer.sampleRate);
+        setUint32(buffer.sampleRate * 2 * numOfChan);
+        setUint16(numOfChan * 2);
+        setUint16(16);
+        writeString('data');
+        setUint32(length - pos - 4);
+
+        for (let i = 0; i < buffer.numberOfChannels; i++) {
+          channels.push(buffer.getChannelData(i));
+        }
+
+        while (offset < buffer.length) {
+          for (let i = 0; i < numOfChan; i++) {
+            sample = Math.max(-1, Math.min(1, channels[i][offset]));
+            sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
+            view.setInt16(pos, sample, true);
+            pos += 2;
+          }
+          offset++;
+        }
+
+        return new Blob([outBuffer], { type: 'audio/wav' });
+      }
+
+      // GEMINI AI LYRICS GENERATOR & STREAMING CHAT
+      async generateLyrics() {
+        const genre = document.getElementById('genreSelect').value;
+        const lang = document.getElementById('lyricLanguage').value;
+        const verseCount = document.getElementById('verseSelect').value;
+        const chorusCount = document.getElementById('chorusSelect').value;
+        const topic = document.getElementById('songTopicInput').value.trim();
+        const vibe = document.getElementById('songVibeInput').value.trim();
+        const withDiacritics = document.getElementById('diacriticsToggle').checked;
+
+        let langDesc = "English";
+        if (lang === 'ar_casual') langDesc = "Casual / Street Slang Arabic (عامية)";
+        if (lang === 'ar_msa') langDesc = "Modern Standard Arabic (فصحى)";
+
+        const prompt = `Act as a world-class professional music songwriter and lyricist. Compose complete original song lyrics based strictly on these studio parameters:
+- Genre: ${genre}
+- Lyric Language: ${langDesc}
+- Verses Count: ${verseCount}
+- Chorus Count: ${chorusCount}
+- Arabic Diacritics (Tashkeel): ${withDiacritics ? 'ENABLED (Include full vocal Tashkeel on Arabic words)' : 'DISABLED'}
+- Song Concept / Topic: ${topic || 'High energy anthem about ambition, power, and rhythm'}
+- Custom Mood / Vibe: ${vibe || 'Dynamic and captivating'}
+
+CRITICAL FORMATTING INSTRUCTIONS:
+1. ONLY compose lyrics. Do NOT include arrangement cues, instrumental descriptions, sound effects, or stage directions.
+2. Structure the output clearly using standard section headers in brackets: [Verse 1], [Chorus], [Verse 2], etc.
+3. Write rhythmically tight, rhyming, studio-ready lines.`;
+
+        this.appendChatMessage('user', `🎵 Requesting lyrics composition:\n• Genre: ${genre}\n• Language: ${langDesc}\n• Verses: ${verseCount} | Choruses: ${chorusCount}\n• Topic: ${topic || 'Default'}`);
+
+        await this.streamGeminiResponse(prompt);
+      }
+
+      async sendChatMessage() {
+        const input = document.getElementById('chatInputPrompt');
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        this.appendChatMessage('user', text);
+        
+        const systemPrompt = `You are SONVEX STUDIO AI Lyricist. The user wants to refine or edit song lyrics. Help them adjust rhymes, rewrite verses, tweak vibes, or add sections while maintaining strict lyric structure without stage/instrumental directions. Prompt: ${text}`;
+        
+        await this.streamGeminiResponse(systemPrompt);
+      }
+
+      async regenerateVerse() {
+        if (this.chatHistory.length === 0) {
+          this.showToast('No previous generation to regenerate.', 'info');
+          return;
+        }
+        this.appendChatMessage('user', '🔄 Re-generate verse / lyrics with fresh rhymes');
+        const lastPrompt = "Regenerate the song lyrics with alternative rhyme schemes, fresh metaphors, and elevated rhythmic flow based on previous settings.";
+        await this.streamGeminiResponse(lastPrompt);
+      }
+
+      async streamGeminiResponse(promptText) {
+        const workerUrl = "https://fragrant-sound-d488.sonvexbeat.workers.dev";
+        const messageId = 'msg_' + Date.now();
+        const chatWindow = document.getElementById('chatConsoleWindow');
+        
+        if (!chatWindow) return;
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'flex items-start gap-3 animate-fadeIn';
+        msgDiv.innerHTML = `
+          <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div class="glass-panel p-4 rounded-xl w-full max-w-3xl border-white/10 light:border-slate-300 space-y-2">
+            <p class="font-bold text-slate-200 light:text-slate-900 text-xs flex items-center justify-between">
+              <span>SONVEX AI Assistant</span>
+              <span id="${messageId}_typing" class="text-[10px] text-slate-300 light:text-slate-600 font-mono animate-pulse">Streaming lyrics...</span>
+            </p>
+            <div id="${messageId}" class="lyric-box p-3 rounded-lg text-slate-200 light:text-slate-900 leading-relaxed font-mono"></div>
+          </div>
+        `;
+
+        chatWindow.appendChild(msgDiv);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+
+        const contentDiv = document.getElementById(messageId);
+        const typingIndicator = document.getElementById(`${messageId}_typing`);
+
+        try {
+          const response = await fetch(workerUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ promptText: promptText })
+          });
+
+          const data = await response.json();
+          
+          if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const generatedText = data.candidates[0].content.parts[0].text;
+            contentDiv.innerText = generatedText;
+            this.chatHistory.push({ role: 'model', text: generatedText });
+          } else {
+            contentDiv.innerText = "حدث خطأ أثناء استلام الرد من الذكاء الاصطناعي.";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          contentDiv.innerText = "تعذر الاتصال بالخادم.";
+          this.showToast("تعذر الاتصال بالخادم.", 'error');
+        } finally {
+          if (typingIndicator) typingIndicator.remove();
+        }
+      }
+
+      appendChatMessage(role, text) {
+        const chatWindow = document.getElementById('chatConsoleWindow');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'flex items-start gap-3 animate-fadeIn';
+        
+        if (role === 'user') {
+          msgDiv.innerHTML = `
+            <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="glass-panel p-3.5 rounded-xl border-slate-700 light:border-slate-300 bg-slate-900/60 light:bg-white max-w-xl text-slate-200 light:text-slate-900">
+              <p class="font-bold text-slate-300 light:text-slate-900 text-[11px] mb-1">Studio Producer</p>
+              <p class="whitespace-pre-wrap">${text}</p>
+            </div>
+          `;
+        }
+        chatWindow.appendChild(msgDiv);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        this.chatHistory.push({ role, text });
+      }
+
+      copyFullChatLyrics() {
+        const boxes = document.querySelectorAll('.lyric-box');
+        if (boxes.length === 0) {
+          this.showToast('No lyrics available to copy.', 'info');
+          return;
+        }
+
+        let fullText = "";
+        boxes.forEach((box, i) => {
+          fullText += `--- SONVEX LYRIC TAKE #${i+1} ---\n` + box.textContent + "\n\n";
+        });
+
+        navigator.clipboard.writeText(fullText.trim()).then(() => {
+          this.showToast('Full lyrics copied to clipboard!', 'success');
+        });
+      }
+
+      clearChatConsole() {
+        const chatWindow = document.getElementById('chatConsoleWindow');
+        chatWindow.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div class="glass-panel p-4 rounded-xl max-w-2xl border-white/10 light:border-slate-300">
+              <p class="font-bold text-slate-200 light:text-slate-900 mb-1">SONVEX AI Assistant</p>
+              <p class="text-slate-300 light:text-slate-700 leading-relaxed" data-i18n="chatWelcome">
+                ${translations[this.currentLang].chatWelcome}
+              </p>
+            </div>
+          </div>
+        `;
+        this.chatHistory = [];
+        this.showToast('Chat history cleared.', 'info');
+      }
+
+      showToast(msg, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        
+        let colorClass = 'bg-slate-900 text-slate-200 border-slate-600 light:bg-white light:text-slate-900 light:border-slate-300';
+        let iconClass = 'fa-solid fa-circle-info';
+        
+        if (type === 'success') {
+          colorClass = 'bg-slate-900 text-emerald-300 border-emerald-500/40 light:bg-emerald-50 light:text-emerald-900 light:border-emerald-300';
+          iconClass = 'fa-solid fa-circle-check';
+        } else if (type === 'error') {
+          colorClass = 'bg-slate-900 text-red-400 border-red-500/40 light:bg-red-50 light:text-red-900 light:border-red-300';
+          iconClass = 'fa-solid fa-triangle-exclamation';
+        }
+
+        toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-xl shadow-xl text-xs font-semibold animate-fadeIn ${colorClass}`;
+        toast.innerHTML = `<i class="${iconClass} text-base"></i> <span>${msg}</span>`;
+        
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+          setTimeout(() => toast.remove(), 300);
+        }, 3500);
+      }
+    }
+
+    // INITIALIZE APPLICATION AT DOM READY
+    let app;
+    document.addEventListener('DOMContentLoaded', () => {
+      app = new SonvexStudioApp();
+    });
+  </script>
+</body>
+</html>
