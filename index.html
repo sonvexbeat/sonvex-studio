@@ -15,26 +15,25 @@
         extend: {
           colors: {
             brand: {
-              50: '#f0f4ff',
-              100: '#e0e9ff',
-              400: '#809fff',
-              500: '#4f75ff',
-              600: '#3b5bdb',
-              900: '#1b2a6b',
+              50: '#f5f7ff',
+              100: '#ebf0ff',
+              400: '#a5b4fc',
+              500: '#818cf8',
+              600: '#6366f1',
+              900: '#0c0d28',
             },
             accent: {
-              cyan: '#00f2fe',
-              purple: '#7f00ff',
-              pink: '#ff007f',
-              emerald: '#00e676'
+              blue: '#3b82f6',
+              indigo: '#6366f1',
+              purple: '#8b5cf6',
+              cobalt: '#1e3a8a'
             }
           },
           fontFamily: {
             sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
           },
           animation: {
-            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'glow-pulse': 'glow 2.5s ease-in-out infinite alternate',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           }
         }
       }
@@ -48,152 +47,240 @@
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Wavesurfer.js & Regions Plugin CDN -->
+  <script src="https://unpkg.com/wavesurfer.js@7"></script>
+  <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
   
   <style>
-    /* STRICT GLASSMORPHISM AESTHETIC SYSTEM (DARK MODE) */
+    /* RADICAL COSMIC MIDNIGHT-INDIGO THEME FOR DARK MODE (ZERO GRAY) */
+    html {
+      background-color: #04040f !important;
+    }
+    body {
+      background-color: transparent !important;
+      color: #ebf0ff !important;
+    }
+
+    #bgGradientLayer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: -20 !important;
+      background: radial-gradient(circle at top left, #04040f 0%, #080822 50%, #03030b 100%) !important;
+    }
+
+    #bgMusicNotesCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: -10 !important;
+    }
+
     .glass-panel {
-      background: rgba(18, 24, 38, 0.65);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      background: rgba(10, 12, 34, 0.6);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      box-shadow: 0 20px 40px -15px rgba(2, 2, 8, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
 
     .glass-input {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(99, 102, 241, 0.05);
+      border: 1px solid rgba(99, 102, 241, 0.2);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
+      color: #ebf0ff !important;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .glass-input:focus {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.4);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+      background: rgba(99, 102, 241, 0.1);
+      border-color: rgba(99, 102, 241, 0.5);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
     }
 
     /* SELECT OPTION DROPDOWN VISIBILITY (DARK MODE) */
     select option {
-      background-color: #0f172a !important;
-      color: #f8fafc !important;
+      background-color: #080822 !important;
+      color: #ebf0ff !important;
       padding: 8px 12px;
     }
 
-    /* COMPREHENSIVE LIGHT MODE STYLING FIXES */
+    /* PREMIUM LIGHT MODE STYLING OVERHAUL (ICE-BLUE THEME, ZERO GRAY, DEEP SHADOWS) */
     .light {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
+      background-color: #f0f3ff !important;
+    }
+    .light body {
+      background-color: transparent !important;
+      color: #0b0f2f !important;
+    }
+
+    .light #bgGradientLayer {
+      background: linear-gradient(135deg, #f0f3ff 0%, #e5eaff 100%) !important;
     }
 
     .light .glass-panel {
-      background: rgba(255, 255, 255, 0.85) !important;
-      backdrop-filter: blur(20px) !important;
-      -webkit-backdrop-filter: blur(20px) !important;
-      border: 1px solid rgba(203, 213, 225, 0.6) !important;
-      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+      background: rgba(255, 255, 255, 0.88) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      border: 1px solid rgba(99, 102, 241, 0.35) !important;
+      box-shadow: 0 30px 60px -15px rgba(9, 12, 35, 0.22), 0 0 25px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
     }
 
     .light .glass-input {
-      background: rgba(255, 255, 255, 0.9) !important;
-      border: 1px solid rgba(203, 213, 225, 0.8) !important;
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: 1px solid rgba(99, 102, 241, 0.38) !important;
       backdrop-filter: blur(16px) !important;
       -webkit-backdrop-filter: blur(16px) !important;
-      color: #0f172a !important;
+      color: #0b0f2f !important;
+      box-shadow: inset 0 1.5px 3px rgba(9, 12, 30, 0.04) !important;
     }
 
     .light .glass-input:focus {
       background: #ffffff !important;
-      border-color: #0f172a !important;
-      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1) !important;
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
     }
 
     .light input, 
     .light textarea, 
     .light select {
-      color: #0f172a !important;
-      background-color: rgba(255, 255, 255, 0.95) !important;
-    }
-
-    .light ::placeholder {
-      color: #64748b !important;
-      opacity: 1 !important;
+      color: #0b0f2f !important;
+      background-color: rgba(255, 255, 255, 0.98) !important;
+      border: 1px solid rgba(99, 102, 241, 0.35) !important;
     }
 
     .light select option {
       background-color: #ffffff !important;
-      color: #0f172a !important;
+      color: #0b0f2f !important;
     }
 
+    /* PREMIUM SHADED UPLOAD & DRAG & DROP BOXES FOR LIGHT MODE (COBALT/INDIGO ACCENTS) */
+    .light #dropZone,
+    .light #remasterDropZone {
+      background: rgba(238, 242, 255, 0.75) !important;
+      border: 2px dashed rgba(99, 102, 241, 0.65) !important;
+      box-shadow: 0 8px 25px -6px rgba(9, 12, 30, 0.08), inset 0 1px 2px rgba(99, 102, 241, 0.05) !important;
+      transition: all 0.25s ease-in-out;
+    }
+
+    .light #dropZone:hover,
+    .light #remasterDropZone:hover {
+      border-color: #6366f1 !important;
+      background: #ffffff !important;
+      box-shadow: 0 12px 30px -5px rgba(99, 102, 241, 0.18) !important;
+    }
+
+    /* GLOBAL TEXT REMAPPING IN LIGHT MODE (ZERO GRAY) */
     .light .text-slate-100,
     .light .text-slate-200,
-    .light .text-slate-300 {
-      color: #0f172a !important;
+    .light .text-slate-300,
+    .light .text-indigo-100,
+    .light .text-indigo-200,
+    .light .text-indigo-300 {
+      color: #0b0f2f !important;
     }
 
     .light .text-slate-400,
-    .light .text-slate-500 {
-      color: #334155 !important;
+    .light .text-slate-505,
+    .light .text-indigo-400,
+    .light .text-indigo-500,
+    .light label {
+      color: #3730a3 !important; /* Deep Indigo instead of gray */
+    }
+
+    .light p {
+      color: #0f172a !important;
     }
 
     .light i {
-      color: #0f172a !important;
+      color: #3730a3 !important;
     }
 
-    /* BADGES & DISABLED BUTTONS LIGHT MODE FIXES */
-    .light .bg-slate-800 {
-      background-color: #e2e8f0 !important;
-      color: #0f172a !important;
+    .light h1, .light h2, .light h3, .light h4, .light span:not(.badge-exclude) {
+      color: #0b0f2f !important;
     }
 
-    .light .bg-slate-500\/20 {
-      background-color: #e2e8f0 !important;
-      color: #0f172a !important;
-      border-color: #cbd5e1 !important;
+    /* Readability of Green and Purple status labels in Light Mode */
+    .light .text-emerald-400 {
+      color: #047857 !important;
+    }
+    .light .text-purple-400 {
+      color: #6d28d9 !important;
     }
 
-    .light #convertBtn:disabled {
-      background-color: #e2e8f0 !important;
-      color: #64748b !important;
+    /* BADGES & DISABLED BUTTONS LIGHT MODE FIXES (COBALT & VIOLET BASE) */
+    .light .bg-slate-800,
+    .light .bg-indigo-900 {
+      background-color: #e0e7ff !important;
+      color: #3730a3 !important;
+    }
+
+    .light .bg-slate-500\/20,
+    .light .bg-indigo-955\/60 {
+      background-color: #e0e7ff !important;
+      color: #3730a3 !important;
+      border-color: #a5b4fc !important;
+    }
+
+    .light #convertBtn:disabled,
+    .light #remasterBtn:disabled {
+      background-color: #ebf0ff !important;
+      color: #818cf8 !important;
+      border: 1px solid #c7d2fe !important;
     }
 
     /* HIGH-CONTRAST HEADER LOGO IN LIGHT MODE */
     .metallic-silver-text {
-      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 25%, #94a3b8 50%, #ffffff 75%, #64748b 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #ebf0ff 30%, #a5b4fc 60%, #ffffff 90%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.15));
+      filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.05));
     }
 
     .light .metallic-silver-text {
-      background: linear-gradient(135deg, #020617 0%, #1e293b 35%, #334155 70%, #0f172a 100%) !important;
+      background: linear-gradient(135deg, #0b0f2f 0%, #4338ca 50%, #030712 100%) !important;
       -webkit-background-clip: text !important;
       -webkit-text-fill-color: transparent !important;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15)) !important;
+      filter: drop-shadow(0 1px 3px rgba(99, 102, 241, 0.2)) !important;
     }
 
     /* CRITICAL FIX: WAVEFORM PLACEHOLDER ALWAYS BRIGHT CRISP WHITE */
+    .light #waveformPlaceholder,
+    .light #waveformPlaceholder i,
+    .light #waveformPlaceholder span,
     #waveformPlaceholder,
     #waveformPlaceholder i,
     #waveformPlaceholder span {
       color: #ffffff !important;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 10px rgba(255, 255, 255, 0.2) !important;
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95), 0 0 10px rgba(99, 102, 241, 0.4) !important;
     }
 
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.05);
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(99, 102, 241, 0.25);
       border-radius: 9999px;
     }
+    .light ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.15);
+    }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(203, 213, 225, 0.5);
+      background: rgba(99, 102, 241, 0.45);
     }
 
     /* Lyric Code Box Styling */
@@ -201,32 +288,83 @@
       font-family: 'Inter', monospace;
       white-space: pre-wrap;
       word-break: break-word;
-      background: rgba(10, 14, 23, 0.7);
-      border-left: 3px solid #cbd5e1;
+      background: rgba(5, 5, 20, 0.7);
+      border-left: 2px solid #6366f1;
     }
     .light .lyric-box {
-      background: rgba(248, 250, 252, 0.95) !important;
-      border-left: 3px solid #0f172a !important;
-      color: #0f172a !important;
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-left: 2px solid #312e81 !important;
+      color: #0b0f2f !important;
+    }
+
+    /* DIACRITICS LIGHT MODE FIX */
+    .light #diacriticsContainer {
+      background-color: rgba(99, 102, 241, 0.08) !important;
+      border-color: rgba(99, 102, 241, 0.28) !important;
+    }
+    .light #diacriticsContainer .w-7 {
+      background-color: #3730a3 !important;
+      color: #ffffff !important;
+      border-color: rgba(99, 102, 241, 0.3) !important;
+    }
+    .light #diacriticsStatusText {
+      color: #3730a3 !important;
+    }
+
+    /* PLACEHOLDER ACCENT STYLING */
+    ::placeholder {
+      color: rgba(235, 240, 255, 0.35) !important;
+    }
+    .light ::placeholder {
+      color: #4f46e5 !important;
+      opacity: 0.65 !important;
+    }
+
+    /* METADATA LIGHT MODE CONTRAST FIX */
+    .light .font-mono div,
+    .light .font-mono div span {
+      color: #3730a3 !important;
+    }
+    .light #metaDuration,
+    .light #metaSampleRate,
+    .light #metaChannels {
+      color: #0b0f2f !important;
+      font-weight: 700 !important;
+    }
+
+    /* BADGES LIGHT MODE BACKGROUND FIX */
+    .light .font-mono.px-2,
+    .light #inspectorStatus,
+    .light #detectedFormatBadge,
+    .light #remasterFormatBadge,
+    .light header .px-3.py-1\.5 {
+      background-color: rgba(99, 102, 241, 0.12) !important;
+      color: #3730a3 !important;
+      border-color: rgba(99, 102, 241, 0.28) !important;
+    }
+    .light header .px-3.py-1\.5 span {
+      color: #3730a3 !important;
     }
   </style>
 </head>
 
-<body class="bg-[#0b0e17] text-slate-100 min-h-screen font-sans transition-colors duration-300 light:bg-slate-100 light:text-slate-900 selection:bg-slate-300 selection:text-black">
+<body class="min-h-screen font-sans transition-colors duration-300 selection:bg-indigo-200 selection:text-black">
 
-  <!-- BACKGROUND GLOW EFFECTS -->
-  <div class="fixed top-0 left-1/4 w-96 h-96 bg-slate-500/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
-  <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-slate-700/10 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow" style="animation-delay: 1.5s;"></div>
+  <!-- FIXED BACKGROUND LAYER & ANIMATED CANVAS -->
+  <div id="bgGradientLayer" class="fixed top-0 left-0 w-full h-full -z-30 pointer-events-none transition-all duration-300"></div>
+  <canvas id="bgMusicNotesCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none -z-20"></canvas>
+  <div class="fixed top-0 left-1/4 w-96 h-96 bg-indigo-600/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
+  <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow" style="animation-delay: 2s;"></div>
 
- <!-- STICKY HEADER -->
-  <header dir="ltr" class="sticky top-0 z-40 w-full glass-panel border-b border-white/10 px-4 lg:px-8 py-3.5 transition-all duration-300">
+  <!-- STICKY HEADER -->
+  <header dir="ltr" class="sticky top-0 z-40 w-full glass-panel border-b border-indigo-500/10 px-4 lg:px-8 py-3.5 transition-all duration-300">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
       
       <!-- Left Side Status Badge -->
       <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/60 light:bg-slate-200 border border-white/10 light:border-slate-300 text-xs font-semibold">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-slate-300 light:text-slate-800 text-[11px] font-mono">Sonvex Studio Active</span>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-950/60 light:bg-indigo-50/70 border border-indigo-500/10 light:border-indigo-200 text-xs font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+          <span class="text-indigo-300 light:text-indigo-900 text-[10px] font-mono">Sonvex Studio Active</span>
         </div>
       </div>
 
@@ -240,14 +378,14 @@
       <!-- Right Controls: Language & Theme -->
       <div class="flex items-center gap-2">
         <!-- Language Switcher -->
-        <button id="langToggleBtn" onclick="app.toggleLanguage()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 hover:border-slate-300 transition-all" title="Toggle Language (EN / AR)">
-          <i class="fa-solid fa-globe text-slate-300"></i>
+        <button id="langToggleBtn" onclick="app.toggleLanguage()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 hover:border-indigo-400 transition-all" title="Toggle Language (EN / AR)">
+          <i class="fa-solid fa-globe text-indigo-300"></i>
           <span id="langText">EN</span>
         </button>
 
         <!-- Dark / Light Theme Toggle -->
-        <button id="themeToggleBtn" onclick="app.toggleTheme()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 hover:border-slate-300 transition-all" title="Toggle Light/Dark Theme">
-          <i id="themeIcon" class="fa-solid fa-moon text-slate-300"></i>
+        <button id="themeToggleBtn" onclick="app.toggleTheme()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 hover:border-indigo-400 transition-all" title="Toggle Light/Dark Theme">
+          <i id="themeIcon" class="fa-solid fa-moon text-indigo-300"></i>
         </button>
       </div>
     </div>
@@ -256,169 +394,39 @@
   <!-- MAIN WRAPPER CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- TOP ROW: AUDIO CONVERTER MODULE & AUDIO INSPECTOR DASHBOARD -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-      <!-- AUDIO CONVERTER MODULE (5 cols) -->
-      <div class="lg:col-span-5 glass-panel rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group">
-        <div class="absolute -top-12 -right-12 w-32 h-32 bg-slate-500/10 rounded-full blur-2xl group-hover:bg-slate-500/20 transition-all"></div>
-        
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold flex items-center gap-2" data-i18n="audioConverterTitle">
-              <i class="fa-solid fa-arrows-rotate text-slate-400"></i> Universal Audio Converter
-            </h2>
-            <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-500/20 text-slate-300 light:bg-slate-200 light:text-slate-800 font-semibold border border-slate-500/30">Client-Side Engine</span>
-          </div>
-          <p class="text-xs text-slate-400 mb-4" data-i18n="audioConverterDesc">
-            Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly.
-          </p>
-
-          <!-- Drag & Drop Uploader Zone -->
-          <div id="dropZone" class="border-2 border-dashed border-white/15 light:border-slate-300 hover:border-slate-400 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 hover:bg-white/[0.02] flex flex-col items-center justify-center gap-3 group/drop">
-            <input type="file" id="audioFileInput" accept="audio/*,video/mp4" class="hidden" onchange="app.handleAudioUpload(this.files[0])">
-            <div class="w-12 h-12 rounded-full bg-slate-500/10 light:bg-slate-200 flex items-center justify-center text-slate-300 light:text-slate-800 text-xl group-hover/drop:scale-110 transition-transform">
-              <i class="fa-solid fa-cloud-arrow-up"></i>
-            </div>
-            <div>
-              <p class="text-sm font-semibold text-slate-200 light:text-slate-900" data-i18n="dropAudioText">Drag & Drop audio file here or click to browse</p>
-              <p class="text-[11px] text-slate-400 mt-1">MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF</p>
-            </div>
-          </div>
-
-          <!-- File Loaded Info Card (Hidden by default) -->
-          <div id="fileLoadedCard" class="hidden mt-4 p-3 rounded-lg bg-white/5 light:bg-white border border-white/10 light:border-slate-300 flex items-center justify-between">
-            <div class="flex items-center gap-3 overflow-hidden">
-              <i class="fa-solid fa-file-audio text-slate-400 text-lg"></i>
-              <div class="truncate">
-                <p id="fileNameDisplay" class="text-xs font-bold truncate text-slate-200 light:text-slate-900">filename.mp3</p>
-                <p id="fileSizeDisplay" class="text-[10px] text-slate-400">0.0 MB</p>
-              </div>
-            </div>
-            <button onclick="app.resetAudio()" class="text-slate-400 hover:text-red-400 text-xs px-2 py-1">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Target Format Selector & Convert Action -->
-        <div class="mt-6 pt-4 border-t border-white/10 light:border-slate-200 space-y-3">
-          <div class="flex items-center justify-between gap-3">
-            <label class="text-xs font-medium text-slate-300 light:text-slate-800" data-i18n="targetFormat">Target Format:</label>
-            <select id="targetFormatSelect" class="glass-input text-xs font-semibold px-3 py-1.5 rounded-lg border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
-              <option value="wav">WAV (.wav)</option>
-              <option value="mp3" selected>MP3 (.mp3)</option>
-              <option value="aac">AAC (.aac)</option>
-              <option value="ogg">OGG (.ogg)</option>
-              <option value="flac">FLAC (.flac)</option>
-              <option value="m4a">M4A (.m4a)</option>
-              <option value="aiff">AIFF (.aiff)</option>
-              <option value="mp4">MP4 Audio (.mp4)</option>
-            </select>
-          </div>
-
-          <button id="convertBtn" onclick="app.processAudioConversion()" disabled class="w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-slate-800 text-slate-500 cursor-not-allowed transition-all">
-            <i class="fa-solid fa-bolt"></i>
-            <span data-i18n="convertBtn">Convert & Download</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- DYNAMIC AUDIO INSPECTOR DASHBOARD (7 cols) -->
-      <div class="lg:col-span-7 glass-panel rounded-2xl p-6 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold flex items-center gap-2 text-slate-200 light:text-slate-900" data-i18n="inspectorTitle">
-              <i class="fa-solid fa-chart-simple text-slate-400"></i> Dynamic Track Inspector
-            </h2>
-            <span id="inspectorStatus" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 light:bg-slate-200 light:text-slate-800 font-medium">Awaiting File...</span>
-          </div>
-
-          <!-- Waveform Canvas Display & High Contrast Inspection Box -->
-          <div class="relative w-full h-24 bg-slate-950 rounded-xl overflow-hidden border border-white/15 light:border-slate-300 mb-6 flex items-center justify-center group shadow-inner">
-            <canvas id="waveformCanvas" class="w-full h-full"></canvas>
-            
-            <!-- HIGH CONTRAST WAVEFORM PLACEHOLDER TEXT & ICON (ALWAYS BRIGHT CRISP WHITE) -->
-            <div id="waveformPlaceholder" class="absolute flex flex-col items-center gap-2 text-center px-4">
-              <i class="fa-solid fa-wave-square text-2xl text-white animate-pulse drop-shadow-md"></i>
-              <span class="text-xs font-bold text-white tracking-wide drop-shadow-md" data-i18n="uploadPrompt">Upload audio to inspect waveform, Gain Peak dB & BPM</span>
-            </div>
-            
-            <!-- Playback Toggle Overlay -->
-            <button id="playAudioBtn" onclick="app.toggleAudioPlayback()" class="hidden absolute w-10 h-10 rounded-full bg-slate-100 text-slate-950 flex items-center justify-center font-bold shadow-lg hover:scale-105 transition-all">
-              <i id="playIcon" class="fa-solid fa-play ml-0.5"></i>
-            </button>
-          </div>
-
-          <!-- METRICS CARDS GRID (Gain Offset & BPM) -->
-          <div class="grid grid-cols-2 gap-4">
-
-            <!-- Gain Offset / Peak Difference Card -->
-            <div class="glass-input p-4 rounded-xl relative overflow-hidden border border-white/10 light:border-slate-300">
-              <div class="text-[11px] font-semibold text-slate-400 light:text-slate-700 uppercase tracking-wider mb-1" data-i18n="gainOffset">Gain Peak Offset</div>
-              <div class="flex items-baseline gap-2">
-                <span id="gainValueDisplay" class="text-2xl font-extrabold font-mono text-slate-100 light:text-slate-900">-- dB</span>
-                <span id="gainBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 light:bg-slate-200 light:text-slate-800 font-mono">0 dBFS Target</span>
-              </div>
-              <p class="text-[10px] text-slate-400 light:text-slate-600 mt-2" data-i18n="gainDesc">Peak amplitude relative to standard digital dynamic headroom.</p>
-            </div>
-
-            <!-- Automatic BPM Detection Card -->
-            <div class="glass-input p-4 rounded-xl relative overflow-hidden border border-white/10 light:border-slate-300">
-              <div class="text-[11px] font-semibold text-slate-400 light:text-slate-700 uppercase tracking-wider mb-1" data-i18n="bpmDetection">BPM Detection</div>
-              <div class="flex items-baseline gap-2">
-                <span id="bpmValueDisplay" class="text-2xl font-extrabold font-mono text-slate-100 light:text-slate-900">-- BPM</span>
-                <span id="bpmConfidenceBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 light:bg-slate-200 light:text-slate-800 font-mono">Auto Tempo</span>
-              </div>
-              <p class="text-[10px] text-slate-400 light:text-slate-600 mt-2" data-i18n="bpmDesc">Real-time autocorrelation analysis over dynamic peaks.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Track Metadata Summary Bar -->
-        <div class="mt-6 pt-4 border-t border-white/10 light:border-slate-200 flex items-center justify-between text-xs text-slate-400 light:text-slate-700 font-mono">
-          <div><span data-i18n="duration">Duration:</span> <span id="metaDuration" class="text-slate-200 light:text-slate-900">00:00</span></div>
-          <div><span data-i18n="sampleRate">Sample Rate:</span> <span id="metaSampleRate" class="text-slate-200 light:text-slate-900">-- Hz</span></div>
-          <div><span data-i18n="channels">Channels:</span> <span id="metaChannels" class="text-slate-200 light:text-slate-900">--</span></div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- MAIN AI LYRICS GENERATOR & STREAMING CHAT WORKSPACE -->
+    <!-- ================= 1. AI LYRIC COMPOSITION & STUDIO GENERATOR ================= -->
     <div class="glass-panel rounded-2xl p-6 lg:p-8 space-y-6">
-
-      <!-- SECTION TITLE -->
-      <div class="flex items-center justify-between border-b border-white/10 light:border-slate-200 pb-4">
+      <div class="flex items-center justify-between border-b border-indigo-500/10 light:border-indigo-200 pb-4">
         <div>
-          <h2 class="text-xl font-black uppercase tracking-wide flex items-center gap-3 text-slate-200 light:text-slate-900">
-            <i class="fa-solid fa-wand-magic-sparkles text-slate-400"></i>
+          <h2 class="text-lg font-bold flex items-center gap-2.5 text-indigo-100 light:text-indigo-950">
+            <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i>
             <span data-i18n="lyricsGeneratorTitle">AI Lyric Composition & Studio Generator</span>
           </h2>
-          <p class="text-xs text-slate-400 light:text-slate-600 mt-1" data-i18n="lyricsGeneratorSubtitle">
+          <p class="text-xs text-indigo-300 light:text-indigo-850 mt-1" data-i18n="lyricsGeneratorSubtitle">
             Compose original lyrics with precise genre customization, verse structures, diacritics, and interactive streaming chat.
           </p>
         </div>
         <div class="hidden sm:flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-xs font-mono font-semibold text-emerald-500 light:text-emerald-700">Sonvex AI Engine Ready</span>
+          <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+          <span class="text-xs font-mono font-semibold text-indigo-300 light:text-indigo-900">Sonvex AI Engine Ready</span>
         </div>
       </div>
 
-      <!-- GENERATOR CONTROLS GRID -->
+      <!-- Generator controls grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
         <!-- 1. Global Genre Selector -->
         <div class="space-y-1.5">
-          <label class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-compact-disc text-slate-400"></i>
+          <label class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-compact-disc"></i>
             <span data-i18n="genreLabel">Global Genre</span>
           </label>
-          <select id="genreSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
+          <select id="genreSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
             <option value="Hip-Hop / Rap" selected>Hip-Hop / Rap</option>
             <option value="Trapsoul">Trapsoul</option>
             <option value="RnB / Soul">RnB / Soul</option>
-            <option value="House / Deep House">House / Deep House</option>
+            <option value="House">House</option>
+            <option value="Deep House">Deep House</option>
+            <option value="Melodic House">Melodic House</option>
             <option value="Techno">Techno</option>
             <option value="Pop">Pop</option>
             <option value="Rock / Alternative">Rock / Alternative</option>
@@ -436,155 +444,564 @@
 
         <!-- 2. Language Selector -->
         <div class="space-y-1.5">
-          <label class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-language text-slate-400"></i>
+          <label class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-language"></i>
             <span data-i18n="languageLabel">Lyric Language</span>
           </label>
-          <select id="lyricLanguage" onchange="app.handleLyricLanguageChange(this.value)" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
+          <select id="lyricLanguage" onchange="app.handleLyricLanguageChange(this.value)" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
             <option value="en" selected>English</option>
-            <option value="ar_casual">Casual / Street Slang Arabic (عامي)</option>
+            <option value="ar_casual">Casual / Street Slang Arabic (عامية)</option>
+            <option value="ar_simple">Simple Standard Arabic (الفصحى البسيطة/البيضاء)</option>
             <option value="ar_msa">Modern Standard Arabic (فصحى)</option>
           </select>
         </div>
 
-        <!-- 3. Verse Dropdown Box -->
+        <!-- 3. Verse Dropdown -->
         <div class="space-y-1.5">
-          <label for="verseSelect" class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-list-ol text-slate-400"></i>
+          <label for="verseSelect" class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-list-ol"></i>
             <span data-i18n="versesLimit">Verse</span>
           </label>
-          <select id="verseSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
+          <select id="verseSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
             <option value="1">1</option>
             <option value="2" selected>2</option>
             <option value="3">3</option>
           </select>
         </div>
 
-        <!-- 4. Chorus Dropdown Box -->
+        <!-- 4. Chorus Dropdown -->
         <div class="space-y-1.5">
-          <label for="chorusSelect" class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-repeat text-slate-400"></i>
+          <label for="chorusSelect" class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-repeat"></i>
             <span data-i18n="chorusLimit">Chorus</span>
           </label>
-          <select id="chorusSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-white/15 bg-slate-900 text-slate-100 focus:outline-none focus:border-slate-300">
+          <select id="chorusSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
             <option value="1">1</option>
             <option value="2" selected>2</option>
           </select>
         </div>
-
       </div>
 
-      <!-- CONDITIONAL DIACRITICS TOGGLE (Tashkeel) - Appears ONLY when Arabic selected -->
-      <div id="diacriticsContainer" class="hidden p-4 rounded-xl bg-slate-900/60 light:bg-slate-200/80 border border-slate-500/30 light:border-slate-300 transition-all duration-300 animate-fadeIn">
+      <!-- CONDITIONAL DIACRITICS TOGGLE -->
+      <div id="diacriticsContainer" class="hidden p-3.5 rounded-xl bg-indigo-950/40 light:bg-indigo-50/60 border border-indigo-500/10 light:border-indigo-200 transition-all duration-300">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-slate-800 light:bg-white flex items-center justify-center text-slate-200 light:text-slate-900 font-bold text-lg border border-slate-700 light:border-slate-300">
-              َ ً
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-indigo-950 light:bg-indigo-50/50 flex items-center justify-center text-indigo-100 light:text-indigo-955 font-bold border border-indigo-500/10 light:border-indigo-200">
+              أَ بْ
             </div>
             <div>
-              <p class="text-xs font-bold text-slate-200 light:text-slate-900" data-i18n="diacriticsTitle">Arabic Diacritics (التشكيل)</p>
-              <p class="text-[11px] text-slate-400 light:text-slate-700" data-i18n="diacriticsDesc">Enable vocal diacritics for accurate Arabic pronunciation and rhythm flow.</p>
+              <p class="text-xs font-bold text-indigo-100 light:text-indigo-950" data-i18n="diacriticsTitle">Arabic Diacritics (التشكيل)</p>
+              <p class="text-[10px] text-indigo-300 light:text-indigo-850" data-i18n="diacriticsDesc">Enable vocal diacritics for rhythm flow.</p>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            <label class="text-xs font-semibold cursor-pointer flex items-center gap-2">
-              <input type="checkbox" id="diacriticsToggle" class="w-4 h-4 rounded border-slate-400 text-slate-600 focus:ring-slate-500">
-              <span id="diacriticsStatusText" class="text-xs text-slate-300 light:text-slate-800" data-i18n="withDiacritics">With Diacritics (مع التشكيل)</span>
-            </label>
-          </div>
+          <label class="text-xs font-semibold cursor-pointer flex items-center gap-2">
+            <input type="checkbox" id="diacriticsToggle" class="w-4 h-4 rounded border-indigo-300 text-indigo-650 focus:ring-indigo-500">
+            <span id="diacriticsStatusText" class="text-[11px] text-indigo-200 light:text-indigo-900" data-i18n="withDiacritics">With Diacritics</span>
+          </label>
         </div>
       </div>
 
-      <!-- SECOND ROW INPUTS: Topic Prompt & Vibe Mood -->
+      <!-- Prompt Topic & Vibe inputs -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        <!-- Concept & Topic Open Prompt Field -->
         <div class="space-y-1.5">
-          <label class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-pen-nib text-slate-400"></i>
+          <label class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-pen-nib"></i>
             <span data-i18n="topicLabel">Song Concept / Topic Prompt</span>
           </label>
-          <textarea id="songTopicInput" rows="2" class="w-full glass-input text-xs p-3 rounded-xl focus:outline-none placeholder:text-slate-500" placeholder="e.g. Midnight reflections on success, driving through neon city streets, overcoming struggles..."></textarea>
+          <textarea id="songTopicInput" rows="2" class="w-full glass-input text-xs p-3 rounded-xl focus:outline-none placeholder:text-indigo-300/40" placeholder="e.g. Midnight reflections on success, driving through neon city streets..."></textarea>
         </div>
 
-        <!-- Custom Vibe / Mood Open Text Field -->
         <div class="space-y-1.5">
-          <label class="text-xs font-bold text-slate-300 light:text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-sliders text-slate-400"></i>
+          <label class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-sliders"></i>
             <span data-i18n="vibeLabel">Custom Vibe / Mood</span>
           </label>
-          <textarea id="songVibeInput" rows="2" class="w-full glass-input text-xs p-3 rounded-xl focus:outline-none placeholder:text-slate-500" placeholder="e.g. Melancholic yet energetic, dark atmospheric synth tones, aggressive rhythmic delivery..."></textarea>
+          <textarea id="songVibeInput" rows="2" class="w-full glass-input text-xs p-3 rounded-xl focus:outline-none placeholder:text-indigo-300/40" placeholder="e.g. Melancholic yet energetic, dark synth tones..."></textarea>
         </div>
-
       </div>
 
-      <!-- PRIMARY GENERATE ACTION BUTTON -->
+      <!-- Generate button -->
       <div class="pt-2">
-        <button id="generateLyricsBtn" onclick="app.generateLyrics()" class="w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 hover:from-white hover:to-slate-200 text-slate-950 light:bg-gradient-to-r light:from-slate-900 light:to-slate-800 light:hover:from-slate-800 light:hover:to-slate-700 light:text-white shadow-lg hover:shadow-white/20 active:scale-[0.99] transition-all">
-          <i class="fa-solid fa-wand-magic-sparkles text-lg animate-spin" style="animation-duration: 4s;"></i>
+        <button id="generateLyricsBtn" onclick="app.generateLyrics()" class="w-full py-3 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 hover:from-indigo-600 hover:to-indigo-800 text-white shadow-lg shadow-indigo-500/10 active:scale-[0.99] transition-all">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
           <span data-i18n="generateLyricsAction">Generate Original Lyrics Stream</span>
         </button>
       </div>
+    </div>
 
-      <!-- INTERACTIVE AI CHAT & STREAMING CONTAINER -->
-      <div class="mt-8 pt-6 border-t border-white/10 light:border-slate-200 space-y-4">
-        
-        <!-- Chat Header & Top Action Controls -->
-        <div class="flex items-center justify-between">
-          <h3 class="text-sm font-extrabold uppercase tracking-wider flex items-center gap-2 text-slate-200 light:text-slate-900">
-            <i class="fa-solid fa-comments text-slate-400"></i>
-            <span data-i18n="chatConsoleTitle">Interactive AI Studio Chat & Lyrics Stream</span>
-          </h3>
+    <!-- ================= 2. INTERACTIVE AI STUDIO CHAT ================= -->
+    <div class="glass-panel rounded-2xl p-6 lg:p-8 space-y-4">
+      <div class="flex items-center justify-between border-b border-indigo-500/10 light:border-indigo-200 pb-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-indigo-300 light:text-indigo-955">
+          <i class="fa-solid fa-comments text-indigo-455"></i>
+          <span data-i18n="chatConsoleTitle">Interactive AI Studio Chat & Lyrics Stream</span>
+        </h3>
 
-          <div class="flex items-center gap-2">
-            <!-- One-Click Copy Script -->
-            <button onclick="app.copyFullChatLyrics()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:border-slate-300 hover:text-white transition-all" title="Copy Full Lyrics">
-              <i class="fa-solid fa-copy"></i>
-              <span data-i18n="copyScriptBtn">Copy Script</span>
-            </button>
+        <div class="flex items-center gap-2">
+          <button onclick="app.copyFullChatLyrics()" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 hover:border-indigo-400 transition-all">
+            <i class="fa-solid fa-copy text-indigo-300"></i>
+            <span data-i18n="copyScriptBtn">Copy Script</span>
+          </button>
+          <button onclick="app.regenerateVerse()" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 hover:border-indigo-400 transition-all">
+            <i class="fa-solid fa-rotate-right text-indigo-300"></i>
+            <span data-i18n="regenerateBtn">Re-generate</span>
+          </button>
+          <button onclick="app.clearChatConsole()" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-red-400 hover:text-red-400 transition-all">
+            <i class="fa-solid fa-trash-can text-indigo-300"></i>
+          </button>
+        </div>
+      </div>
 
-            <!-- Re-generate Verse -->
-            <button onclick="app.regenerateVerse()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:border-slate-300 hover:text-white transition-all" title="Regenerate Last Output">
-              <i class="fa-solid fa-rotate-right"></i>
-              <span data-i18n="regenerateBtn">Re-generate</span>
-            </button>
+      <!-- Chat Console Box -->
+      <div id="chatConsoleWindow" class="w-full h-80 overflow-y-auto glass-input p-4 rounded-xl border border-indigo-500/10 light:border-indigo-200 space-y-4 font-sans text-xs">
+        <div class="flex items-start gap-2.5">
+          <div class="w-6.5 h-6.5 rounded-lg bg-indigo-950 text-indigo-100 flex items-center justify-center font-bold text-[10px] shrink-0 border border-indigo-500/10">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div class="glass-panel p-3.5 rounded-xl max-w-2xl">
+            <p class="font-bold text-indigo-100 light:text-indigo-955 mb-1 text-[11px]">SONVEX AI Assistant</p>
+            <p class="text-indigo-355 light:text-indigo-850 leading-relaxed" data-i18n="chatWelcome">
+              Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe, then click <strong>Generate Original Lyrics Stream</strong>. You can also chat directly with me to refine rhymes.
+            </p>
+          </div>
+        </div>
+      </div>
 
-            <!-- Clear Chat -->
-            <button onclick="app.clearChatConsole()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 hover:border-red-400 hover:text-red-400 transition-all" title="Clear Conversation">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
+      <!-- Prompt Input -->
+      <div class="relative flex items-center">
+        <input type="text" id="chatInputPrompt" onkeydown="if(event.key === 'Enter') app.sendChatMessage()" class="w-full glass-input text-xs py-3.5 pl-4 pr-20 rounded-xl focus:outline-none border border-indigo-500/10 light:border-indigo-200" placeholder="Ask AI to refine rhyme scheme, change line 2, etc...">
+        <button onclick="app.sendChatMessage()" class="absolute right-2 px-3.5 py-2 rounded-lg bg-indigo-650 hover:bg-indigo-700 text-white font-bold text-[11px] flex items-center gap-1 transition-all">
+          <span data-i18n="sendChat">Send</span>
+          <i class="fa-solid fa-paper-plane text-[9px]"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= 3. AI AUDIO REMASTERER MODULE (100% CLIENT-SIDE DSP WITH CUSTOM A/B PLAYERS) ================= -->
+    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
+      
+      <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
+        <h2 class="text-base font-bold flex items-center gap-2" data-i18n="audioRemastererTitle">
+          <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> AI Audio Remasterer
+        </h2>
+        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">100% Client-Side DSP</span>
+      </div>
+      <p class="text-xs text-indigo-300 light:text-indigo-880 mb-4" data-i18n="audioRemastererDesc">
+        Remaster your audio locally with high-pass filtering, 3-band parametric EQ, dynamics compression, and hard limiting.
+      </p>
+
+      <div class="space-y-4">
+        <!-- Drag & Drop Zone -->
+        <div id="remasterDropZone" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
+          <input type="file" id="remasterTargetInput" accept="audio/*" class="hidden" onchange="app.handleRemasterTargetSelect(this.files[0])">
+          <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
+          <div>
+            <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="dropRemasterText">Drag & Drop track to remaster or browse</p>
           </div>
         </div>
 
-        <!-- Chat Stream Window Container -->
-        <div id="chatConsoleWindow" class="w-full h-96 overflow-y-auto glass-input p-4 lg:p-6 rounded-2xl border border-white/10 light:border-slate-300 space-y-4 font-sans text-xs">
-          <!-- Initial AI Welcome Message -->
-          <div class="flex items-start gap-3">
-            <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
-              <i class="fa-solid fa-robot"></i>
+        <!-- File Info Card (Dynamically displayed when file loaded) -->
+        <div id="remasterFileCard" class="hidden p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 flex items-center justify-between shadow-inner">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-10 h-10 rounded-lg bg-indigo-900/40 flex items-center justify-center text-indigo-300 shrink-0">
+              <i class="fa-solid fa-file-audio text-lg"></i>
             </div>
-            <div class="glass-panel p-4 rounded-xl max-w-2xl border-white/10 light:border-slate-300">
-              <p class="font-bold text-slate-200 light:text-slate-900 mb-1">SONVEX AI Assistant</p>
-              <p class="text-slate-300 light:text-slate-700 leading-relaxed" data-i18n="chatWelcome">
-                Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe above, then click <strong>Generate Original Lyrics Stream</strong>. You can also chat directly with me below to refine rhymes, change lines, or tweak verses!
-              </p>
+            <div class="truncate">
+              <p id="remasterFileName" class="text-xs font-bold truncate text-indigo-100 light:text-indigo-950">filename.mp3</p>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span id="remasterFileSize" class="text-[10px] text-indigo-300">0.0 MB</span>
+                <span class="w-1 h-1 bg-indigo-50 rounded-full"></span>
+                <span id="remasterFormatBadge" class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10 badge-exclude">MP3</span>
+              </div>
             </div>
           </div>
-        </div>
-
-        <!-- Direct Prompt Input Box -->
-        <div class="relative flex items-center">
-          <input type="text" id="chatInputPrompt" onkeydown="if(event.key === 'Enter') app.sendChatMessage()" class="w-full glass-input text-xs py-3.5 pl-4 pr-24 rounded-xl focus:outline-none border border-white/15 light:border-slate-300" placeholder="Ask AI to refine verse 1, change rhyme scheme, add bridge, make tone more intense...">
-          <button onclick="app.sendChatMessage()" class="absolute right-2 px-4 py-2 rounded-lg bg-slate-200 light:bg-slate-900 light:text-white hover:bg-white text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all shadow-md">
-            <span data-i18n="sendChat">Send</span>
-            <i class="fa-solid fa-paper-plane"></i>
+          <button onclick="app.resetRemaster()" class="text-indigo-300 hover:text-red-400 text-xs px-3 py-1.5 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
+            <i class="fa-solid fa-trash-can mr-1"></i> Remove
           </button>
         </div>
 
-      </div>
+        <!-- Actions Container / Custom A-B Audio Players (Visible when file loaded) -->
+        <div id="remasterActionsBar" class="hidden pt-2 border-t border-indigo-500/5 light:border-indigo-200 flex flex-col gap-4">
+          
+          <!-- Status display -->
+          <div id="remasterStatusText" class="hidden text-xs text-center font-bold animate-pulse text-purple-400 light:text-purple-750 py-2">
+            <i class="fa-solid fa-spinner animate-spin mr-2"></i>
+            <span>Mastering audio... Applying filters and compression</span>
+          </div>
 
+          <!-- BEFORE / AFTER A/B COMPARISON CUSTOM PLAYERS -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Left: Original Track (Before) - Custom UI Player -->
+            <div class="space-y-3 p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/10 light:border-indigo-200 shadow-inner flex flex-col justify-between">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 light:text-indigo-900" data-i18n="originalTrackLabel">Original Track</label>
+              
+              <!-- Hidden Native Audio -->
+              <audio id="remasterOriginalPlayer" class="hidden"></audio>
+              
+              <!-- Custom Control Row -->
+              <div class="flex items-center gap-3">
+                <!-- Play Button -->
+                <button onclick="app.toggleCustomPlay('orig')" class="w-8 h-8 rounded-lg bg-indigo-650 hover:bg-indigo-700 text-white flex items-center justify-center transition-all shrink-0">
+                  <i id="origPlayIcon" class="fa-solid fa-play text-xs"></i>
+                </button>
+                
+                <!-- Time counter -->
+                <span id="origTimeDisplay" class="text-[10px] font-mono text-indigo-300 light:text-indigo-950 shrink-0 select-none">0:00 / 0:00</span>
+                
+                <!-- Volume Controls -->
+                <div class="flex items-center gap-1.5 ml-auto">
+                  <button onclick="app.toggleCustomMute('orig')" class="text-indigo-300 hover:text-indigo-100 light:text-indigo-900 text-xs transition-all">
+                    <i id="origMuteIcon" class="fa-solid fa-volume-high"></i>
+                  </button>
+                  <input type="range" id="origVolumeSlider" min="0" max="1" step="0.05" value="0.8" oninput="app.setCustomVolume('orig', this.value)" class="w-16 h-1 rounded-lg bg-indigo-950 light:bg-indigo-200 accent-indigo-500 cursor-pointer">
+                </div>
+              </div>
+              
+              <!-- Custom Seek Bar -->
+              <div class="w-full flex items-center mt-1">
+                <input type="range" id="origSeekBar" min="0" max="100" value="0" oninput="app.seekCustomAudio('orig', this.value)" class="w-full h-1 rounded-lg bg-indigo-950 light:bg-indigo-200 accent-indigo-500 cursor-pointer">
+              </div>
+            </div>
+            
+            <!-- Right: Remastered Track (After) - Custom UI Player -->
+            <div id="remasteredPlayerContainer" class="space-y-3 p-4 rounded-xl bg-purple-950/10 border border-purple-500/10 light:border-purple-200 shadow-inner flex flex-col justify-between opacity-40 pointer-events-none transition-opacity duration-300">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-purple-400 light:text-purple-755" data-i18n="remasteredTrackLabel">Remastered Track</label>
+              
+              <!-- Hidden Native Audio -->
+              <audio id="remasterAudioPlayer" class="hidden"></audio>
+              
+              <!-- Custom Control Row -->
+              <div class="flex items-center gap-3">
+                <!-- Play Button -->
+                <button onclick="app.toggleCustomPlay('rem')" class="w-8 h-8 rounded-lg bg-purple-650 hover:bg-purple-700 text-white flex items-center justify-center transition-all shrink-0">
+                  <i id="remPlayIcon" class="fa-solid fa-play text-xs"></i>
+                </button>
+                
+                <!-- Time counter -->
+                <span id="remTimeDisplay" class="text-[10px] font-mono text-purple-300 light:text-purple-955 shrink-0 select-none">0:00 / 0:00</span>
+                
+                <!-- Volume Controls -->
+                <div class="flex items-center gap-1.5 ml-auto">
+                  <button onclick="app.toggleCustomMute('rem')" class="text-purple-300 hover:text-purple-100 light:text-purple-900 text-xs transition-all">
+                    <i id="remMuteIcon" class="fa-solid fa-volume-high"></i>
+                  </button>
+                  <input type="range" id="remVolumeSlider" min="0" max="1" step="0.05" value="0.8" oninput="app.setCustomVolume('rem', this.value)" class="w-16 h-1 rounded-lg bg-purple-950 light:bg-purple-200 accent-purple-500 cursor-pointer">
+                </div>
+              </div>
+              
+              <!-- Custom Seek Bar -->
+              <div class="w-full flex items-center mt-1">
+                <input type="range" id="remSeekBar" min="0" max="100" value="0" oninput="app.seekCustomAudio('rem', this.value)" class="w-full h-1 rounded-lg bg-purple-950 light:bg-purple-200 accent-purple-550 cursor-pointer">
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button id="remasterBtn" onclick="app.processRemaster()" class="flex-1 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-indigo-900 text-indigo-200 light:bg-indigo-50 hover:bg-indigo-800 hover:text-white transition-all">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span data-i18n="remasterBtn">Remaster Audio</span>
+            </button>
+
+            <a id="remasterDownloadBtn" class="hidden flex-1 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-650 text-white shadow-lg transition-all" href="#" download>
+              <i class="fa-solid fa-download"></i>
+              <span data-i18n="downloadRemastered">Download Remastered WAV</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- ================= 4. UNIVERSAL AUDIO CONVERTER (STEP-BY-STEP WORKFLOW) ================= -->
+    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
+
+      <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
+        <h2 class="text-base font-bold flex items-center gap-2">
+          <i class="fa-solid fa-arrows-rotate text-indigo-300"></i>
+          <span data-i18n="audioConverterTitle">Universal Audio Converter</span>
+        </h2>
+        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Client-Side Engine</span>
+      </div>
+
+      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="audioConverterDesc">
+        Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly without server uploads.
+      </p>
+
+      <div class="space-y-4">
+        <!-- Drag & Drop Zone -->
+        <div id="dropZone" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
+          <input type="file" id="audioFileInput" accept="audio/*,video/mp4" class="hidden" onchange="app.handleAudioUpload(this.files[0])">
+          <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
+          <div>
+            <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="dropAudioText">Drag & Drop file or browse</p>
+          </div>
+        </div>
+
+        <!-- File Info Card -->
+        <div id="fileLoadedCard" class="hidden p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 flex items-center justify-between shadow-inner">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-10 h-10 rounded-lg bg-indigo-900/40 flex items-center justify-center text-indigo-300 shrink-0">
+              <i class="fa-solid fa-file-audio text-lg"></i>
+            </div>
+            <div class="truncate">
+              <p id="fileNameDisplay" class="text-xs font-bold truncate text-indigo-100 light:text-indigo-950">filename.mp3</p>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span id="fileSizeDisplay" class="text-[10px] text-indigo-300">0.0 MB</span>
+                <span class="w-1 h-1 bg-indigo-50 rounded-full"></span>
+                <span id="detectedFormatBadge" class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10 badge-exclude">MP3</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="app.resetAudio()" class="text-indigo-300 hover:text-red-400 text-xs px-3 py-1.5 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
+            <i class="fa-solid fa-trash-can mr-1"></i> Remove
+          </button>
+        </div>
+
+        <!-- Target Selector & Convert button -->
+        <div id="converterActionsBar" class="hidden pt-2 border-t border-indigo-500/5 light:border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <label class="text-xs font-medium text-indigo-300 light:text-indigo-900 shrink-0" data-i18n="targetFormat">Target Format:</label>
+            <select id="targetFormatSelect" class="w-full sm:w-48 glass-input text-xs font-semibold px-3 py-2 rounded-lg border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
+              <!-- Dynamically populated via JS -->
+            </select>
+          </div>
+
+          <button id="convertBtn" onclick="app.processAudioConversion()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-700 text-white shadow-lg transition-all">
+            <i class="fa-solid fa-bolt"></i>
+            <span data-i18n="convertBtn">Convert & Download</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 5. DYNAMIC TRACK INSPECTOR (AT VERY BOTTOM) ================= -->
+    <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
+          <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="inspectorTitle">
+            <i class="fa-solid fa-chart-simple text-indigo-350"></i> Dynamic Track Inspector
+          </h2>
+          <span id="inspectorStatus" class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Awaiting File...</span>
+        </div>
+
+        <!-- Inspector Drag & Drop Zone -->
+        <div id="inspectorPlaceholder" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
+          <input type="file" id="inspectorFileInput" accept="audio/*" class="hidden" onchange="app.handleInspectorFileUpload(this.files[0])">
+          <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
+          <div>
+            <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955">Drag & Drop audio file here or browse to Inspect</p>
+          </div>
+        </div>
+
+        <div id="inspectorContent" class="hidden space-y-4">
+          <!-- File Info Card inside Inspector -->
+          <div id="inspectorFileLoadedCard" class="flex items-center justify-between p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 shadow-inner">
+            <div class="flex items-center gap-2.5 truncate">
+              <i class="fa-solid fa-file-audio text-indigo-300"></i>
+              <span id="inspectorFileNameDisplay" class="text-xs font-bold text-indigo-100 light:text-indigo-955 truncate">filename.mp3</span>
+            </div>
+            <button onclick="app.resetInspectorState()" class="text-indigo-300 hover:text-red-400 text-xs px-2.5 py-1 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
+              <i class="fa-solid fa-trash-can mr-1"></i> Remove
+            </button>
+          </div>
+
+          <!-- Waveform Canvas Display -->
+          <div class="relative w-full h-24 bg-[#04040f] rounded-xl overflow-hidden border border-indigo-500/15 light:border-indigo-200 mb-6 flex items-center justify-center group shadow-inner">
+            <canvas id="waveformCanvas" class="w-full h-full"></canvas>
+            
+            <!-- Playback Toggle Overlay -->
+            <button id="playAudioBtn" onclick="app.toggleAudioPlayback()" class="hidden absolute w-9 h-9 rounded-full bg-white text-indigo-955 flex items-center justify-center font-bold shadow-lg hover:scale-105 transition-all">
+              <i id="playIcon" class="fa-solid fa-play text-xs ml-0.5"></i>
+            </button>
+          </div>
+
+          <!-- METRICS CARDS GRID -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Gain Card -->
+            <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+              <div class="text-[10px] font-bold text-indigo-300 light:text-indigo-855 uppercase tracking-wider mb-1" data-i18n="gainOffset">Gain Peak Offset</div>
+              <div class="flex items-baseline gap-1.5">
+                <span id="gainValueDisplay" class="text-xl font-black font-mono text-indigo-100 light:text-indigo-950">-- dB</span>
+                <span id="gainBadge" class="text-[9px] px-1.5 py-0.5 rounded bg-indigo-950/40 text-indigo-300 font-mono">0 dBFS</span>
+              </div>
+            </div>
+
+            <!-- Integrated LUFS Card -->
+            <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+              <div class="text-[10px] font-bold text-indigo-300 light:text-indigo-855 uppercase tracking-wider mb-1">Integrated LUFS</div>
+              <div class="flex items-baseline gap-1.5">
+                <span id="lufsValueDisplay" class="text-xl font-black font-mono text-indigo-100 light:text-indigo-950">-- LUFS</span>
+                <span id="lufsBadge" class="text-[9px] px-1.5 py-0.5 rounded bg-indigo-950/40 text-indigo-300 font-mono">Loudness</span>
+              </div>
+            </div>
+
+            <!-- BPM Card -->
+            <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+              <div class="text-[10px] font-bold text-indigo-300 light:text-indigo-855 uppercase tracking-wider mb-1" data-i18n="bpmDetection">BPM Detection</div>
+              <div class="flex items-baseline gap-1.5">
+                <span id="bpmValueDisplay" class="text-xl font-black font-mono text-indigo-100 light:text-indigo-955">-- BPM</span>
+                <span id="bpmConfidenceBadge" class="text-[9px] px-1.5 py-0.5 rounded bg-indigo-950/40 text-indigo-300 font-mono">Tempo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STREAMING PLATFORM LOUDNESS PENALTY INSPECTOR WIDGET -->
+          <div class="mt-6 pt-4 border-t border-indigo-500/10 light:border-indigo-200">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-350 light:text-indigo-955 mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-gauge text-indigo-400"></i>
+              <span>Streaming Platform Loudness Penalty Inspector</span>
+            </h3>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <!-- Spotify Card -->
+              <div class="glass-input p-3 rounded-xl border border-indigo-500/10 flex flex-col items-center justify-between text-center gap-2">
+                <div class="flex items-center gap-1 text-[11px] font-bold text-indigo-100 light:text-indigo-955">
+                  <i class="fa-brands fa-spotify text-emerald-400 text-sm"></i> Spotify
+                </div>
+                <div id="penalty-spotify" class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10">--</div>
+              </div>
+              
+              <!-- Apple Music Card -->
+              <div class="glass-input p-3 rounded-xl border border-indigo-500/10 flex flex-col items-center justify-between text-center gap-2">
+                <div class="flex items-center gap-1 text-[11px] font-bold text-indigo-100 light:text-indigo-955">
+                  <i class="fa-brands fa-apple text-pink-400 text-sm"></i> Apple Music
+                </div>
+                <div id="penalty-apple" class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10">--</div>
+              </div>
+              
+              <!-- YouTube Card -->
+              <div class="glass-input p-3 rounded-xl border border-indigo-500/10 flex flex-col items-center justify-between text-center gap-2">
+                <div class="flex items-center gap-1 text-[11px] font-bold text-indigo-100 light:text-indigo-955">
+                  <i class="fa-brands fa-youtube text-red-500 text-sm"></i> YouTube
+                </div>
+                <div id="penalty-youtube" class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10">--</div>
+              </div>
+              
+              <!-- Anghami Card -->
+              <div class="glass-input p-3 rounded-xl border border-indigo-500/10 flex flex-col items-center justify-between text-center gap-2">
+                <div class="flex items-center gap-1 text-[11px] font-bold text-indigo-100 light:text-indigo-955">
+                  <i class="fa-solid fa-compact-disc text-purple-400 text-sm animate-spin" style="animation-duration: 4s;"></i> Anghami
+                </div>
+                <div id="penalty-anghami" class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10">--</div>
+              </div>
+              
+              <!-- Tidal / Amazon Music Card -->
+              <div class="glass-input p-3 rounded-xl border border-indigo-500/10 flex flex-col items-center justify-between text-center gap-2">
+                <div class="flex items-center gap-1 text-[11px] font-bold text-indigo-100 light:text-indigo-955">
+                  <i class="fa-solid fa-music text-cyan-400 text-sm"></i> Tidal / Amazon
+                </div>
+                <div id="penalty-tidal" class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10">--</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Track Metadata Summary Bar -->
+          <div class="mt-4 pt-3 border-t border-indigo-500/10 light:border-indigo-200 flex items-center justify-between text-[11px] text-indigo-300 light:text-indigo-855 font-mono">
+            <div><span data-i18n="duration">Duration:</span> <span id="metaDuration" class="text-indigo-100 light:text-indigo-950">00:00</span></div>
+            <div><span data-i18n="sampleRate">Sample Rate:</span> <span id="metaSampleRate" class="text-indigo-100 light:text-indigo-950">-- Hz</span></div>
+            <div><span data-i18n="channels">Channels:</span> <span id="metaChannels" class="text-indigo-100 light:text-indigo-950">--</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 6. AUDIO TRIMMER & TEASER MAKER (AT THE ABSOLUTE BOTTOM) ================= -->
+    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
+
+      <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
+        <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955">
+          <i class="fa-solid fa-scissors text-indigo-350"></i>
+          <span>Audio Trimmer & Social Teaser Maker</span>
+        </h2>
+        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Wavesurfer Engine</span>
+      </div>
+
+      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4">
+        Crop and slice your uploaded audio file client-side instantly. Select a region to create short social media audio previews and teasers.
+      </p>
+
+      <!-- Trimmer Drag & Drop Zone -->
+      <div id="trimmerPlaceholder" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
+        <input type="file" id="trimmerFileInput" accept="audio/*" class="hidden" onchange="app.handleTrimmerFileUpload(this.files[0])">
+        <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
+        <div>
+          <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955">Drag & Drop audio file here or browse to Trim</p>
+        </div>
+      </div>
+
+      <div id="trimmerContent" class="hidden space-y-4">
+        <!-- File Info Card inside Trimmer -->
+        <div id="trimmerFileLoadedCard" class="flex items-center justify-between p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 shadow-inner">
+          <div class="flex items-center gap-2.5 truncate">
+            <i class="fa-solid fa-file-audio text-indigo-300"></i>
+            <span id="trimmerFileNameDisplay" class="text-xs font-bold text-indigo-100 light:text-indigo-955 truncate">filename.mp3</span>
+          </div>
+          <button onclick="app.resetTrimmerState()" class="text-indigo-300 hover:text-red-400 text-xs px-2.5 py-1 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
+            <i class="fa-solid fa-trash-can mr-1"></i> Remove
+          </button>
+        </div>
+
+        <!-- Wavesurfer Container -->
+        <div class="relative w-full bg-[#04040f]/60 rounded-xl border border-indigo-500/15 light:border-indigo-200 p-2 overflow-hidden shadow-inner">
+          <div id="trimmerWaveform" class="w-full"></div>
+        </div>
+
+        <!-- Selections & Precision Timestamps -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1">Start Time</div>
+            <div id="trimStartDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
+          </div>
+          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1">End Time</div>
+            <div id="trimEndDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
+          </div>
+          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1">Selection Duration</div>
+            <div id="trimDurationDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">0.00s</div>
+          </div>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-indigo-300 light:text-indigo-900 font-semibold mr-1">Quick Teaser Presets:</span>
+          <button onclick="app.applyTrimmerPreset(15)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">15s Preset</button>
+          <button onclick="app.applyTrimmerPreset(30)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">30s Preset</button>
+          <button onclick="app.applyTrimmerPreset(60)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">60s Preset</button>
+        </div>
+
+        <!-- Action Row -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-indigo-500/5 light:border-indigo-200">
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <!-- Play Selection Preview -->
+            <button id="trimPlayPreviewBtn" onclick="app.toggleTrimmerPreview()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-indigo-955/60 light:bg-indigo-50 hover:border-indigo-400 border border-indigo-500/10 text-indigo-100 light:text-indigo-955 transition-all">
+              <i id="trimPlayIcon" class="fa-solid fa-circle-play text-sm"></i>
+              <span>Play Selection</span>
+            </button>
+            
+            <!-- Slice Action Button -->
+            <button onclick="app.cropAudioSelection()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md transition-all">
+              <i class="fa-solid fa-scissors"></i>
+              <span>Trim & Crop Audio</span>
+            </button>
+          </div>
+
+          <!-- Sliced Output Card -->
+          <div id="trimOutputBar" class="hidden w-full sm:w-auto flex items-center gap-3 bg-indigo-950/40 light:bg-indigo-50/50 p-2 rounded-xl border border-indigo-500/10 light:border-indigo-200 shadow-inner shrink-0">
+            <span class="text-[10px] uppercase font-mono px-2 py-1 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10">Trimmed Output Ready</span>
+            <button id="downloadTrimmedBtn" class="px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-all">
+              <i class="fa-solid fa-cloud-arrow-down"></i>
+              <span>Download WAV</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- TOAST NOTIFICATION CONTAINER -->
@@ -616,8 +1033,8 @@
         versesLimit: "Verse",
         chorusLimit: "Chorus",
         diacriticsTitle: "Arabic Diacritics (التشكيل)",
-        diacriticsDesc: "Enable vocal diacritics for accurate Arabic pronunciation and rhythm flow.",
-        withDiacritics: "With Diacritics (مع التشكيل)",
+        diacriticsDesc: "Enable vocal diacritics for rhythm flow.",
+        withDiacritics: "With Diacritics",
         topicLabel: "Song Concept / Topic Prompt",
         vibeLabel: "Custom Vibe / Mood",
         generateLyricsAction: "Generate Original Lyrics Stream",
@@ -625,19 +1042,27 @@
         copyScriptBtn: "Copy Script",
         regenerateBtn: "Re-generate",
         sendChat: "Send",
-        chatWelcome: "Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe above, then click Generate Original Lyrics Stream. You can also chat directly with me below to refine rhymes, change lines, or tweak verses!"
+        chatWelcome: "Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe, then click Generate Original Lyrics Stream. You can also chat directly with me to refine rhymes.",
+        audioRemastererTitle: "AI Audio Remasterer",
+        audioRemastererDesc: "Remaster your audio locally with high-pass filtering, 3-band parametric EQ, dynamics compression, and hard limiting.",
+        dropRemasterText: "Drag & Drop track to remaster or browse",
+        remasterBtn: "Remaster Audio",
+        remasteringStatus: "Remastering... Please wait (10-20 seconds)",
+        downloadRemastered: "Download Remastered WAV",
+        originalTrackLabel: "Original Track",
+        remasteredTrackLabel: "Remastered Track"
       },
       ar: {
         audioConverterTitle: "المحول الصوتي الشامل",
         audioConverterDesc: "تحويل صيغ الملفات الصوتية محلياً فورياً بين MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF.",
-        dropAudioText: "اسحب وأسقط الملف الصوتي هنا أو انقر للتصفح",
+        dropAudioText: "اسحب وأسقط الملف هنا أو تصفح",
         targetFormat: "الصيغة المستهدفة:",
         convertBtn: "تحويل وتحميل فوراً",
         inspectorTitle: "محلل الصوت والسرعة (BPM & dB)",
         uploadPrompt: "قم برفع مقطع صوتي لتحليل الموجة، الفروق الصوتية والسرعة BPM",
-        gainOffset: "فرق مستوى الصوت (Gain Offset)",
+        gainOffset: "فرق مستوى الصوت",
         gainDesc: "قياس أعلى قمة صوتية مقارنة بالمدى الديناميكي القياسي (0 dBFS).",
-        bpmDetection: "سرعة الإيقاع (BPM Detection)",
+        bpmDetection: "سرعة الإيقاع (BPM)",
         bpmDesc: "حساب التمبو التلقائي عبر خوارزمية Peak Autocorrelation.",
         duration: "المدة:",
         sampleRate: "معدل العينات:",
@@ -658,7 +1083,15 @@
         copyScriptBtn: "نسخ النص الكامل",
         regenerateBtn: "إعادة التوليد",
         sendChat: "إرسال",
-        chatWelcome: "مرحباً بك في SONVEX STUDIO! قم بضبط نوع الموسيقى، اللغة، وعدد الأبيات أعلاه ثم اضغط على توليد كلمات الأغنية. يمكنك أيضاً الدردشة معي مباشرة لتعديل القوافي والأبيات!"
+        chatWelcome: "مرحباً بك في SONVEX STUDIO! قم بضبط نوع الموسيقى، اللغة، وعدد الأبيات أعلاه ثم اضغط على توليد كلمات الأغنية. يمكنك أيضاً الدردشة معي مباشرة لتعديل القوافي والأبيات!",
+        audioRemastererTitle: "محسن الصوت بالذكاء الاصطناعي",
+        audioRemastererDesc: "تحسين هندسة وجودة مقاطعك الصوتية محلياً عبر فلاتر الترددات، معالجة الديناميكيات، والـ Peak Limiter.",
+        dropRemasterText: "اسحب وأسقط الملف هنا لتحسين جودته أو تصفح",
+        remasterBtn: "بدء معالجة وتحسين الصوت",
+        remasteringStatus: "جاري المعالجة... يرجى الانتظار (10-20 ثانية)",
+        downloadRemastered: "تحميل WAV المحسّن",
+        originalTrackLabel: "المقطع الأصلي",
+        remasteredTrackLabel: "المقطع المحسّن"
       }
     };
 
@@ -671,6 +1104,19 @@
         this.audioSourceNode = null;
         this.isPlaying = false;
         this.chatHistory = [];
+        this.messages = []; // stateful conversation history for full-context API requests
+        
+        // Supported Formats Configurations
+        this.supportedFormats = [
+          { value: 'wav', label: 'WAV (.wav)' },
+          { value: 'mp3', label: 'MP3 (.mp3)' },
+          { value: 'aac', label: 'AAC (.aac)' },
+          { value: 'ogg', label: 'OGG (.ogg)' },
+          { value: 'flac', label: 'FLAC (.flac)' },
+          { value: 'm4a', label: 'M4A (.m4a)' },
+          { value: 'aiff', label: 'AIFF (.aiff)' },
+          { value: 'mp4', label: 'MP4 Audio (.mp4)' }
+        ];
 
         this.init();
       }
@@ -678,6 +1124,9 @@
       init() {
         this.setupDragAndDrop();
         this.checkInitialDiacritics();
+        this.updateFormatDropdown('');
+        this.setupCustomPlayers();
+        this.initBgMusicNotes();
       }
 
       // LOCALIZATION LOGIC
@@ -706,7 +1155,7 @@
         } else {
           html.classList.remove('light');
           html.classList.add('dark');
-          icon.className = 'fa-solid fa-moon text-slate-300';
+          icon.className = 'fa-solid fa-moon text-indigo-300';
         }
         if (this.audioBuffer) {
           this.drawWaveform(this.audioBuffer);
@@ -716,7 +1165,7 @@
       // DIACRITICS CONDITIONAL LOGIC
       handleLyricLanguageChange(val) {
         const container = document.getElementById('diacriticsContainer');
-        if (val === 'ar_casual' || val === 'ar_msa') {
+        if (val === 'ar_casual' || val === 'ar_msa' || val === 'ar_simple') {
           container.classList.remove('hidden');
         } else {
           container.classList.add('hidden');
@@ -728,45 +1177,131 @@
         this.handleLyricLanguageChange(val);
       }
 
+      // DYNAMIC FORMAT SELECT OPTIONS FILTERING
+      updateFormatDropdown(uploadedExt = '') {
+        const select = document.getElementById('targetFormatSelect');
+        if (!select) return;
+        select.innerHTML = '';
+        
+        let selectedSet = false;
+        this.supportedFormats.forEach(f => {
+          if (f.value === uploadedExt) return;
+          
+          const opt = document.createElement('option');
+          opt.value = f.value;
+          opt.textContent = f.label;
+          
+          if (!selectedSet) {
+            opt.selected = true;
+            selectedSet = true;
+          }
+          select.appendChild(opt);
+        });
+      }
+
       // AUDIO UPLOADER, ANALYZER & CONVERTER LOGIC
       setupDragAndDrop() {
-        const zone = document.getElementById('dropZone');
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-          zone.addEventListener(eventName, e => {
-            e.preventDefault();
-            e.stopPropagation();
-          }, false);
-        });
+        // Converter Drag & Drop Zone
+        const converterZone = document.getElementById('dropZone');
+        if (converterZone) {
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            converterZone.addEventListener(eventName, e => {
+              e.preventDefault();
+              e.stopPropagation();
+            }, false);
+          });
+          converterZone.addEventListener('dragover', () => converterZone.classList.add('border-indigo-400', 'bg-indigo-500/5'));
+          converterZone.addEventListener('dragleave', () => converterZone.classList.remove('border-indigo-400', 'bg-indigo-500/5'));
+          converterZone.addEventListener('drop', e => {
+            converterZone.classList.remove('border-indigo-400', 'bg-indigo-500/5');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+              this.handleAudioUpload(e.dataTransfer.files[0]);
+            }
+          });
+          converterZone.addEventListener('click', () => document.getElementById('audioFileInput').click());
+        }
 
-        zone.addEventListener('dragover', () => zone.classList.add('border-slate-400', 'bg-slate-500/10'));
-        zone.addEventListener('dragleave', () => zone.classList.remove('border-slate-400', 'bg-slate-500/10'));
-        zone.addEventListener('drop', e => {
-          zone.classList.remove('border-slate-400', 'bg-slate-500/10');
-          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            this.handleAudioUpload(e.dataTransfer.files[0]);
-          }
-        });
+        // Remasterer Drag & Drop Zone
+        const remasterZone = document.getElementById('remasterDropZone');
+        if (remasterZone) {
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            remasterZone.addEventListener(eventName, e => {
+              e.preventDefault();
+              e.stopPropagation();
+            }, false);
+          });
+          remasterZone.addEventListener('dragover', () => remasterZone.classList.add('border-indigo-400', 'bg-indigo-500/5'));
+          remasterZone.addEventListener('dragleave', () => remasterZone.classList.remove('border-indigo-400', 'bg-indigo-500/5'));
+          remasterZone.addEventListener('drop', e => {
+        remasterZone.classList.remove('border-indigo-400', 'bg-indigo-500/5');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+              this.handleRemasterTargetSelect(e.dataTransfer.files[0]);
+            }
+          });
+          remasterZone.addEventListener('click', () => document.getElementById('remasterTargetInput').click());
+        }
 
-        zone.addEventListener('click', () => document.getElementById('audioFileInput').click());
+        // Trimmer Drag & Drop Zone
+        const trimmerZone = document.getElementById('trimmerPlaceholder');
+        if (trimmerZone) {
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            trimmerZone.addEventListener(eventName, e => {
+              e.preventDefault();
+              e.stopPropagation();
+            }, false);
+          });
+          trimmerZone.addEventListener('dragover', () => trimmerZone.classList.add('border-indigo-400', 'bg-indigo-500/5'));
+          trimmerZone.addEventListener('dragleave', () => trimmerZone.classList.remove('border-indigo-400', 'bg-indigo-500/5'));
+          trimmerZone.addEventListener('drop', e => {
+            trimmerZone.classList.remove('border-indigo-400', 'bg-indigo-500/5');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+              this.handleTrimmerFileUpload(e.dataTransfer.files[0]);
+            }
+          });
+          trimmerZone.addEventListener('click', () => document.getElementById('trimmerFileInput').click());
+        }
+
+        // Inspector Drag & Drop Zone
+        const inspectorZone = document.getElementById('inspectorPlaceholder');
+        if (inspectorZone) {
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            inspectorZone.addEventListener(eventName, e => {
+              e.preventDefault();
+              e.stopPropagation();
+            }, false);
+          });
+          inspectorZone.addEventListener('dragover', () => inspectorZone.classList.add('border-indigo-400', 'bg-indigo-500/5'));
+          inspectorZone.addEventListener('dragleave', () => inspectorZone.classList.remove('border-indigo-400', 'bg-indigo-500/5'));
+          inspectorZone.addEventListener('drop', e => {
+            inspectorZone.classList.remove('border-indigo-400', 'bg-indigo-500/5');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+              this.handleInspectorFileUpload(e.dataTransfer.files[0]);
+            }
+          });
+          inspectorZone.addEventListener('click', () => document.getElementById('inspectorFileInput').click());
+        }
       }
+
 
       async handleAudioUpload(file) {
         if (!file) return;
         this.selectedFile = file;
 
+        // Dynamic Filtering of Dropdown
+        const ext = file.name.split('.').pop().toLowerCase();
+        this.updateFormatDropdown(ext);
+
         // Update File Card UI
+        document.getElementById('dropZone').classList.add('hidden');
         document.getElementById('fileLoadedCard').classList.remove('hidden');
+        document.getElementById('converterActionsBar').classList.remove('hidden');
         document.getElementById('fileNameDisplay').textContent = file.name;
         document.getElementById('fileSizeDisplay').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-        
-        // Enable Convert Button
-        const convertBtn = document.getElementById('convertBtn');
-        convertBtn.disabled = false;
-        convertBtn.className = 'w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-slate-200 to-slate-400 light:from-slate-900 light:to-slate-800 light:text-white text-slate-950 cursor-pointer shadow-lg transition-all';
+        document.getElementById('detectedFormatBadge').textContent = ext.toUpperCase();
 
         // Update Inspector Status
-        document.getElementById('inspectorStatus').textContent = 'Analyzing Track...';
-        document.getElementById('inspectorStatus').className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-slate-700 text-slate-200 light:bg-slate-300 light:text-slate-800 font-bold border border-slate-600';
+        document.getElementById('inspectorStatus').textContent = 'Analyzing...';
+        document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-555/20 font-bold';
 
         // Decode Audio with Web Audio API
         try {
@@ -791,8 +1326,11 @@
           document.getElementById('metaChannels').textContent = this.audioBuffer.numberOfChannels;
 
           document.getElementById('inspectorStatus').textContent = 'Analysis Complete';
-          document.getElementById('inspectorStatus').className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 font-bold border border-emerald-500/30';
+          document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 font-bold border border-emerald-500/30';
           this.showToast('Audio analyzed successfully!', 'success');
+
+          // Load into Trimmer
+          this.loadAudioIntoTrimmer(file);
 
         } catch (err) {
           console.error('Audio decode error:', err);
@@ -807,20 +1345,15 @@
           this.audioSourceNode.stop();
           this.isPlaying = false;
         }
-        document.getElementById('fileLoadedCard').classList.add('hidden');
-        document.getElementById('convertBtn').disabled = true;
-        document.getElementById('convertBtn').className = 'w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-slate-800 light:bg-slate-300 text-slate-500 cursor-not-allowed transition-all';
-        document.getElementById('waveformPlaceholder').classList.remove('hidden');
-        document.getElementById('playAudioBtn').classList.add('hidden');
-        document.getElementById('gainValueDisplay').textContent = '-- dB';
-        document.getElementById('bpmValueDisplay').textContent = '-- BPM';
-        document.getElementById('metaDuration').textContent = '00:00';
-        document.getElementById('metaSampleRate').textContent = '-- Hz';
-        document.getElementById('metaChannels').textContent = '--';
         
-        const canvas = document.getElementById('waveformCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Restore Layout State
+        document.getElementById('dropZone').classList.remove('hidden');
+        document.getElementById('fileLoadedCard').classList.add('hidden');
+        document.getElementById('converterActionsBar').classList.add('hidden');
+        this.updateFormatDropdown(''); // restore full formats list
+        
+        this.resetInspectorState();
+        this.resetTrimmerState();
       }
 
       drawWaveform(buffer) {
@@ -837,8 +1370,8 @@
 
         ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
         ctx.beginPath();
-        ctx.strokeStyle = isLight ? '#0f172a' : '#cbd5e1';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = isLight ? '#4f46e5' : '#6366f1';
+        ctx.lineWidth = 1.2;
 
         for (let i = 0; i < canvas.offsetWidth; i++) {
           let min = 1.0;
@@ -861,35 +1394,44 @@
         if (this.isPlaying) {
           if (this.audioSourceNode) this.audioSourceNode.stop();
           this.isPlaying = false;
-          icon.className = 'fa-solid fa-play ml-0.5';
+          icon.className = 'fa-solid fa-play text-xs ml-0.5';
         } else {
           this.audioSourceNode = this.audioContext.createBufferSource();
           this.audioSourceNode.buffer = this.audioBuffer;
           this.audioSourceNode.connect(this.audioContext.destination);
           this.audioSourceNode.onended = () => {
             this.isPlaying = false;
-            icon.className = 'fa-solid fa-play ml-0.5';
+            icon.className = 'fa-solid fa-play text-xs ml-0.5';
           };
           this.audioSourceNode.start(0);
           this.isPlaying = true;
-          icon.className = 'fa-solid fa-pause';
+          icon.className = 'fa-solid fa-pause text-xs';
         }
       }
 
       analyzeAudioMetrics(buffer) {
-        // 1. Calculate Gain Peak Offset (dBFS)
         const channelData = buffer.getChannelData(0);
         let maxPeak = 0;
+        let sumSquares = 0;
         for (let i = 0; i < channelData.length; i++) {
-          const abs = Math.abs(channelData[i]);
+          const val = channelData[i];
+          const abs = Math.abs(val);
           if (abs > maxPeak) maxPeak = abs;
+          sumSquares += val * val;
         }
 
         const peakDb = maxPeak > 0 ? (20 * Math.log10(maxPeak)).toFixed(1) : '-96.0';
-        const gainDisplay = peakDb > 0 ? `+${peakDb} dB` : `${peakDb} dB`;
-        document.getElementById('gainValueDisplay').textContent = gainDisplay;
+        document.getElementById('gainValueDisplay').textContent = peakDb > 0 ? `+${peakDb} dB` : `${peakDb} dB`;
 
-        // 2. Automatic BPM Detection via Autocorrelation Peak Detection
+        // Client-side integrated LUFS approximation
+        const rms = Math.sqrt(sumSquares / channelData.length);
+        let lufs = rms > 0 ? (20 * Math.log10(rms) - 0.6) : -96.0;
+        lufs = parseFloat(lufs.toFixed(1));
+        document.getElementById('lufsValueDisplay').textContent = `${lufs} LUFS`;
+
+        // Update Platform Penalty widget
+        this.updateLoudnessPenalty(lufs);
+
         const sampleRate = buffer.sampleRate;
         const downsampleFactor = 4;
         const sampledData = [];
@@ -897,7 +1439,6 @@
           sampledData.push(Math.abs(channelData[i]));
         }
 
-        // Energy envelope
         const windowSize = Math.floor(sampleRate / downsampleFactor * 0.05);
         const energyEnvelope = [];
         for (let i = 0; i < sampledData.length; i += windowSize) {
@@ -908,7 +1449,6 @@
           energyEnvelope.push(sum / windowSize);
         }
 
-        // Autocorrelation over BPM range [70, 165]
         const fps = (sampleRate / downsampleFactor) / windowSize;
         let maxCorrelation = 0;
         let bestBpm = 120;
@@ -931,16 +1471,50 @@
         document.getElementById('bpmValueDisplay').textContent = `${bestBpm} BPM`;
       }
 
+      updateLoudnessPenalty(lufs) {
+        const targetLUFS = {
+          spotify: -14,
+          apple: -16,
+          youtube: -14,
+          anghami: -14,
+          tidal: -14
+        };
+        const platforms = ['spotify', 'apple', 'youtube', 'anghami', 'tidal'];
+        platforms.forEach(p => {
+          const target = targetLUFS[p];
+          const el = document.getElementById(`penalty-${p}`);
+          if (!el) return;
+          
+          if (lufs > target) {
+            const penalty = (target - lufs).toFixed(1);
+            el.textContent = `${penalty} dB`;
+            el.className = "text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/25";
+          } else {
+            el.textContent = "0.0 dB - Safe";
+            el.className = "text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 light:bg-emerald-100 light:text-emerald-800";
+          }
+        });
+      }
+
+      resetLoudnessPenalty() {
+        const platforms = ['spotify', 'apple', 'youtube', 'anghami', 'tidal'];
+        platforms.forEach(p => {
+          const el = document.getElementById(`penalty-${p}`);
+          if (el) {
+            el.textContent = '--';
+            el.className = "text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10";
+          }
+        });
+      }
+
       async processAudioConversion() {
         if (!this.audioBuffer) return;
         const targetFormat = document.getElementById('targetFormatSelect').value;
         this.showToast(`Encoding local audio to .${targetFormat}...`, 'info');
 
-        // Convert AudioBuffer to WAV Blob
         const wavBlob = this.audioBufferToWavBlob(this.audioBuffer);
         const filename = this.selectedFile.name.replace(/\.[^/.]+$/, "") + `_sonvex.${targetFormat}`;
 
-        // Trigger Direct Download
         const url = URL.createObjectURL(wavBlob);
         const a = document.createElement('a');
         a.style.display = 'none';
@@ -1013,8 +1587,273 @@
         return new Blob([outBuffer], { type: 'audio/wav' });
       }
 
-      // GEMINI AI LYRICS GENERATOR & STREAMING CHAT
+      // CUSTOM AUDIO PLAYERS CONTROLLERS
+      setupCustomPlayers() {
+        const origPlayer = document.getElementById('remasterOriginalPlayer');
+        const remPlayer = document.getElementById('remasterAudioPlayer');
+
+        if (origPlayer) {
+          origPlayer.addEventListener('timeupdate', () => this.updatePlayerUI('orig', origPlayer));
+          origPlayer.addEventListener('loadedmetadata', () => this.updatePlayerUI('orig', origPlayer));
+          origPlayer.addEventListener('ended', () => {
+            document.getElementById('origPlayIcon').className = 'fa-solid fa-play text-xs';
+          });
+        }
+
+        if (remPlayer) {
+          remPlayer.addEventListener('timeupdate', () => this.updatePlayerUI('rem', remPlayer));
+          remPlayer.addEventListener('loadedmetadata', () => this.updatePlayerUI('rem', remPlayer));
+          remPlayer.addEventListener('ended', () => {
+            document.getElementById('remPlayIcon').className = 'fa-solid fa-play text-xs';
+          });
+        }
+      }
+
+      formatTime(secs) {
+        if (isNaN(secs) || secs === Infinity) return "0:00";
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+      }
+
+      updatePlayerUI(key, player) {
+        const timeDisplay = document.getElementById(`${key}TimeDisplay`);
+        const seekBar = document.getElementById(`${key}SeekBar`);
+        if (timeDisplay) {
+          timeDisplay.textContent = `${this.formatTime(player.currentTime)} / ${this.formatTime(player.duration)}`;
+        }
+        if (seekBar && player.duration) {
+          seekBar.value = (player.currentTime / player.duration) * 100;
+        }
+      }
+
+      toggleCustomPlay(key) {
+        const origPlayer = document.getElementById('remasterOriginalPlayer');
+        const remPlayer = document.getElementById('remasterAudioPlayer');
+        const activePlayer = key === 'orig' ? origPlayer : remPlayer;
+        const passivePlayer = key === 'orig' ? remPlayer : origPlayer;
+        
+        const activeIcon = document.getElementById(`${key}PlayIcon`);
+        const passiveKey = key === 'orig' ? 'rem' : 'orig';
+        const passiveIcon = document.getElementById(`${passiveKey}PlayIcon`);
+
+        // Mutual exclusion logic (Pause passive player)
+        if (!passivePlayer.paused) {
+          passivePlayer.pause();
+          passiveIcon.className = 'fa-solid fa-play text-xs';
+        }
+
+        if (activePlayer.paused) {
+          activePlayer.play();
+          activeIcon.className = 'fa-solid fa-pause text-xs';
+        } else {
+          activePlayer.pause();
+          activeIcon.className = 'fa-solid fa-play text-xs';
+        }
+      }
+
+      seekCustomAudio(key, pct) {
+        const player = key === 'orig' ? document.getElementById('remasterOriginalPlayer') : document.getElementById('remasterAudioPlayer');
+        if (player && player.duration) {
+          player.currentTime = (pct / 100) * player.duration;
+        }
+      }
+
+      setCustomVolume(key, val) {
+        const player = key === 'orig' ? document.getElementById('remasterOriginalPlayer') : document.getElementById('remasterAudioPlayer');
+        const muteIcon = document.getElementById(`${key}MuteIcon`);
+        if (player) {
+          player.volume = val;
+          player.muted = false;
+          
+          if (val == 0) {
+            muteIcon.className = 'fa-solid fa-volume-xmark';
+          } else if (val < 0.4) {
+            muteIcon.className = 'fa-solid fa-volume-low';
+          } else {
+            muteIcon.className = 'fa-solid fa-volume-high';
+          }
+        }
+      }
+
+      toggleCustomMute(key) {
+        const player = key === 'orig' ? document.getElementById('remasterOriginalPlayer') : document.getElementById('remasterAudioPlayer');
+        const muteIcon = document.getElementById(`${key}MuteIcon`);
+        const slider = document.getElementById(`${key}VolumeSlider`);
+        if (player) {
+          if (player.muted) {
+            player.muted = false;
+            slider.value = player.volume || 0.8;
+            muteIcon.className = player.volume < 0.4 ? 'fa-solid fa-volume-low' : 'fa-solid fa-volume-high';
+          } else {
+            player.muted = true;
+            slider.value = 0;
+            muteIcon.className = 'fa-solid fa-volume-xmark';
+          }
+        }
+      }
+
+      // CLIENT-SIDE DSP REMASTERER LOGIC
+      handleRemasterTargetSelect(file) {
+        if (!file) return;
+        const ext = file.name.split('.').pop().toLowerCase();
+        
+        document.getElementById('remasterDropZone').classList.add('hidden');
+        document.getElementById('remasterFileCard').classList.remove('hidden');
+        document.getElementById('remasterActionsBar').classList.remove('hidden');
+        
+        document.getElementById('remasterFileName').textContent = file.name;
+        document.getElementById('remasterFileSize').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        document.getElementById('remasterFormatBadge').textContent = ext.toUpperCase();
+
+        // 1. Bind and load Original Audio Player immediately
+        const originalUrl = URL.createObjectURL(file);
+        const originalPlayer = document.getElementById('remasterOriginalPlayer');
+        originalPlayer.src = originalUrl;
+        
+        // Reset Custom UI elements for original
+        document.getElementById('origPlayIcon').className = 'fa-solid fa-play text-xs';
+        document.getElementById('origSeekBar').value = 0;
+        
+        // 2. Reset Remastered audio preview player container to default disabled state
+        const audioPlayer = document.getElementById('remasterAudioPlayer');
+        audioPlayer.src = '';
+        document.getElementById('remasteredPlayerContainer').classList.add('opacity-40', 'pointer-events-none');
+        document.getElementById('remPlayIcon').className = 'fa-solid fa-play text-xs';
+        document.getElementById('remSeekBar').value = 0;
+        document.getElementById('remTimeDisplay').textContent = '0:00 / 0:00';
+        document.getElementById('remasterDownloadBtn').classList.add('hidden');
+        
+        this.showToast(`Track loaded for remastering: ${file.name}`, 'info');
+
+        // Load into Trimmer
+        this.loadAudioIntoTrimmer(file);
+      }
+
+      resetRemaster() {
+        const targetInput = document.getElementById('remasterTargetInput');
+        if (targetInput) targetInput.value = '';
+        
+        document.getElementById('remasterDropZone').classList.remove('hidden');
+        document.getElementById('remasterFileCard').classList.add('hidden');
+        document.getElementById('remasterActionsBar').classList.add('hidden');
+        
+        // Clear Original audio
+        const originalPlayer = document.getElementById('remasterOriginalPlayer');
+        originalPlayer.src = '';
+        document.getElementById('origPlayIcon').className = 'fa-solid fa-play text-xs';
+        document.getElementById('origSeekBar').value = 0;
+        document.getElementById('origTimeDisplay').textContent = '0:00 / 0:00';
+        
+        // Clear Remastered audio
+        const audioPlayer = document.getElementById('remasterAudioPlayer');
+        audioPlayer.src = '';
+        document.getElementById('remPlayIcon').className = 'fa-solid fa-play text-xs';
+        document.getElementById('remSeekBar').value = 0;
+        document.getElementById('remTimeDisplay').textContent = '0:00 / 0:00';
+        document.getElementById('remasteredPlayerContainer').classList.add('opacity-40', 'pointer-events-none');
+        
+        document.getElementById('remasterDownloadBtn').classList.add('hidden');
+        this.resetTrimmerState();
+      }
+
+      async processRemaster() {
+        const targetInput = document.getElementById('remasterTargetInput');
+        const remasterBtn = document.getElementById('remasterBtn');
+        const statusText = document.getElementById('remasterStatusText');
+        const audioPlayer = document.getElementById('remasterAudioPlayer');
+        const downloadBtn = document.getElementById('remasterDownloadBtn');
+
+        if (!targetInput.files || targetInput.files.length === 0) {
+          this.showToast('Please upload an audio file to remaster', 'error');
+          return;
+        }
+
+        const file = targetInput.files[0];
+
+        // Update UI to Loading State
+        remasterBtn.disabled = true;
+        statusText.classList.remove('hidden');
+        document.getElementById('remasteredPlayerContainer').classList.add('opacity-40', 'pointer-events-none');
+        downloadBtn.classList.add('hidden');
+
+        try {
+          // 1. Decode Audio locally
+          const arrayBuffer = await file.arrayBuffer();
+          const tempContext = new (window.AudioContext || window.webkitAudioContext)();
+          const sourceBuffer = await tempContext.decodeAudioData(arrayBuffer);
+
+          // 2. Create OfflineAudioContext for fast background DSP rendering
+          const offlineCtx = new OfflineAudioContext(
+            sourceBuffer.numberOfChannels,
+            sourceBuffer.length,
+            sourceBuffer.sampleRate
+          );
+
+          const bufferSource = offlineCtx.createBufferSource();
+          bufferSource.buffer = sourceBuffer;
+
+          // 3. DSP STEP 1: High-Pass Filter (Low-Cut at 30 Hz)
+          const hpf = offlineCtx.createBiquadFilter();
+          hpf.type = 'highpass';
+          hpf.frequency.setValueAtTime(30, offlineCtx.currentTime);
+
+          // 4. DSP STEP 2: Parametric EQ
+          // Low-Mid Warmth (Bell EQ around 250 Hz, +1.0 dB, Q=1.0)
+          const lowMidEQ = offlineCtx.createBiquadFilter();
+          lowMidEQ.type = 'peaking';
+          lowMidEQ.frequency.setValueAtTime(250, offlineCtx.currentTime);
+          lowMidEQ.Q.setValueAtTime(1.0, offlineCtx.currentTime);
+          lowMidEQ.gain.setValueAtTime(1.0, offlineCtx.currentTime);
+
+          // High-Mid Clarity (Bell EQ around 3.5 kHz, +1.5 dB, Q=1.0)
+          const highMidEQ = offlineCtx.createBiquadFilter();
+          highMidEQ.type = 'peaking';
+          highMidEQ.frequency.setValueAtTime(3500, offlineCtx.currentTime);
+          highMidEQ.Q.setValueAtTime(1.0, offlineCtx.currentTime);
+          highMidEQ.gain.setValueAtTime(1.5, offlineCtx.currentTime);
+
+          // High Shelf Air (High-shelf filter at 10 kHz, +2.0 dB)
+          const highShelfEQ = offlineCtx.createBiquadFilter();
+          highShelfEQ.type = 'highshelf';
+          highShelfEQ.frequency.setValueAtTime(10000, offlineCtx.currentTime);
+          highShelfEQ.gain.setValueAtTime(2.0, offlineCtx.currentTime);
+
+          // 5. DSP STEP 3: Dynamics Compressor Node (Threshold: -18 dB, Knee: 12 dB, Ratio: 3:1, Attack: 0.01s, Release: 0.25s)
+          const compressor = offlineCtx.createDynamicsCompressor();
+          compressor.threshold.setValueAtTime(-18, offlineCtx.currentTime);
+          compressor.knee.setValueAtTime(12, offlineCtx.currentTime);
+          compressor.ratio.setValueAtTime(3, offlineCtx.currentTime);
+          compressor.attack.setValueAtTime(0.01, offlineCtx.currentTime);
+          compressor.release.setValueAtTime(0.25, offlineCtx.currentTime);
+
+          // 6. DSP STEP 4: Peak Limiter Node (Hard limiter ceiling set at -0.3 dBFS)
+          const limiter = offlineCtx.createDynamicsCompressor();
+          limiter.threshold.setValueAtTime(-0.3, offlineCtx.currentTime);
+          limiter.knee.setValueAtTime(0, offlineCtx.currentTime);
+          limiter.ratio.setValueAtTime(20, offlineCtx.currentTime);
+          limiter.attack.setValueAtTime(0.001, offlineCtx.currentTime);
+          limiter.release.setValueAtTime(0.05, offlineCtx.currentTime);
+
+          // Connect DSP Node chain
+          bufferSource.connect(hpf);
+          hpf.connect(lowMidEQ);
+          lowMidEQ.connect(highMidEQ);
+          highMidEQ.connect(highShelfEQ);
+          highShelfEQ.connect(compressor);
+          compressor.connect(limiter);
+          limiter.connect(offlineCtx.destination);
+
+          // Render
+          bufferSource.start(0);
+          const renderedBuffer = await offlineCtx.startRendering();
+
+          // 7. Convert rendered AudioBuffer to WAV Blob
+            // GEMINI AI LYRICS GENERATOR & STREAMING CHAT
       async generateLyrics() {
+        this.messages = [];
+        this.chatHistory = [];
+
         const genre = document.getElementById('genreSelect').value;
         const lang = document.getElementById('lyricLanguage').value;
         const verseCount = document.getElementById('verseSelect').value;
@@ -1025,6 +1864,7 @@
 
         let langDesc = "English";
         if (lang === 'ar_casual') langDesc = "Casual / Street Slang Arabic (عامية)";
+        if (lang === 'ar_simple') langDesc = "Simple Standard Arabic (الفصحى البسيطة / البيضاء)";
         if (lang === 'ar_msa') langDesc = "Modern Standard Arabic (فصحى)";
 
         const prompt = `Act as a world-class professional music songwriter and lyricist. Compose complete original song lyrics based strictly on these studio parameters:
@@ -1041,9 +1881,13 @@ CRITICAL FORMATTING INSTRUCTIONS:
 2. Structure the output clearly using standard section headers in brackets: [Verse 1], [Chorus], [Verse 2], etc.
 3. Write rhythmically tight, rhyming, studio-ready lines.`;
 
-        this.appendChatMessage('user', `🎵 Requesting lyrics composition:\n• Genre: ${genre}\n• Language: ${langDesc}\n• Verses: ${verseCount} | Choruses: ${chorusCount}\n• Topic: ${topic || 'Default'}`);
+        // Push UI-only message
+        this.appendChatMessageUI('user', `🎵 Requesting lyrics composition:\n• Genre: ${genre}\n• Language: ${langDesc}\n• Verses: ${verseCount} | Choruses: ${chorusCount}\n• Topic: ${topic || 'Default'}`);
 
-        await this.streamGeminiResponse(prompt);
+        // Set state history to the initial parameters prompt
+        this.messages.push({ role: 'user', content: prompt });
+
+        await this.streamGeminiResponse();
       }
 
       async sendChatMessage() {
@@ -1054,9 +1898,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
         input.value = '';
         this.appendChatMessage('user', text);
         
-        const systemPrompt = `You are SONVEX STUDIO AI Lyricist. The user wants to refine or edit song lyrics. Help them adjust rhymes, rewrite verses, tweak vibes, or add sections while maintaining strict lyric structure without stage/instrumental directions. Prompt: ${text}`;
-        
-        await this.streamGeminiResponse(systemPrompt);
+        await this.streamGeminiResponse();
       }
 
       async regenerateVerse() {
@@ -1065,81 +1907,98 @@ CRITICAL FORMATTING INSTRUCTIONS:
           return;
         }
         this.appendChatMessage('user', '🔄 Re-generate verse / lyrics with fresh rhymes');
-        const lastPrompt = "Regenerate the song lyrics with alternative rhyme schemes, fresh metaphors, and elevated rhythmic flow based on previous settings.";
-        await this.streamGeminiResponse(lastPrompt);
+        await this.streamGeminiResponse();
       }
 
-async streamGeminiResponse(promptText) {
-  const workerUrl = "https://fragrant-sound-d488.sonvexbeat.workers.dev";
-  const messageId = 'msg_' + Date.now();
-  const chatWindow = document.getElementById('chatConsoleWindow');
-  
-  if (!chatWindow) return;
+      async streamGeminiResponse() {
+        const workerUrl = "https://fragrant-sound-d488.sonvexbeat.workers.dev";
+        const messageId = 'msg_' + Date.now();
+        const chatWindow = document.getElementById('chatConsoleWindow');
+        
+        if (!chatWindow) return;
 
-  const msgDiv = document.createElement('div');
-  msgDiv.className = 'flex items-start gap-3 animate-fadeIn';
-  msgDiv.innerHTML = `
-    <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
-      <i class="fa-solid fa-robot"></i>
-    </div>
-    <div class="glass-panel p-4 rounded-xl w-full max-w-3xl border-white/10 light:border-slate-300 space-y-2">
-      <p class="font-bold text-slate-200 light:text-slate-900 text-xs flex items-center justify-between">
-        <span>SONVEX AI Assistant</span>
-        <span id="${messageId}_typing" class="text-[10px] text-slate-300 light:text-slate-600 font-mono animate-pulse">Streaming lyrics...</span>
-      </p>
-      <div id="${messageId}" class="lyric-box p-3 rounded-lg text-slate-200 light:text-slate-900 leading-relaxed font-mono"></div>
-    </div>
-  `;
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'flex items-start gap-3 animate-fadeIn';
+        msgDiv.innerHTML = `
+          <div class="w-7 h-7 rounded-lg bg-indigo-950 text-indigo-100 flex items-center justify-center font-bold text-xs shrink-0 border border-indigo-500/10">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div class="glass-panel p-4 rounded-xl w-full max-w-3xl border-indigo-500/10 light:border-indigo-200 space-y-2">
+            <p class="font-bold text-indigo-100 light:text-indigo-955 text-xs flex items-center justify-between">
+              <span>SONVEX AI Assistant</span>
+              <span id="${messageId}_typing" class="text-[10px] text-indigo-355 light:text-indigo-655 font-mono animate-pulse">Streaming lyrics...</span>
+            </p>
+            <div id="${messageId}" class="lyric-box p-3 rounded-lg text-indigo-100 light:text-indigo-955 leading-relaxed font-mono"></div>
+          </div>
+        `;
 
-  chatWindow.appendChild(msgDiv);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
+        chatWindow.appendChild(msgDiv);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
 
-  const contentDiv = document.getElementById(messageId);
-  const typingIndicator = document.getElementById(`${messageId}_typing`);
+        const contentDiv = document.getElementById(messageId);
+        const typingIndicator = document.getElementById(`${messageId}_typing`);
 
-  try {
-    const response = await fetch(workerUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ promptText: promptText })
-    });
+        // Build fallback concatenated promptText from last 10 messages context
+        const fallbackPromptText = this.messages.map(m => {
+          const label = m.role === 'user' ? 'User' : 'Assistant';
+          return `${label}: ${m.content}`;
+        }).join('\n\n');
 
-    const data = await response.json();
-    console.log("API Response Data:", data); // لمراجعة الرد من Console المتصفح
+        try {
+          const response = await fetch(workerUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              promptText: fallbackPromptText,
+              messages: this.messages
+            })
+          });
 
-    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-      const generatedText = data.candidates[0].content.parts[0].text;
-      contentDiv.innerText = generatedText;
-      this.chatHistory.push({ role: 'model', text: generatedText });
-    } else if (data.error) {
-      // إظهار رسالة الخطأ القادمة من جوجل بالتفصيل لمعرفة السبب
-      const errorMsg = data.error.message || JSON.stringify(data.error);
-      contentDiv.innerText = `⚠️ خطأ من الـ API (${data.error.code || 'Error'}): ${errorMsg}`;
-      this.showToast(`خطأ: ${errorMsg}`, 'error');
-    } else {
-      contentDiv.innerText = "لم يتم إرجاع أي نص. قد يكون الرد حُجب بواسطة فلتر الأمان لدى جوجل.";
-    }
-  } catch (error) {
-    console.error("Fetch Error:", error);
-    contentDiv.innerText = `تعذر الاتصال بالخادم: ${error.message}`;
-    this.showToast("تعذر الاتصال بالخادم.", 'error');
-  } finally {
-    if (typingIndicator) typingIndicator.remove();
-  }
-}
+          const data = await response.json();
+          console.log("API Response Data:", data);
 
-      appendChatMessage(role, text) {
+          if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+            const generatedText = data.candidates[0].content.parts[0].text;
+            contentDiv.innerText = generatedText;
+            
+            this.chatHistory.push({ role: 'model', text: generatedText });
+            
+            // Push assistant response to history
+            this.messages.push({
+              role: 'assistant',
+              content: generatedText
+            });
+            if (this.messages.length > 10) {
+              this.messages = this.messages.slice(-10);
+            }
+          } else if (data.error) {
+            const errorMsg = data.error.message || JSON.stringify(data.error);
+            contentDiv.innerText = `⚠️ خطأ من الـ API (${data.error.code || 'Error'}): ${errorMsg}`;
+            this.showToast(`خطأ: ${errorMsg}`, 'error');
+          } else {
+            contentDiv.innerText = "لم يتم إرجاع أي نص. قد يكون الرد حُجب بواسطة فلتر الأمان لدى جوجل.";
+          }
+        } catch (error) {
+          console.error("Fetch Error:", error);
+          contentDiv.innerText = `تعذر الاتصال بالخادم: ${error.message}`;
+          this.showToast("تعذر الاتصال بالخادم.", 'error');
+        } finally {
+          if (typingIndicator) typingIndicator.remove();
+        }
+      }
+
+      appendChatMessageUI(role, text) {
         const chatWindow = document.getElementById('chatConsoleWindow');
         const msgDiv = document.createElement('div');
         msgDiv.className = 'flex items-start gap-3 animate-fadeIn';
         
         if (role === 'user') {
           msgDiv.innerHTML = `
-            <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
+            <div class="w-7 h-7 rounded-lg bg-indigo-950 text-indigo-100 flex items-center justify-center font-bold text-xs shrink-0 border border-indigo-500/10">
               <i class="fa-solid fa-user"></i>
             </div>
-            <div class="glass-panel p-3.5 rounded-xl border-slate-700 light:border-slate-300 bg-slate-900/60 light:bg-white max-w-xl text-slate-200 light:text-slate-900">
-              <p class="font-bold text-slate-300 light:text-slate-900 text-[11px] mb-1">Studio Producer</p>
+            <div class="glass-panel p-3.5 rounded-xl border-indigo-500/10 bg-indigo-950/60 light:bg-white max-w-xl text-indigo-100 light:text-indigo-955">
+              <p class="font-bold text-indigo-200 light:text-indigo-955 text-[11px] mb-1">Studio Producer</p>
               <p class="whitespace-pre-wrap">${text}</p>
             </div>
           `;
@@ -1147,6 +2006,17 @@ async streamGeminiResponse(promptText) {
         chatWindow.appendChild(msgDiv);
         chatWindow.scrollTop = chatWindow.scrollHeight;
         this.chatHistory.push({ role, text });
+      }
+
+      appendChatMessage(role, text) {
+        this.appendChatMessageUI(role, text);
+        this.messages.push({
+          role: role === 'user' ? 'user' : 'assistant',
+          content: text
+        });
+        if (this.messages.length > 10) {
+          this.messages = this.messages.slice(-10);
+        }
       }
 
       copyFullChatLyrics() {
@@ -1170,18 +2040,19 @@ async streamGeminiResponse(promptText) {
         const chatWindow = document.getElementById('chatConsoleWindow');
         chatWindow.innerHTML = `
           <div class="flex items-start gap-3">
-            <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
+            <div class="w-7 h-7 rounded-lg bg-indigo-950 text-indigo-100 flex items-center justify-center font-bold text-xs shrink-0 border border-indigo-500/10">
               <i class="fa-solid fa-robot"></i>
             </div>
-            <div class="glass-panel p-4 rounded-xl max-w-2xl border-white/10 light:border-slate-300">
-              <p class="font-bold text-slate-200 light:text-slate-900 mb-1">SONVEX AI Assistant</p>
-              <p class="text-slate-300 light:text-slate-700 leading-relaxed" data-i18n="chatWelcome">
+            <div class="glass-panel p-4 rounded-xl max-w-2xl border-indigo-500/10 light:border-indigo-200">
+              <p class="font-bold text-indigo-100 light:text-indigo-955 mb-1">SONVEX AI Assistant</p>
+              <p class="text-indigo-350 light:text-indigo-850 leading-relaxed" data-i18n="chatWelcome">
                 ${translations[this.currentLang].chatWelcome}
               </p>
             </div>
           </div>
         `;
         this.chatHistory = [];
+        this.messages = [];
         this.showToast('Chat history cleared.', 'info');
       }
 
@@ -1189,14 +2060,14 @@ async streamGeminiResponse(promptText) {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         
-        let colorClass = 'bg-slate-900 text-slate-200 border-slate-600 light:bg-white light:text-slate-900 light:border-slate-300';
+        let colorClass = 'bg-indigo-955 text-indigo-100 border-indigo-500/10 light:bg-white light:text-indigo-955 light:border-indigo-200';
         let iconClass = 'fa-solid fa-circle-info';
         
         if (type === 'success') {
-          colorClass = 'bg-slate-900 text-emerald-300 border-emerald-500/40 light:bg-emerald-50 light:text-emerald-900 light:border-emerald-300';
+          colorClass = 'bg-indigo-955 text-emerald-305 border-emerald-500/40 light:bg-emerald-50 light:text-emerald-955 light:border-indigo-200';
           iconClass = 'fa-solid fa-circle-check';
         } else if (type === 'error') {
-          colorClass = 'bg-slate-900 text-red-400 border-red-500/40 light:bg-red-50 light:text-red-900 light:border-red-300';
+          colorClass = 'bg-indigo-955 text-red-400 border-red-500/40 light:bg-red-50 light:text-red-955 light:border-indigo-200';
           iconClass = 'fa-solid fa-triangle-exclamation';
         }
 
@@ -1208,6 +2079,375 @@ async streamGeminiResponse(promptText) {
           toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
           setTimeout(() => toast.remove(), 300);
         }, 3500);
+      }
+
+      initBgMusicNotes() {
+        const canvas = document.getElementById('bgMusicNotesCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        
+        window.addEventListener('resize', () => {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+        });
+        
+        const notes = ['♪', '♫', '♩', '♬', '𝅘𝅥𝅯', '𝅘𝅥𝅰'];
+        const particles = [];
+        const maxParticles = 35; // small and gentle rain of notes
+        
+        class NoteParticle {
+          constructor() {
+            this.reset();
+            this.y = Math.random() * height; // distribute notes initially
+          }
+          reset() {
+            this.x = Math.random() * width;
+            this.y = -20;
+            this.size = Math.random() * 10 + 8; // small elegant notes
+            this.speed = Math.random() * 0.7 + 0.3; // gentle speed
+            this.wind = Math.random() * 0.3 - 0.15; // gentle side float
+            this.opacity = Math.random() * 0.12 + 0.04; // very soft and glassmorphic
+            this.char = notes[Math.floor(Math.random() * notes.length)];
+          }
+          update() {
+            this.y += this.speed;
+            this.x += this.wind;
+            if (this.y > height + 20 || this.x < -20 || this.x > width + 20) {
+              this.reset();
+            }
+          }
+          draw() {
+            const isLight = document.documentElement.classList.contains('light');
+            ctx.font = `${this.size}px serif`;
+            const color = isLight ? `rgba(79, 70, 229, ${this.opacity * 4.0})` : `rgba(165, 180, 252, ${this.opacity})`;
+            ctx.fillStyle = color;
+            ctx.fillText(this.char, this.x, this.y);
+          }
+        }
+        
+        for (let i = 0; i < maxParticles; i++) {
+          particles.push(new NoteParticle());
+        }
+        
+        function animateBg() {
+          ctx.clearRect(0, 0, width, height);
+          particles.forEach(p => {
+            p.update();
+            p.draw();
+          });
+          requestAnimationFrame(animateBg);
+        }
+        animateBg();
+      }
+
+      // WAVESURFER AUDIO TRIMMER & TEASER MAKER
+      initWavesurferTrimmer() {
+        if (this.wavesurferInstance) return;
+
+        this.wavesurferInstance = WaveSurfer.create({
+          container: '#trimmerWaveform',
+          waveColor: '#818cf8',
+          progressColor: '#4f46e5',
+          height: 90,
+          responsive: true,
+          cursorWidth: 0,
+        });
+
+        // Register regions plugin
+        this.wavesurferRegions = this.wavesurferInstance.registerPlugin(WaveSurfer.Regions.create());
+
+        // Event listeners
+        this.wavesurferRegions.on('region-updated', (region) => {
+          this.updateTrimmerRegionDisplays(region);
+        });
+
+        this.wavesurferInstance.on('audioprocess', () => {
+          // Loop playback inside selection region
+          if (this.wavesurferInstance.isPlaying() && this.activeTrimRegion) {
+            const current = this.wavesurferInstance.getCurrentTime();
+            if (current >= this.activeTrimRegion.end) {
+              this.wavesurferInstance.setTime(this.activeTrimRegion.start);
+            }
+          }
+        });
+
+        this.wavesurferInstance.on('finish', () => {
+          document.getElementById('trimPlayIcon').className = 'fa-solid fa-circle-play text-sm';
+          this.isTrimmerPlaying = false;
+        });
+      }
+
+      async handleTrimmerFileUpload(file) {
+        if (!file) return;
+        this.showToast(`Loading track into trimmer: ${file.name}`, 'info');
+        await this.loadAudioIntoTrimmer(file);
+      }
+
+      async loadAudioIntoTrimmer(file) {
+        this.initWavesurferTrimmer();
+        document.getElementById('trimmerPlaceholder').classList.add('hidden');
+        document.getElementById('trimmerContent').classList.remove('hidden');
+        document.getElementById('trimOutputBar').classList.add('hidden');
+
+        this.selectedFile = file;
+
+        // Set the filename display inside the Trimmer card
+        const nameDisplay = document.getElementById('trimmerFileNameDisplay');
+        if (nameDisplay) {
+          nameDisplay.textContent = file.name;
+        }
+
+        // Decode arrayBuffer to raw AudioBuffer in trimmer context
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+          this.trimmerAudioBuffer = await tempCtx.decodeAudioData(arrayBuffer);
+        } catch (err) {
+          console.error('Trimmer AudioBuffer decoding error:', err);
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+        this.wavesurferInstance.load(objectUrl);
+
+        this.wavesurferInstance.once('ready', () => {
+          this.wavesurferRegions.clearRegions();
+          const duration = this.wavesurferInstance.getDuration();
+          const regionLen = Math.min(30, duration);
+          const start = Math.max(0, (duration - regionLen) / 2);
+          const end = start + regionLen;
+
+          this.activeTrimRegion = this.wavesurferRegions.addRegion({
+            start: start,
+            end: end,
+            color: 'rgba(99, 102, 241, 0.25)',
+            drag: true,
+            resize: true
+          });
+
+          this.updateTrimmerRegionDisplays(this.activeTrimRegion);
+        });
+      }
+
+      formatTrimmerTime(secs) {
+        if (isNaN(secs)) return "00:00.00";
+        const m = Math.floor(secs / 60).toString().padStart(2, '0');
+        const s = Math.floor(secs % 60).toString().padStart(2, '0');
+        const ms = Math.floor((secs % 1) * 100).toString().padStart(2, '0');
+        return `${m}:${s}.${ms}`;
+      }
+
+      updateTrimmerRegionDisplays(region) {
+        if (!region) return;
+        this.activeTrimRegion = region;
+        const start = region.start;
+        const end = region.end;
+        const duration = end - start;
+
+        document.getElementById('trimStartDisplay').textContent = this.formatTrimmerTime(start);
+        document.getElementById('trimEndDisplay').textContent = this.formatTrimmerTime(end);
+        document.getElementById('trimDurationDisplay').textContent = `${duration.toFixed(2)}s`;
+      }
+
+      applyTrimmerPreset(seconds) {
+        if (!this.wavesurferInstance || !this.activeTrimRegion) return;
+        const duration = this.wavesurferInstance.getDuration();
+        const regionLen = Math.min(seconds, duration);
+        const currentCenter = (this.activeTrimRegion.start + this.activeTrimRegion.end) / 2;
+
+        let start = Math.max(0, currentCenter - regionLen / 2);
+        let end = start + regionLen;
+        if (end > duration) {
+          end = duration;
+          start = Math.max(0, end - regionLen);
+        }
+
+        this.activeTrimRegion.setOptions({
+          start: start,
+          end: end
+        });
+
+        this.updateTrimmerRegionDisplays(this.activeTrimRegion);
+      }
+
+      toggleTrimmerPreview() {
+        if (!this.wavesurferInstance || !this.activeTrimRegion) return;
+
+        const icon = document.getElementById('trimPlayIcon');
+        if (this.isTrimmerPlaying) {
+          this.wavesurferInstance.pause();
+          this.isTrimmerPlaying = false;
+          icon.className = 'fa-solid fa-circle-play text-sm';
+        } else {
+          // Pause main inspectors/remaster players
+          if (this.isPlaying && this.audioSourceNode) {
+            this.audioSourceNode.stop();
+            this.isPlaying = false;
+            document.getElementById('playIcon').className = 'fa-solid fa-play text-xs ml-0.5';
+          }
+          const origPlayer = document.getElementById('remasterOriginalPlayer');
+          const remPlayer = document.getElementById('remasterAudioPlayer');
+          if (origPlayer && !origPlayer.paused) {
+            origPlayer.pause();
+            document.getElementById('origPlayIcon').className = 'fa-solid fa-play text-xs';
+          }
+          if (remPlayer && !remPlayer.paused) {
+            remPlayer.pause();
+            document.getElementById('remPlayIcon').className = 'fa-solid fa-play text-xs';
+          }
+
+          this.wavesurferInstance.setTime(this.activeTrimRegion.start);
+          this.wavesurferInstance.play();
+          this.isTrimmerPlaying = true;
+          icon.className = 'fa-solid fa-circle-pause text-sm';
+        }
+      }
+
+      cropAudioSelection() {
+        const bufferToSlice = this.trimmerAudioBuffer || this.audioBuffer;
+        if (!bufferToSlice || !this.activeTrimRegion) {
+          this.showToast('No active audio buffer to trim.', 'error');
+          return;
+        }
+
+        this.showToast('Slicing audio buffer client-side...', 'info');
+
+        const start = this.activeTrimRegion.start;
+        const end = this.activeTrimRegion.end;
+        const sampleRate = bufferToSlice.sampleRate;
+        const startFrame = Math.floor(start * sampleRate);
+        const endFrame = Math.floor(end * sampleRate);
+        const frameCount = endFrame - startFrame;
+
+        if (frameCount <= 0) {
+          this.showToast('Invalid trim selection.', 'error');
+          return;
+        }
+
+        const tempContext = new (window.AudioContext || window.webkitAudioContext)();
+        const slicedBuffer = tempContext.createBuffer(
+          bufferToSlice.numberOfChannels,
+          frameCount,
+          sampleRate
+        );
+
+        for (let channel = 0; channel < bufferToSlice.numberOfChannels; channel++) {
+          const channelData = bufferToSlice.getChannelData(channel);
+          const slicedData = slicedBuffer.getChannelData(channel);
+          slicedData.set(channelData.subarray(startFrame, endFrame));
+        }
+
+        const wavBlob = this.audioBufferToWavBlob(slicedBuffer);
+        const url = URL.createObjectURL(wavBlob);
+
+        const downloadBtn = document.getElementById('downloadTrimmedBtn');
+        const filename = this.selectedFile.name.replace(/\.[^/.]+$/, "") + `_trimmed.wav`;
+
+        downloadBtn.onclick = () => {
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+          }, 1000);
+          this.showToast(`Downloaded trimmed audio: ${filename}`, 'success');
+        };
+
+        document.getElementById('trimOutputBar').classList.remove('hidden');
+        this.showToast('Audio trimmed successfully! Click Download to save.', 'success');
+      }
+
+      resetTrimmerState() {
+        document.getElementById('trimmerPlaceholder').classList.remove('hidden');
+        document.getElementById('trimmerContent').classList.add('hidden');
+        if (this.wavesurferInstance) {
+          try {
+            this.wavesurferInstance.destroy();
+          } catch (e) {}
+          this.wavesurferInstance = null;
+          this.wavesurferRegions = null;
+          this.activeTrimRegion = null;
+          this.trimmerAudioBuffer = null;
+          this.isTrimmerPlaying = false;
+        }
+      }
+
+      async handleInspectorFileUpload(file) {
+        if (!file) return;
+        this.selectedFile = file;
+        this.showToast(`Loading track into inspector: ${file.name}`, 'info');
+
+        // Decode Audio and Analyze
+        try {
+          document.getElementById('inspectorStatus').textContent = 'Analyzing...';
+          document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-555/20 font-bold';
+
+          const arrayBuffer = await file.arrayBuffer();
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+
+          this.drawWaveform(this.audioBuffer);
+          document.getElementById('playAudioBtn').classList.remove('hidden');
+
+          this.analyzeAudioMetrics(this.audioBuffer);
+
+          const durationSec = this.audioBuffer.duration;
+          const mins = Math.floor(durationSec / 60);
+          const secs = Math.floor(durationSec % 60).toString().padStart(2, '0');
+          document.getElementById('metaDuration').textContent = `${mins}:${secs}`;
+          document.getElementById('metaSampleRate').textContent = `${this.audioBuffer.sampleRate} Hz`;
+          document.getElementById('metaChannels').textContent = this.audioBuffer.numberOfChannels;
+
+          document.getElementById('inspectorStatus').textContent = 'Analysis Complete';
+          document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 font-bold border border-emerald-500/30';
+          this.showToast('Audio analyzed successfully!', 'success');
+          
+          // Also load into Trimmer
+          this.loadAudioIntoTrimmer(file);
+
+          // Update Inspector UI card displays
+          document.getElementById('inspectorPlaceholder').classList.add('hidden');
+          document.getElementById('inspectorContent').classList.remove('hidden');
+          document.getElementById('inspectorFileNameDisplay').textContent = file.name;
+        } catch (err) {
+          console.error('Inspector decoding error:', err);
+          this.showToast('Could not decode audio file for analysis.', 'error');
+        }
+      }
+
+      resetInspectorState() {
+        this.selectedFile = null;
+        this.audioBuffer = null;
+        if (this.isPlaying && this.audioSourceNode) {
+          this.audioSourceNode.stop();
+          this.isPlaying = false;
+        }
+
+        document.getElementById('inspectorPlaceholder').classList.remove('hidden');
+        document.getElementById('inspectorContent').classList.add('hidden');
+
+        document.getElementById('playAudioBtn').classList.add('hidden');
+        document.getElementById('gainValueDisplay').textContent = '-- dB';
+        document.getElementById('lufsValueDisplay').textContent = '-- LUFS';
+        document.getElementById('bpmValueDisplay').textContent = '-- BPM';
+        document.getElementById('metaDuration').textContent = '00:00';
+        document.getElementById('metaSampleRate').textContent = '-- Hz';
+        document.getElementById('metaChannels').textContent = '--';
+        this.resetLoudnessPenalty();
+
+        const canvas = document.getElementById('waveformCanvas');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        document.getElementById('inspectorStatus').textContent = 'Awaiting File...';
+        document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold';
       }
     }
 
