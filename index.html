@@ -51,15 +51,37 @@
   <!-- Wavesurfer.js & Regions Plugin CDN -->
   <script src="https://unpkg.com/wavesurfer.js@7"></script>
   <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/regions.min.js"></script>
+  <script src="https://unpkg.com/wavesurfer.js@7/dist/plugins/timeline.min.js"></script>
   
   <style>
     /* RADICAL COSMIC MIDNIGHT-INDIGO THEME FOR DARK MODE (ZERO GRAY) */
     html {
       background-color: #04040f !important;
+      min-height: 100%;
     }
     body {
       background-color: transparent !important;
       color: #ebf0ff !important;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .light {
+      background-color: #f0f3ff !important;
+    }
+    .light body {
+      background-color: transparent !important;
+      color: #0b0f2f !important;
+    }
+
+    /* Ensure page background fills full scroll height in light mode */
+    .light::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #f0f3ff 0%, #e5eaff 100%);
+      z-index: -30;
+      pointer-events: none;
     }
 
     #bgGradientLayer {
@@ -115,14 +137,6 @@
     }
 
     /* PREMIUM LIGHT MODE STYLING OVERHAUL (ICE-BLUE THEME, ZERO GRAY, DEEP SHADOWS) */
-    .light {
-      background-color: #f0f3ff !important;
-    }
-    .light body {
-      background-color: transparent !important;
-      color: #0b0f2f !important;
-    }
-
     .light #bgGradientLayer {
       background: linear-gradient(135deg, #f0f3ff 0%, #e5eaff 100%) !important;
     }
@@ -345,6 +359,363 @@
     .light header .px-3.py-1\.5 span {
       color: #3730a3 !important;
     }
+
+    /* HIDE DECORATIVE BLUR ORBS IN LIGHT MODE — prevents white box artifacts on scroll */
+    .light .deco-orb {
+      display: none !important;
+    }
+
+    /* ============================================================
+       LYRIC STUDIO — FULL-SCREEN WORKSTATION STYLES
+    ============================================================ */
+    #lyricStudioView {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      background: #06071a;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+    }
+    #lyricStudioView.studio-open {
+      display: flex;
+    }
+    .light #lyricStudioView {
+      background: #f0f3ff;
+    }
+
+    /* Studio header bar */
+    .studio-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: rgba(10, 12, 40, 0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(99,102,241,0.2);
+      flex-shrink: 0;
+    }
+    .light .studio-header {
+      background: rgba(240,243,255,0.95);
+      border-bottom: 1px solid rgba(99,102,241,0.25);
+    }
+    .studio-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      background: rgba(99,102,241,0.12);
+      color: #a5b4fc;
+      border-color: rgba(99,102,241,0.3);
+    }
+    .studio-btn:hover {
+      background: rgba(99,102,241,0.25);
+      border-color: rgba(99,102,241,0.6);
+    }
+    .studio-btn.cyan {
+      background: rgba(6,182,212,0.12);
+      color: #67e8f9;
+      border-color: rgba(6,182,212,0.3);
+    }
+    .studio-btn.cyan:hover {
+      background: rgba(6,182,212,0.25);
+      border-color: rgba(6,182,212,0.6);
+    }
+    .studio-btn.emerald {
+      background: rgba(16,185,129,0.12);
+      color: #6ee7b7;
+      border-color: rgba(16,185,129,0.3);
+    }
+    .studio-btn.emerald:hover {
+      background: rgba(16,185,129,0.25);
+      border-color: rgba(16,185,129,0.6);
+    }
+    .studio-btn.amber {
+      background: rgba(245,158,11,0.12);
+      color: #fcd34d;
+      border-color: rgba(245,158,11,0.3);
+    }
+    .studio-btn.amber:hover {
+      background: rgba(245,158,11,0.25);
+      border-color: rgba(245,158,11,0.6);
+    }
+    .light .studio-btn { color: #3730a3; background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.3); }
+    .light .studio-btn.cyan { color: #0e7490; background: rgba(6,182,212,0.08); }
+    .light .studio-btn.emerald { color: #047857; background: rgba(16,185,129,0.08); }
+    .light .studio-btn.amber { color: #b45309; background: rgba(245,158,11,0.08); }
+
+    /* Studio 3-pane layout */
+    .studio-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+    .studio-top-panes {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .studio-pane {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(99,102,241,0.15);
+    }
+    .studio-pane-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #818cf8;
+      background: rgba(10,12,40,0.7);
+      border-bottom: 1px solid rgba(99,102,241,0.12);
+      flex-shrink: 0;
+    }
+    .light .studio-pane-header { background: rgba(224,231,255,0.7); color: #4338ca; border-bottom-color: rgba(99,102,241,0.2); }
+    .pane-left { flex: 0 0 55%; background: rgba(6,8,28,0.8); }
+    .pane-right { flex: 1; background: rgba(6,8,28,0.9); }
+    .light .pane-left, .light .pane-right { background: rgba(240,243,255,0.8); }
+
+    /* Lyric Table */
+    .lyric-table-scroll {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(99,102,241,0.3) transparent;
+    }
+    .lyric-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .lyric-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 7px 8px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #6366f1;
+      background: rgba(10,12,40,0.98);
+      border-bottom: 1px solid rgba(99,102,241,0.2);
+      white-space: nowrap;
+    }
+    .light .lyric-table thead th { background: rgba(224,231,255,0.98); color: #4338ca; }
+    .lyric-table tbody tr {
+      border-bottom: 1px solid rgba(99,102,241,0.07);
+      transition: background 0.15s;
+    }
+    .lyric-table tbody tr:hover { background: rgba(99,102,241,0.06); }
+    .lyric-table tbody tr.active-lyric-row { background: rgba(99,102,241,0.15) !important; }
+    .lyric-table td {
+      padding: 4px 6px;
+      vertical-align: middle;
+      color: #c7d2fe;
+    }
+    .light .lyric-table td { color: #1e1b4b; }
+    .lyric-table td:first-child { color: #4f46e5; font-weight: 700; font-size: 10px; text-align: center; width: 28px; }
+    .lyric-cell-input {
+      width: 100%;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 3px 5px;
+      font-size: 12px;
+      color: inherit;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      transition: border-color 0.2s, background 0.2s;
+      outline: none;
+    }
+    .lyric-cell-input:focus {
+      border-color: rgba(99,102,241,0.5);
+      background: rgba(99,102,241,0.08);
+    }
+    .time-input { width: 80px; font-size: 11px; }
+    .text-input { width: 100%; }
+    .lyric-table-footer {
+      padding: 8px 12px;
+      border-top: 1px solid rgba(99,102,241,0.12);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      background: rgba(6,8,28,0.8);
+    }
+    .light .lyric-table-footer { background: rgba(224,231,255,0.8); }
+
+    /* Stamp time button */
+    .stamp-btn {
+      font-size: 9px;
+      padding: 2px 5px;
+      border-radius: 3px;
+      background: rgba(99,102,241,0.15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99,102,241,0.25);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .stamp-btn:hover { background: rgba(99,102,241,0.35); }
+    .delete-line-btn {
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 3px;
+      background: rgba(239,68,68,0.1);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.2);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .delete-line-btn:hover { background: rgba(239,68,68,0.25); }
+
+    /* Video/Audio player pane */
+    .player-drop-zone {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed rgba(6,182,212,0.25);
+      border-radius: 10px;
+      margin: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .player-drop-zone:hover, .player-drop-zone.dragover {
+      border-color: rgba(6,182,212,0.6);
+      background: rgba(6,182,212,0.05);
+    }
+    .player-drop-zone.has-media { border: none; margin: 0; padding: 0; background: #000; justify-content: stretch; border-radius: 0; position: relative; overflow: hidden; }
+    #studioVideoEl {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+      background: #000;
+      pointer-events: none;
+    }
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-enclosure,
+    video::-webkit-media-controls-panel {
+      display: none !important;
+      -webkit-appearance: none !important;
+    }
+    .studio-time-display {
+      padding: 6px 12px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #67e8f9;
+      background: rgba(6,8,28,0.9);
+      border-top: 1px solid rgba(6,182,212,0.15);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .light .studio-time-display { background: rgba(224,241,255,0.9); color: #0e7490; }
+
+    /* Waveform bottom pane */
+    .studio-wave-pane {
+      flex: 0 0 180px;
+      background: rgba(4,6,20,0.95);
+      border-top: 2px solid rgba(99,102,241,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .light .studio-wave-pane { background: rgba(220,228,255,0.95); }
+    .studio-wave-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-bottom: 1px solid rgba(99,102,241,0.12);
+      flex-shrink: 0;
+    }
+    #studioWaveContainer {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      min-height: 0;
+    }
+    .studio-no-media-msg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #4f46e5;
+      font-size: 12px;
+      gap: 6px;
+      opacity: 0.6;
+    }
+
+    /* Duration cell auto-calc display */
+    .duration-cell { color: #64748b; font-size: 11px; font-family: monospace; }
+    .light .duration-cell { color: #6366f1; }
+
+    /* Region color dot legend */
+    .region-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Active lyric row highlighting */
+    tr.active-lyric-row {
+      background: rgba(99, 102, 241, 0.25) !important;
+      box-shadow: inset 3px 0 0 #06b6d4;
+    }
+    .light tr.active-lyric-row {
+      background: rgba(99, 102, 241, 0.15) !important;
+      box-shadow: inset 3px 0 0 #4f46e5;
+    }
+
+    /* YouTube CC Style Subtitle Overlay */
+    .studio-cc-overlay {
+      position: absolute !important;
+      bottom: 10% !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      z-index: 999 !important; /* Float strictly ON TOP of the video */
+      pointer-events: none !important;
+      text-align: center !important;
+      color: #ffffff !important;
+      background-color: rgba(0, 0, 0, 0.75) !important;
+      padding: 8px 16px !important;
+      border-radius: 6px !important;
+      font-size: 1.25rem !important;
+      font-weight: 600 !important;
+      max-width: 80% !important;
+      white-space: pre-wrap !important;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.6) !important;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9) !important;
+      line-height: 1.4 !important;
+      transition: opacity 0.15s ease !important;
+    }
   </style>
 </head>
 
@@ -353,8 +724,8 @@
   <!-- FIXED BACKGROUND LAYER & ANIMATED CANVAS -->
   <div id="bgGradientLayer" class="fixed top-0 left-0 w-full h-full -z-30 pointer-events-none transition-all duration-300"></div>
   <canvas id="bgMusicNotesCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none -z-20"></canvas>
-  <div class="fixed top-0 left-1/4 w-96 h-96 bg-indigo-600/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
-  <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow" style="animation-delay: 2s;"></div>
+  <div class="deco-orb fixed top-0 left-1/4 w-96 h-96 bg-indigo-600/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow"></div>
+  <div class="deco-orb fixed bottom-0 right-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse-slow" style="animation-delay: 2s;"></div>
 
   <!-- STICKY HEADER -->
   <header dir="ltr" class="sticky top-0 z-40 w-full glass-panel border-b border-indigo-500/10 px-4 lg:px-8 py-3.5 transition-all duration-300">
@@ -375,8 +746,14 @@
         </h1>
       </div>
 
-      <!-- Right Controls: Language & Theme -->
+      <!-- Right Controls: Language, Theme & Subtitle Studio -->
       <div class="flex items-center gap-2">
+        <!-- Subtitle Studio Launcher -->
+        <button id="lyricStudioBtn" onclick="app.openLyricStudio()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 hover:border-cyan-400 transition-all" title="Subtitle & Lyric Studio">
+          <i class="fa-solid fa-closed-captioning text-cyan-400 text-sm"></i>
+          <span class="hidden sm:inline text-cyan-300 light:text-cyan-700">Lyric Studio</span>
+        </button>
+
         <!-- Language Switcher -->
         <button id="langToggleBtn" onclick="app.toggleLanguage()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 hover:border-indigo-400 transition-all" title="Toggle Language (EN / AR)">
           <i class="fa-solid fa-globe text-indigo-300"></i>
@@ -392,6 +769,8 @@
   </header>
 
   <!-- MAIN WRAPPER CONTAINER -->
+  <!-- MAIN LANDING VIEW -->
+  <div id="mainView">
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
     <!-- ================= 1. AI LYRIC COMPOSITION & STUDIO GENERATOR ================= -->
@@ -903,12 +1282,156 @@
           <div class="mt-4 pt-3 border-t border-indigo-500/10 light:border-indigo-200 flex items-center justify-between text-[11px] text-indigo-300 light:text-indigo-855 font-mono">
             <div><span data-i18n="duration">Duration:</span> <span id="metaDuration" class="text-indigo-100 light:text-indigo-950">00:00</span></div>
             <div><span data-i18n="sampleRate">Sample Rate:</span> <span id="metaSampleRate" class="text-indigo-100 light:text-indigo-950">-- Hz</span></div>
+            <div><span data-i18n="channels">Channels:</span> <span id="metaChannels" class="text-indigo-100 light:text-indigo-950">--</span></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ================= 6. AUDIO TRIMMER & TEASER MAKER (AT THE ABSOLUTE BOTTOM) ================= -->
+    <!-- ================= 6. PITCH & TEMPO TRANSPOSER ================= -->
+    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
+      <div class="absolute -top-16 -left-16 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-12 -right-12 w-36 h-36 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+      <!-- Card Header -->
+      <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
+        <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="transposerTitle">
+          <i class="fa-solid fa-sliders text-purple-400"></i>
+          <span>Pitch & Tempo Transposer</span>
+        </h2>
+        <div class="flex items-center gap-2">
+          <span id="transposerStatus" class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold" data-i18n="awaitingFile">Awaiting File...</span>
+        </div>
+      </div>
+
+      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="transposerDesc">
+        Transpose pitch (semitones) and adjust tempo independently. Preview in real-time and export the modified audio as a WAV file — 100% client-side.
+      </p>
+
+      <!-- Transposer Drag & Drop Zone -->
+      <div id="transposerPlaceholder" class="border border-dashed border-indigo-500/10 hover:border-purple-400 rounded-xl p-6 text-center cursor-pointer hover:bg-purple-500/[0.02] flex flex-col items-center justify-center gap-2 transition-all mb-4" onclick="document.getElementById('transposerFileInput').click()">
+        <input type="file" id="transposerFileInput" accept="audio/*" class="hidden" onchange="app.handleTransposerFileUpload(this.files[0])">
+        <i class="fa-solid fa-cloud-arrow-up text-purple-400 text-2xl"></i>
+        <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="transposerDropzone">Drag & Drop audio file here or browse to Transpose</p>
+        <p class="text-[10px] text-indigo-400">WAV · MP3 · FLAC · M4A · AAC · OGG</p>
+      </div>
+
+      <!-- Transposer Content (hidden until file loaded) -->
+      <div id="transposerContent" class="hidden space-y-5">
+
+        <!-- File Info Bar -->
+        <div id="transposerFileCard" class="flex items-center justify-between p-3 rounded-xl bg-indigo-950/40 border border-purple-500/15 light:border-purple-200 shadow-inner">
+          <div class="flex items-center gap-2.5 truncate">
+            <i class="fa-solid fa-file-audio text-purple-400"></i>
+            <span id="transposerFileName" class="text-xs font-bold text-indigo-100 light:text-indigo-955 truncate">filename.mp3</span>
+          </div>
+          <button onclick="app.resetTransposerState()" class="text-indigo-300 hover:text-red-400 text-xs px-2.5 py-1 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
+            <i class="fa-solid fa-trash-can mr-1"></i> <span data-i18n="removeBtn">Remove</span>
+          </button>
+        </div>
+
+        <!-- Lock Toggle -->
+        <div class="flex items-center justify-between p-3 rounded-xl bg-indigo-950/30 border border-indigo-500/10 light:border-indigo-200">
+          <div>
+            <div class="text-xs font-bold text-indigo-100 light:text-indigo-955" data-i18n="transposerLinkLabel">Independent Pitch / Tempo</div>
+            <div class="text-[10px] text-indigo-400 mt-0.5" data-i18n="transposerLinkDesc">OFF = Vinyl-style linked (pitch follows speed) · ON = True independent stretch</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="transposerLinkToggle" class="sr-only peer" checked onchange="app.onTransposerLinkToggle()">
+            <div class="w-11 h-6 bg-indigo-950 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600 border border-indigo-500/20"></div>
+            <span id="transposerLinkLabel" class="ml-2 text-[10px] font-bold text-purple-400 uppercase tracking-widest">ON</span>
+          </label>
+        </div>
+
+        <!-- Pitch (Semitones) Section -->
+        <div class="space-y-3 p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/10 light:border-indigo-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-music text-purple-400 text-sm"></i>
+              <span class="text-xs font-bold text-indigo-100 light:text-indigo-955 uppercase tracking-wide" data-i18n="transposerPitchLabel">Pitch Shift</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="semitoneDisplay" class="text-lg font-black font-mono text-purple-300 min-w-[60px] text-center">0 st</span>
+              <input type="number" id="semitoneInput" value="0" min="-12" max="12" step="1"
+                class="w-16 glass-input text-xs font-bold px-2 py-1.5 rounded-lg border border-indigo-500/10 bg-indigo-950 text-indigo-100 text-center focus:outline-none focus:border-purple-400"
+                onchange="app.setSemitones(parseInt(this.value))">
+            </div>
+          </div>
+
+          <input type="range" id="semitoneSlider" min="-12" max="12" step="1" value="0"
+            class="w-full h-2 rounded-lg appearance-none cursor-pointer accent-purple-500 bg-indigo-950/60"
+            oninput="app.setSemitones(parseInt(this.value))">
+
+          <!-- Pitch Presets -->
+          <div class="flex flex-wrap gap-2 pt-1">
+            <span class="text-[10px] text-indigo-400 font-semibold self-center mr-1" data-i18n="transposerPresets">Presets:</span>
+            <button onclick="app.setSemitones(-2)" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-purple-400 hover:text-purple-300 transition-all">-2st</button>
+            <button onclick="app.setSemitones(-1)" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-purple-400 hover:text-purple-300 transition-all">-1st</button>
+            <button onclick="app.setSemitones(0)" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-purple-400 hover:text-purple-300 transition-all">0 (Original)</button>
+            <button onclick="app.setSemitones(1)" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-purple-400 hover:text-purple-300 transition-all">+1st</button>
+            <button onclick="app.setSemitones(2)" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-purple-400 hover:text-purple-300 transition-all">+2st</button>
+          </div>
+        </div>
+
+        <!-- Tempo / Speed Section -->
+        <div class="space-y-3 p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/10 light:border-indigo-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-gauge-high text-cyan-400 text-sm"></i>
+              <span class="text-xs font-bold text-indigo-100 light:text-indigo-955 uppercase tracking-wide" data-i18n="transposerSpeedLabel">Playback Speed</span>
+            </div>
+            <span id="speedDisplay" class="text-lg font-black font-mono text-cyan-300 min-w-[60px] text-center">1.00x</span>
+          </div>
+
+          <input type="range" id="speedSlider" min="0.5" max="2.0" step="0.05" value="1.0"
+            class="w-full h-2 rounded-lg appearance-none cursor-pointer accent-cyan-500 bg-indigo-950/60"
+            oninput="app.setPlaybackSpeed(parseFloat(this.value))">
+
+          <!-- Speed Presets -->
+          <div class="flex flex-wrap gap-2 pt-1">
+            <span class="text-[10px] text-indigo-400 font-semibold self-center mr-1" data-i18n="transposerPresets">Presets:</span>
+            <button onclick="app.setPlaybackSpeed(0.75)" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-cyan-400 hover:text-cyan-300 transition-all">0.75x</button>
+            <button onclick="app.setPlaybackSpeed(1.0)" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-cyan-400 hover:text-cyan-300 transition-all">1.0x (Original)</button>
+            <button onclick="app.setPlaybackSpeed(1.25)" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-cyan-400 hover:text-cyan-300 transition-all">1.25x</button>
+            <button onclick="app.setPlaybackSpeed(1.5)" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-cyan-400 hover:text-cyan-300 transition-all">1.5x</button>
+          </div>
+        </div>
+
+        <!-- Preview Waveform -->
+        <div class="relative w-full h-20 bg-[#04040f]/70 rounded-xl overflow-hidden border border-purple-500/15 light:border-purple-200 flex items-center justify-center shadow-inner">
+          <canvas id="transposerWaveCanvas" class="w-full h-full"></canvas>
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div id="transposerProgressBar" class="absolute left-0 top-0 h-full bg-purple-500/10 transition-all duration-100" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Action Row -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 pt-2 border-t border-indigo-500/5 light:border-indigo-200">
+          <!-- Play Preview Button -->
+          <button id="transposerPlayBtn" onclick="app.toggleTransposerPlayback()" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-indigo-955/60 light:bg-indigo-50 hover:border-purple-400 border border-purple-500/20 text-indigo-100 light:text-indigo-955 transition-all">
+            <i id="transposerPlayIcon" class="fa-solid fa-circle-play text-purple-400 text-sm"></i>
+            <span data-i18n="transposerPlay">Preview</span>
+          </button>
+
+          <!-- Render & Export Button -->
+          <button onclick="app.renderTransposedAudio()" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg transition-all hover:from-purple-500 hover:to-indigo-500">
+            <i class="fa-solid fa-waveform-lines"></i>
+            <span data-i18n="transposerExport">Render & Export WAV</span>
+          </button>
+
+          <!-- Output Download (hidden until rendered) -->
+          <div id="transposerOutputBar" class="hidden flex items-center gap-2 bg-indigo-950/40 light:bg-indigo-50/50 p-2 rounded-xl border border-emerald-500/20 shadow-inner">
+            <span class="text-[10px] uppercase font-mono px-2 py-1 rounded bg-emerald-950/60 text-emerald-300 font-semibold border border-emerald-500/20" data-i18n="transposerReady">Output Ready</span>
+            <button id="transposerDownloadBtn" class="px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-all">
+              <i class="fa-solid fa-cloud-arrow-down"></i>
+              <span data-i18n="transposerDownload">Download WAV</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 7. AUDIO TRIMMER & TEASER MAKER (AT THE ABSOLUTE BOTTOM) ================= -->
     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
       <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
 
@@ -1002,6 +1525,209 @@
       </div>
     </div>
   </main>
+  </div><!-- /#mainView -->
+
+  <!-- ============================================================
+       LYRIC STUDIO — FULL-SCREEN WORKSTATION VIEW
+  ============================================================ -->
+  <div id="lyricStudioView">
+
+    <!-- STUDIO HEADER -->
+    <div class="studio-header">
+      <!-- Back button -->
+      <button class="studio-btn" onclick="app.closeLyricStudio()" title="Back to Sonvex Studio">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Back</span>
+      </button>
+
+      <!-- Title -->
+      <div class="flex items-center gap-2 flex-1">
+        <i class="fa-solid fa-closed-captioning text-cyan-400"></i>
+        <span class="text-sm font-bold text-white light:text-indigo-900">Subtitle &amp; Lyric Studio</span>
+        <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">SRT &amp; LRC Maker</span>
+      </div>
+
+      <!-- Import / Export Actions -->
+      <div class="flex items-center gap-2 ml-auto">
+
+        <!-- Import / Export -->
+        <label class="studio-btn cursor-pointer" title="Import existing .srt file">
+          <i class="fa-solid fa-file-import"></i>
+          <span class="hidden md:inline">Import SRT</span>
+          <input type="file" accept=".srt" class="hidden" onchange="app.handleSrtImport(this.files[0])">
+        </label>
+        <label class="studio-btn cursor-pointer" title="Import existing .lrc file">
+          <i class="fa-solid fa-music"></i>
+          <span class="hidden md:inline">Import LRC</span>
+          <input type="file" accept=".lrc" class="hidden" onchange="app.handleLrcImport(this.files[0])">
+        </label>
+
+        <div class="w-px h-5 bg-indigo-500/20 mx-1"></div>
+
+        <button class="studio-btn emerald" onclick="app.exportLrc()" title="Export .lrc file">
+          <i class="fa-solid fa-download"></i>
+          <span>Export LRC</span>
+        </button>
+        <button class="studio-btn cyan" onclick="app.exportSrt()" title="Export .srt file">
+          <i class="fa-solid fa-download"></i>
+          <span>Export SRT</span>
+        </button>
+      </div>
+    </div><!-- /.studio-header -->
+
+    <!-- STUDIO 3-PANE BODY -->
+    <div class="studio-body">
+
+      <!-- TOP PANES -->
+      <div class="studio-top-panes">
+
+        <!-- LEFT PANE: Lyric / Subtitle Table -->
+        <div class="studio-pane pane-left">
+
+          <div class="studio-pane-header">
+            <span><i class="fa-solid fa-list-ul mr-1"></i>Lyric Lines</span>
+            <span id="studioLineCount" class="text-[10px] font-mono text-indigo-400">0 lines</span>
+          </div>
+
+          <!-- Table -->
+          <div class="lyric-table-scroll">
+            <table class="lyric-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Duration</th>
+                  <th style="width:99%">Lyric Text</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="lyricTableBody">
+                <tr>
+                  <td colspan="6" style="text-align:center; padding: 24px; color: #4f46e5; opacity: 0.5; font-size: 12px;">
+                    <i class="fa-solid fa-arrow-right-to-bracket mr-2"></i>Add lines below or import an SRT / LRC file
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Footer Controls -->
+          <div class="lyric-table-footer">
+            <button class="studio-btn" onclick="app.addLyricLine()">
+              <i class="fa-solid fa-plus"></i> Add Line
+            </button>
+            <button class="studio-btn amber" onclick="app.clearAllLines()" title="Clear all lyric lines">
+              <i class="fa-solid fa-trash"></i> Clear All
+            </button>
+            <div class="ml-auto text-[10px] text-indigo-400 font-mono" id="studioPlayheadLabel">Playhead: 00:00.000</div>
+          </div>
+        </div><!-- /.pane-left -->
+
+        <!-- RIGHT PANE: Video / Audio Player -->
+        <div class="studio-pane pane-right">
+          <div class="studio-pane-header">
+            <span><i class="fa-solid fa-play-circle mr-1"></i>Media Player</span>
+            <label class="studio-btn cyan cursor-pointer" style="font-size: 10px; padding: 3px 8px;">
+              <i class="fa-solid fa-folder-open"></i> Load File
+              <input type="file" id="studioMediaFileInput" accept="video/*,audio/*,.mp4,.webm,.mp3,.wav,.ogg,.aac,.m4a,.flac" class="hidden" onchange="app.handleStudioMediaUpload(this.files[0])">
+            </label>
+          </div>
+
+          <!-- Drop zone / Player area -->
+          <div id="studioPlayerDropZone" class="player-drop-zone" style="position:relative;"
+               ondragover="event.preventDefault(); this.classList.add('dragover')"
+               ondragleave="this.classList.remove('dragover')"
+               ondrop="event.preventDefault(); this.classList.remove('dragover'); app.handleStudioMediaUpload(event.dataTransfer.files[0])"
+               onclick="document.getElementById('studioMediaFileInput').click()">
+            <i class="fa-solid fa-photo-film text-3xl text-cyan-500/40 mb-3"></i>
+            <p class="text-sm text-cyan-300/60 font-semibold">Drop video or audio here</p>
+            <p class="text-[11px] text-indigo-400/50 mt-1">MP4, WebM, MP3, WAV, OGG, AAC, FLAC</p>
+            <!-- Video element without native controls -->
+            <video id="studioVideoEl" preload="metadata" style="pointer-events:none;" oncontextmenu="return false;"></video>
+            <!-- Real-Time Subtitle Overlay Floating strictly ON TOP -->
+            <div id="studioCcOverlay" class="studio-cc-overlay" style="display:none;"></div>
+          </div>
+
+          <!-- Playback time display -->
+          <div class="studio-time-display">
+            <i class="fa-solid fa-clock text-cyan-500/60"></i>
+            <span id="studioCurrentTime" class="font-mono">00:00.000</span>
+            <span class="text-indigo-400/50">/</span>
+            <span id="studioDuration" class="text-indigo-400 font-mono">00:00.000</span>
+            <div class="ml-auto flex items-center gap-2">
+              <span id="studioFileName" class="text-[10px] text-indigo-400/60 max-w-40 truncate">No file loaded</span>
+            </div>
+          </div>
+
+          <!-- DEDICATED ACTIVE SUBTITLE INPUT BOX -->
+          <div class="active-text-box-wrap p-3 bg-indigo-950/60 border-t border-indigo-500/20">
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="studioActiveTextInput" class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-pen-to-square text-indigo-400"></i> Active Line Text
+              </label>
+              <span id="studioActiveLineLabel" class="text-[10px] font-mono text-indigo-400/60">No active line</span>
+            </div>
+            <input id="studioActiveTextInput"
+                   type="text"
+                   dir="auto"
+                   class="w-full px-3 py-2 bg-indigo-900/30 border border-indigo-500/30 focus:border-cyan-400 focus:bg-indigo-900/50 rounded-lg text-white placeholder-indigo-400/40 text-sm font-semibold outline-none transition"
+                   placeholder="Click a line or playhead to edit text here..."
+                   oninput="app.onActiveInputTextChange(this.value)"
+                   onkeydown="app.onActiveInputKeyDown(event)">
+          </div>
+        </div><!-- /.pane-right -->
+
+      </div><!-- /.studio-top-panes -->
+
+      <!-- BOTTOM PANE: Wavesurfer Waveform Timeline -->
+      <div class="studio-wave-pane">
+        <div class="studio-wave-controls">
+          <button id="studioPlayPauseBtn" class="studio-btn cyan" onclick="app.studioTogglePlayback()" disabled>
+            <i id="studioPlayPauseIcon" class="fa-solid fa-play"></i>
+          </button>
+          <button class="studio-btn" onclick="app.studioSkipBackward()" title="Skip back 5s" disabled id="studioSkipBackBtn">
+            <i class="fa-solid fa-backward-step"></i> 5s
+          </button>
+          <button class="studio-btn" onclick="app.studioSkipForward()" title="Skip forward 5s" disabled id="studioSkipFwdBtn">
+            5s <i class="fa-solid fa-forward-step"></i>
+          </button>
+
+          <!-- Zoom -->
+          <div class="flex items-center gap-1 ml-2">
+            <span class="text-[10px] text-indigo-400">Zoom:</span>
+            <button class="studio-btn" style="padding: 3px 7px;" onclick="app.studioZoom(-50)" title="Zoom out"><i class="fa-solid fa-minus"></i></button>
+            <button class="studio-btn" style="padding: 3px 7px;" onclick="app.studioZoom(50)" title="Zoom in"><i class="fa-solid fa-plus"></i></button>
+          </div>
+
+          <!-- INSERT LINE button — most important action -->
+          <div class="w-px h-5 bg-indigo-500/20 mx-1"></div>
+          <button id="studioInsertBtn"
+            class="studio-btn"
+            style="background: rgba(16,185,129,0.18); color: #34d399; border-color: rgba(16,185,129,0.45); font-size: 13px; padding: 6px 16px; gap: 7px;"
+            onclick="app.insertLineAtCurrentTime()"
+            disabled
+            title="Pause playback and insert a new lyric line at the current playhead position (Spacebar)">
+            <i class="fa-solid fa-circle-dot"></i>
+            <span style="font-weight:800; letter-spacing:0.04em;">INSERT LINE</span>
+            <kbd style="font-size:9px; padding:1px 4px; border-radius:3px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:#86efac;">Space</kbd>
+          </button>
+
+          <div class="ml-auto flex items-center gap-6">
+            <span class="text-[10px] text-indigo-400/60"><i class="fa-solid fa-hand-pointer mr-1"></i>Drag regions to adjust timing</span>
+            <span class="text-[10px] text-cyan-400/70 font-mono" id="studioWaveStatus">No audio loaded</span>
+          </div>
+        </div>
+        <div id="studioWaveContainer">
+          <div class="studio-no-media-msg" id="studioWaveEmptyMsg">
+            <i class="fa-solid fa-waveform-lines text-2xl"></i>
+            <span>Load a media file to see the waveform timeline</span>
+          </div>
+        </div>
+      </div><!-- /.studio-wave-pane -->
+
+    </div><!-- /.studio-body -->
+  </div><!-- /#lyricStudioView -->
 
   <!-- TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
@@ -1066,7 +1792,22 @@
         
         // Additional Shared Keys
         removeBtn: "Remove",
-        inspectorDropzone: "Drag & Drop audio file here or browse to Inspect"
+        inspectorDropzone: "Drag & Drop audio file here or browse to Inspect",
+
+        // Transposer Translation Keys
+        transposerTitle: "Pitch & Tempo Transposer",
+        transposerDesc: "Transpose pitch (semitones) and adjust tempo independently. Preview in real-time and export the modified audio as a WAV file — 100% client-side.",
+        transposerDropzone: "Drag & Drop audio file here or browse to Transpose",
+        transposerLinkLabel: "Independent Pitch / Tempo",
+        transposerLinkDesc: "OFF = Vinyl-style linked (pitch follows speed) · ON = True independent stretch",
+        transposerPitchLabel: "Pitch Shift",
+        transposerSpeedLabel: "Playback Speed",
+        transposerPresets: "Presets:",
+        transposerPlay: "Preview",
+        transposerExport: "Render & Export WAV",
+        transposerReady: "Output Ready",
+        transposerDownload: "Download WAV",
+        awaitingFile: "Awaiting File..."
       },
       ar: {
         audioConverterTitle: "المحول الصوتي الشامل",
@@ -1124,7 +1865,22 @@
         
         // Additional Shared Keys
         removeBtn: "إزالة",
-        inspectorDropzone: "اسحب وأسقط الملف الصوتي هنا للتحليل أو تصفح"
+        inspectorDropzone: "اسحب وأسقط الملف الصوتي هنا للتحليل أو تصفح",
+
+        // Transposer Translation Keys
+        transposerTitle: "ضابط طبقة الصوت والإيقاع",
+        transposerDesc: "اضبط طبقة الصوت (بالنغمات) وسرعة الإيقاع باستقلالية تامة. استمع للنتيجة فورياً وصدّر الملف المعدّل بصيغة WAV — معالجة 100% محلية.",
+        transposerDropzone: "اسحب وأسقط الملف هنا لضبط طبقته أو تصفح",
+        transposerLinkLabel: "استقلالية الطبقة / الإيقاع",
+        transposerLinkDesc: "إيقاف = ربط فينيل (الطبقة تتبع السرعة) · تشغيل = تمديد مستقل حقيقي",
+        transposerPitchLabel: "ضبط طبقة الصوت",
+        transposerSpeedLabel: "سرعة التشغيل",
+        transposerPresets: "مؤقتات جاهزة:",
+        transposerPlay: "معاينة",
+        transposerExport: "تصيير وتصدير WAV",
+        transposerReady: "الإخراج جاهز",
+        transposerDownload: "تحميل WAV",
+        awaitingFile: "في انتظار ملف..."
       }
     };
 
@@ -1138,6 +1894,33 @@
         this.isPlaying = false;
         this.chatHistory = [];
         this.messages = []; // stateful conversation history for full-context API requests
+        this.inspectorAudioCtx = null; // dedicated context for Dynamic Track Inspector
+
+        // Transposer state
+        this.transposerBuffer = null;
+        this.transposerCtx = null;
+        this.transposerSource = null;
+        this.transposerIsPlaying = false;
+        this.transposerSemitones = 0;
+        this.transposerSpeed = 1.0;
+        this.transposerIndependent = true;
+        this.transposerStartTime = 0;
+        this.transposerPauseOffset = 0;
+        this.transposerAnimFrame = null;
+
+        // Lyric Studio state
+        this.lyricLines = [];        // [{id, startTime, endTime, text}]
+        this.lyricLineCounter = 0;
+        this.studioWavesurfer = null;
+        this.studioRegionsPlugin = null;
+        this.studioMediaEl = null;   // HTMLVideoElement or audio fallback
+        this.studioZoomLevel = 100;
+        this._studioTimeUpdateBound = null;
+        this._studioRegionColors = [
+          'rgba(99,102,241,0.35)', 'rgba(6,182,212,0.35)', 'rgba(16,185,129,0.35)',
+          'rgba(245,158,11,0.35)', 'rgba(239,68,68,0.35)', 'rgba(168,85,247,0.35)',
+          'rgba(20,184,166,0.35)', 'rgba(249,115,22,0.35)'
+        ];
         
         // Supported Formats Configurations
         this.supportedFormats = [
@@ -1313,6 +2096,25 @@
           });
           inspectorZone.addEventListener('click', () => document.getElementById('inspectorFileInput').click());
         }
+
+        // Transposer Drag & Drop Zone
+        const transposerZone = document.getElementById('transposerPlaceholder');
+        if (transposerZone) {
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            transposerZone.addEventListener(eventName, e => {
+              e.preventDefault();
+              e.stopPropagation();
+            }, false);
+          });
+          transposerZone.addEventListener('dragover', () => transposerZone.classList.add('border-purple-400', 'bg-purple-500/5'));
+          transposerZone.addEventListener('dragleave', () => transposerZone.classList.remove('border-purple-400', 'bg-purple-500/5'));
+          transposerZone.addEventListener('drop', e => {
+            transposerZone.classList.remove('border-purple-400', 'bg-purple-500/5');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+              this.handleTransposerFileUpload(e.dataTransfer.files[0]);
+            }
+          });
+        }
       }
 
 
@@ -1324,7 +2126,7 @@
         const ext = file.name.split('.').pop().toLowerCase();
         this.updateFormatDropdown(ext);
 
-        // Update File Card UI
+        // Update Converter File Card UI only — do NOT touch Inspector or Trimmer
         document.getElementById('dropZone').classList.add('hidden');
         document.getElementById('fileLoadedCard').classList.remove('hidden');
         document.getElementById('converterActionsBar').classList.remove('hidden');
@@ -1332,92 +2134,79 @@
         document.getElementById('fileSizeDisplay').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
         document.getElementById('detectedFormatBadge').textContent = ext.toUpperCase();
 
-        // Update Inspector Status
-        document.getElementById('inspectorStatus').textContent = 'Analyzing...';
-        document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-555/20 font-bold';
-
-        // Decode Audio with Web Audio API
-        try {
-          const arrayBuffer = await file.arrayBuffer();
-          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-
-          // Render Waveform Canvas
-          this.drawWaveform(this.audioBuffer);
-          document.getElementById('waveformPlaceholder').classList.add('hidden');
-          document.getElementById('playAudioBtn').classList.remove('hidden');
-
-          // Calculate Peak Gain Offset & BPM
-          this.analyzeAudioMetrics(this.audioBuffer);
-
-          // Update Metadata
-          const durationSec = this.audioBuffer.duration;
-          const mins = Math.floor(durationSec / 60);
-          const secs = Math.floor(durationSec % 60).toString().padStart(2, '0');
-          document.getElementById('metaDuration').textContent = `${mins}:${secs}`;
-          document.getElementById('metaSampleRate').textContent = `${this.audioBuffer.sampleRate} Hz`;
-          document.getElementById('metaChannels').textContent = this.audioBuffer.numberOfChannels;
-
-          document.getElementById('inspectorStatus').textContent = 'Analysis Complete';
-          document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 font-bold border border-emerald-500/30';
-          this.showToast('Audio analyzed successfully!', 'success');
-
-          // Load into Trimmer
-          this.loadAudioIntoTrimmer(file);
-
-        } catch (err) {
-          console.error('Audio decode error:', err);
-          this.showToast('Could not decode audio file.', 'error');
-        }
+        // Store raw file for conversion — no audio analysis or cross-section side-effects
+        this.showToast(`File ready for conversion: ${file.name}`, 'success');
       }
 
       resetAudio() {
         this.selectedFile = null;
-        this.audioBuffer = null;
-        if (this.isPlaying && this.audioSourceNode) {
-          this.audioSourceNode.stop();
-          this.isPlaying = false;
-        }
-        
-        // Restore Layout State
+
+        // Reset Converter UI only — do NOT touch Inspector or Trimmer
         document.getElementById('dropZone').classList.remove('hidden');
         document.getElementById('fileLoadedCard').classList.add('hidden');
         document.getElementById('converterActionsBar').classList.add('hidden');
-        this.updateFormatDropdown(''); // restore full formats list
-        
-        this.resetInspectorState();
-        this.resetTrimmerState();
+        this.updateFormatDropdown('');
       }
 
       drawWaveform(buffer) {
         const canvas = document.getElementById('waveformCanvas');
-        canvas.width = canvas.offsetWidth * 2;
-        canvas.height = canvas.offsetHeight * 2;
-        const ctx = canvas.getContext('2d');
-        ctx.scale(2, 2);
+        if (!canvas || !buffer) return;
 
-        const isLight = document.documentElement.classList.contains('light');
-        const data = buffer.getChannelData(0);
-        const step = Math.ceil(data.length / (canvas.offsetWidth));
-        const amp = canvas.offsetHeight / 2;
+        const drawActual = () => {
+          const rect = canvas.getBoundingClientRect();
+          const W = rect.width  || canvas.offsetWidth  || canvas.parentElement?.offsetWidth  || 800;
+          const H = rect.height || canvas.offsetHeight || canvas.parentElement?.offsetHeight || 96;
+          const dpr = window.devicePixelRatio || 1;
 
-        ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
-        ctx.beginPath();
-        ctx.strokeStyle = isLight ? '#4f46e5' : '#6366f1';
-        ctx.lineWidth = 1.2;
+          canvas.width  = W * dpr;
+          canvas.height = H * dpr;
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.scale(dpr, dpr);
 
-        for (let i = 0; i < canvas.offsetWidth; i++) {
-          let min = 1.0;
-          let max = -1.0;
-          for (let j = 0; j < step; j++) {
-            const datum = data[(i * step) + j];
-            if (datum < min) min = datum;
-            if (datum > max) max = datum;
+          const isLight = document.documentElement.classList.contains('light');
+          const data = buffer.getChannelData(0);
+          const step = Math.ceil(data.length / W);
+          const amp  = H / 2;
+
+          // Gradient stroke: indigo -> purple -> indigo
+          const grad = ctx.createLinearGradient(0, 0, W, 0);
+          if (isLight) {
+            grad.addColorStop(0,   '#4f46e5');
+            grad.addColorStop(0.5, '#7c3aed');
+            grad.addColorStop(1,   '#4f46e5');
+          } else {
+            grad.addColorStop(0,   '#818cf8');
+            grad.addColorStop(0.5, '#a78bfa');
+            grad.addColorStop(1,   '#818cf8');
           }
-          ctx.moveTo(i, (1 + min) * amp);
-          ctx.lineTo(i, (1 + max) * amp);
+
+          ctx.beginPath();
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 1.5;
+
+          for (let i = 0; i < W; i++) {
+            let min = 1.0, max = -1.0;
+            for (let j = 0; j < step; j++) {
+              const d = data[i * step + j];
+              if (d !== undefined) {
+                if (d < min) min = d;
+                if (d > max) max = d;
+              }
+            }
+            ctx.moveTo(i, (1 + min) * amp);
+            ctx.lineTo(i, (1 + max) * amp);
+          }
+          ctx.stroke();
+        };
+
+        // If canvas has no dimensions yet (still inside hidden parent)
+        // wait one animation frame for the browser to lay out the DOM
+        if (canvas.offsetWidth === 0) {
+          requestAnimationFrame(() => requestAnimationFrame(drawActual));
+        } else {
+          drawActual();
         }
-        ctx.stroke();
       }
 
       toggleAudioPlayback() {
@@ -1541,26 +2330,42 @@
       }
 
       async processAudioConversion() {
-        if (!this.audioBuffer) return;
+        if (!this.selectedFile) {
+          this.showToast('Please select an audio file first.', 'error');
+          return;
+        }
         const targetFormat = document.getElementById('targetFormatSelect').value;
-        this.showToast(`Encoding local audio to .${targetFormat}...`, 'info');
+        const btn = document.getElementById('convertBtn');
 
-        const wavBlob = this.audioBufferToWavBlob(this.audioBuffer);
-        const filename = this.selectedFile.name.replace(/\.[^/.]+$/, "") + `_sonvex.${targetFormat}`;
+        try {
+          if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Converting...'; }
+          this.showToast(`Encoding to .${targetFormat}...`, 'info');
 
-        const url = URL.createObjectURL(wavBlob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }, 1000);
+          // Decode fresh — converter is fully independent, uses no shared audioBuffer
+          const arrayBuffer = await this.selectedFile.arrayBuffer();
+          const convCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const decodedBuffer = await convCtx.decodeAudioData(arrayBuffer);
+          await convCtx.close();
 
-        this.showToast(`Converted & downloaded as ${filename}`, 'success');
+          const wavBlob = this.audioBufferToWavBlob(decodedBuffer);
+          const filename = this.selectedFile.name.replace(/\.[^/.]+$/, '') + `_sonvex.${targetFormat}`;
+
+          const url = URL.createObjectURL(wavBlob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+
+          this.showToast(`Converted & downloaded as ${filename}`, 'success');
+        } catch(err) {
+          console.error('Conversion error:', err);
+          this.showToast(`Conversion failed: ${err.message || 'Unknown error'}`, 'error');
+        } finally {
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-bolt"></i> <span data-i18n="convertBtn">Convert & Download</span>'; }
+        }
       }
 
       audioBufferToWavBlob(buffer) {
@@ -1758,9 +2563,6 @@
         document.getElementById('remasterDownloadBtn').classList.add('hidden');
         
         this.showToast(`Track loaded for remastering: ${file.name}`, 'info');
-
-        // Load into Trimmer
-        this.loadAudioIntoTrimmer(file);
       }
 
       resetRemaster() {
@@ -2436,44 +3238,71 @@ CRITICAL FORMATTING INSTRUCTIONS:
 
       async handleInspectorFileUpload(file) {
         if (!file) return;
-        this.selectedFile = file;
         this.showToast(`Loading track into inspector: ${file.name}`, 'info');
 
         // Decode Audio and Analyze
         try {
-          document.getElementById('inspectorStatus').textContent = 'Analyzing...';
-          document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-555/20 font-bold';
+          const statusEl = document.getElementById('inspectorStatus');
+          if (statusEl) {
+            statusEl.textContent = 'Analyzing...';
+            statusEl.className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-555/20 font-bold';
+          }
+
+          // Always create a fresh dedicated AudioContext for the inspector
+          // to avoid stale/closed context errors from other sections
+          if (this.inspectorAudioCtx) {
+            try { await this.inspectorAudioCtx.close(); } catch(e) {}
+          }
+          this.inspectorAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+          // Stop any existing inspector playback
+          if (this.isPlaying && this.audioSourceNode) {
+            try { this.audioSourceNode.stop(); } catch(e) {}
+            this.isPlaying = false;
+          }
 
           const arrayBuffer = await file.arrayBuffer();
-          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          this.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+          // Use the inspector-dedicated context
+          this.audioBuffer = await this.inspectorAudioCtx.decodeAudioData(arrayBuffer);
+          // Keep shared ctx in sync so toggleAudioPlayback can use it
+          this.audioContext = this.inspectorAudioCtx;
 
+          // ---- Show content FIRST so the canvas has real layout dimensions ----
+          document.getElementById('inspectorPlaceholder').classList.add('hidden');
+          document.getElementById('inspectorContent').classList.remove('hidden');
+          document.getElementById('inspectorFileNameDisplay').textContent = file.name;
+
+          // Now draw waveform (canvas is visible, getBoundingClientRect returns real size)
           this.drawWaveform(this.audioBuffer);
-          document.getElementById('playAudioBtn').classList.remove('hidden');
+          const playBtn = document.getElementById('playAudioBtn');
+          if (playBtn) playBtn.classList.remove('hidden');
 
           this.analyzeAudioMetrics(this.audioBuffer);
 
           const durationSec = this.audioBuffer.duration;
           const mins = Math.floor(durationSec / 60);
           const secs = Math.floor(durationSec % 60).toString().padStart(2, '0');
-          document.getElementById('metaDuration').textContent = `${mins}:${secs}`;
-          document.getElementById('metaSampleRate').textContent = `${this.audioBuffer.sampleRate} Hz`;
-          document.getElementById('metaChannels').textContent = this.audioBuffer.numberOfChannels;
+          const elDur = document.getElementById('metaDuration');
+          const elSR  = document.getElementById('metaSampleRate');
+          const elCh  = document.getElementById('metaChannels');
+          if (elDur) elDur.textContent = `${mins}:${secs}`;
+          if (elSR)  elSR.textContent  = `${this.audioBuffer.sampleRate} Hz`;
+          if (elCh)  elCh.textContent  = this.audioBuffer.numberOfChannels;
 
-          document.getElementById('inspectorStatus').textContent = 'Analysis Complete';
-          document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 font-bold border border-emerald-500/30';
+          const inspStatus2 = document.getElementById('inspectorStatus');
+          if (inspStatus2) {
+            inspStatus2.textContent = 'Analysis Complete';
+            inspStatus2.className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 font-bold border border-emerald-500/30';
+          }
           this.showToast('Audio analyzed successfully!', 'success');
-          
-          // Also load into Trimmer
-          this.loadAudioIntoTrimmer(file);
-
-          // Update Inspector UI card displays
-          document.getElementById('inspectorPlaceholder').classList.add('hidden');
-          document.getElementById('inspectorContent').classList.remove('hidden');
-          document.getElementById('inspectorFileNameDisplay').textContent = file.name;
         } catch (err) {
           console.error('Inspector decoding error:', err);
-          this.showToast('Could not decode audio file for analysis.', 'error');
+          const inspErrStatus = document.getElementById('inspectorStatus');
+          if (inspErrStatus) {
+            inspErrStatus.textContent = 'Error';
+            inspErrStatus.className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-red-950/60 text-red-300 border border-red-500/20 font-semibold';
+          }
+          this.showToast(`Could not decode audio: ${err.message || 'Unsupported format'}`, 'error');
         }
       }
 
@@ -2505,6 +3334,1131 @@ CRITICAL FORMATTING INSTRUCTIONS:
 
         document.getElementById('inspectorStatus').textContent = 'Awaiting File...';
         document.getElementById('inspectorStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold';
+      }
+
+      // ============================================================
+      // PITCH & TEMPO TRANSPOSER METHODS
+      // ============================================================
+
+      async handleTransposerFileUpload(file) {
+        if (!file) return;
+        this.stopTransposerPlayback();
+        this.transposerPauseOffset = 0;
+
+        document.getElementById('transposerStatus').textContent = 'Loading...';
+        document.getElementById('transposerStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-yellow-950/60 text-yellow-300 border border-yellow-500/20 font-semibold';
+
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          this.transposerCtx = new (window.AudioContext || window.webkitAudioContext)();
+          this.transposerBuffer = await this.transposerCtx.decodeAudioData(arrayBuffer);
+
+          document.getElementById('transposerFileName').textContent = file.name;
+          document.getElementById('transposerPlaceholder').classList.add('hidden');
+          document.getElementById('transposerContent').classList.remove('hidden');
+          document.getElementById('transposerOutputBar').classList.add('hidden');
+
+          this.drawTransposerWave();
+
+          document.getElementById('transposerStatus').textContent = 'Ready';
+          document.getElementById('transposerStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-300 border border-emerald-500/20 font-semibold';
+          this.showToast('File loaded into Transposer!', 'success');
+        } catch(e) {
+          document.getElementById('transposerStatus').textContent = 'Error';
+          document.getElementById('transposerStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-red-950/60 text-red-300 border border-red-500/20 font-semibold';
+          this.showToast('Could not decode audio file.', 'error');
+        }
+      }
+
+      drawTransposerWave() {
+        const canvas = document.getElementById('transposerWaveCanvas');
+        if (!canvas || !this.transposerBuffer) return;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = canvas.offsetWidth * dpr;
+        canvas.height = canvas.offsetHeight * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const data = this.transposerBuffer.getChannelData(0);
+        const step = Math.ceil(data.length / canvas.width);
+        const amp = canvas.height / 2;
+        const isLight = document.documentElement.classList.contains('light');
+
+        const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+        grad.addColorStop(0, isLight ? '#a855f7' : '#c084fc');
+        grad.addColorStop(0.5, isLight ? '#6366f1' : '#818cf8');
+        grad.addColorStop(1, isLight ? '#22d3ee' : '#67e8f9');
+
+        ctx.beginPath();
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.5 * dpr;
+        for (let i = 0; i < canvas.width; i++) {
+          let min = 1, max = -1;
+          for (let j = 0; j < step; j++) {
+            const d = data[i * step + j] || 0;
+            if (d < min) min = d;
+            if (d > max) max = d;
+          }
+          const y1 = (1 + min) * amp;
+          const y2 = (1 + max) * amp;
+          if (i === 0) ctx.moveTo(i, y1);
+          ctx.lineTo(i, y1);
+          ctx.lineTo(i, y2);
+        }
+        ctx.stroke();
+      }
+
+      setSemitones(val) {
+        val = Math.max(-12, Math.min(12, val));
+        this.transposerSemitones = val;
+        document.getElementById('semitoneSlider').value = val;
+        document.getElementById('semitoneInput').value = val;
+        document.getElementById('semitoneDisplay').textContent = (val > 0 ? '+' : '') + val + ' st';
+
+        // If vinyl-linked mode: sync speed to pitch ratio
+        if (!this.transposerIndependent) {
+          const rate = Math.pow(2, val / 12);
+          this.transposerSpeed = rate;
+          document.getElementById('speedSlider').value = Math.min(2.0, Math.max(0.5, rate));
+          document.getElementById('speedDisplay').textContent = rate.toFixed(2) + 'x';
+        }
+
+        if (this.transposerIsPlaying) {
+          this.stopTransposerPlayback();
+          this.startTransposerPlayback();
+        }
+      }
+
+      setPlaybackSpeed(val) {
+        val = Math.max(0.5, Math.min(2.0, val));
+        this.transposerSpeed = val;
+        document.getElementById('speedSlider').value = val;
+        document.getElementById('speedDisplay').textContent = val.toFixed(2) + 'x';
+
+        if (this.transposerIsPlaying) {
+          this.stopTransposerPlayback();
+          this.startTransposerPlayback();
+        }
+      }
+
+      onTransposerLinkToggle() {
+        this.transposerIndependent = document.getElementById('transposerLinkToggle').checked;
+        document.getElementById('transposerLinkLabel').textContent = this.transposerIndependent ? 'ON' : 'OFF';
+      }
+
+      startTransposerPlayback() {
+        if (!this.transposerBuffer || !this.transposerCtx) return;
+        if (this.transposerCtx.state === 'suspended') this.transposerCtx.resume();
+
+        const source = this.transposerCtx.createBufferSource();
+        source.buffer = this.transposerBuffer;
+        source.playbackRate.value = this.transposerSpeed;
+
+        if (this.transposerIndependent) {
+          // Independent pitch: detune in cents = semitones * 100, compensate speed back
+          source.detune.value = this.transposerSemitones * 100;
+          source.playbackRate.value = this.transposerSpeed;
+        } else {
+          // Vinyl-linked: pitch follows speed naturally
+          source.playbackRate.value = this.transposerSpeed;
+          source.detune.value = 0;
+        }
+
+        source.connect(this.transposerCtx.destination);
+        source.start(0, this.transposerPauseOffset);
+        this.transposerSource = source;
+        this.transposerStartTime = this.transposerCtx.currentTime - this.transposerPauseOffset;
+        this.transposerIsPlaying = true;
+
+        source.onended = () => {
+          if (this.transposerIsPlaying) {
+            this.transposerIsPlaying = false;
+            this.transposerPauseOffset = 0;
+            document.getElementById('transposerPlayIcon').className = 'fa-solid fa-circle-play text-purple-400 text-sm';
+            document.getElementById('transposerProgressBar').style.width = '0%';
+            cancelAnimationFrame(this.transposerAnimFrame);
+          }
+        };
+
+        // Animate progress bar
+        const animate = () => {
+          if (!this.transposerIsPlaying) return;
+          const elapsed = (this.transposerCtx.currentTime - this.transposerStartTime) * this.transposerSpeed;
+          const pct = Math.min(100, (elapsed / this.transposerBuffer.duration) * 100);
+          document.getElementById('transposerProgressBar').style.width = pct + '%';
+          this.transposerAnimFrame = requestAnimationFrame(animate);
+        };
+        this.transposerAnimFrame = requestAnimationFrame(animate);
+
+        document.getElementById('transposerPlayIcon').className = 'fa-solid fa-circle-pause text-purple-400 text-sm';
+      }
+
+      stopTransposerPlayback() {
+        if (this.transposerSource) {
+          try {
+            const elapsed = (this.transposerCtx.currentTime - this.transposerStartTime) * this.transposerSpeed;
+            this.transposerPauseOffset = Math.min(elapsed, this.transposerBuffer ? this.transposerBuffer.duration : 0);
+            this.transposerSource.onended = null;
+            this.transposerSource.stop();
+          } catch(e) {}
+          this.transposerSource = null;
+        }
+        this.transposerIsPlaying = false;
+        cancelAnimationFrame(this.transposerAnimFrame);
+        const icon = document.getElementById('transposerPlayIcon');
+        if (icon) icon.className = 'fa-solid fa-circle-play text-purple-400 text-sm';
+      }
+
+      toggleTransposerPlayback() {
+        if (!this.transposerBuffer) return;
+        if (this.transposerIsPlaying) {
+          this.stopTransposerPlayback();
+        } else {
+          this.startTransposerPlayback();
+        }
+      }
+
+      async renderTransposedAudio() {
+        if (!this.transposerBuffer) {
+          this.showToast('Please load a file first.', 'error');
+          return;
+        }
+
+        const btn = document.querySelector('[onclick="app.renderTransposedAudio()"]');
+        if (btn) { btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Rendering...</span>'; btn.disabled = true; }
+
+        try {
+          const rate = this.transposerSpeed;
+          const pitchRatio = this.transposerIndependent ? Math.pow(2, this.transposerSemitones / 12) : 1;
+
+          const origDur = this.transposerBuffer.duration;
+          const origSR = this.transposerBuffer.sampleRate;
+          const numCh = this.transposerBuffer.numberOfChannels;
+
+          // Effective duration after time-stretch (speed changes duration)
+          const newDuration = origDur / rate;
+          const offlineCtx = new OfflineAudioContext(numCh, Math.ceil(newDuration * origSR), origSR);
+
+          const src = offlineCtx.createBufferSource();
+          src.buffer = this.transposerBuffer;
+          src.playbackRate.value = rate;
+          if (this.transposerIndependent) {
+            src.detune.value = this.transposerSemitones * 100;
+          }
+          src.connect(offlineCtx.destination);
+          src.start(0);
+
+          const rendered = await offlineCtx.startRendering();
+
+          // Encode to WAV
+          const wavBlob = this.audioBufferToWavBlob(rendered);
+          const url = URL.createObjectURL(wavBlob);
+
+          const dlBtn = document.getElementById('transposerDownloadBtn');
+          dlBtn.onclick = () => {
+            const a = document.createElement('a');
+            const suffix = `_${this.transposerSemitones > 0 ? '+' : ''}${this.transposerSemitones}st_${rate.toFixed(2)}x`;
+            a.download = 'transposed' + suffix + '.wav';
+            a.href = url;
+            a.click();
+          };
+
+          document.getElementById('transposerOutputBar').classList.remove('hidden');
+          this.showToast('Render complete! Ready to download.', 'success');
+        } catch(e) {
+          this.showToast('Render failed: ' + e.message, 'error');
+        } finally {
+          if (btn) { btn.innerHTML = '<i class="fa-solid fa-waveform-lines"></i> <span data-i18n="transposerExport">Render & Export WAV</span>'; btn.disabled = false; }
+        }
+      }
+
+      resetTransposerState() {
+        this.stopTransposerPlayback();
+        this.transposerBuffer = null;
+        this.transposerPauseOffset = 0;
+        this.transposerSemitones = 0;
+        this.transposerSpeed = 1.0;
+
+        // Reset sliders & displays
+        document.getElementById('semitoneSlider').value = 0;
+        document.getElementById('semitoneInput').value = 0;
+        document.getElementById('semitoneDisplay').textContent = '0 st';
+        document.getElementById('speedSlider').value = 1.0;
+        document.getElementById('speedDisplay').textContent = '1.00x';
+
+        document.getElementById('transposerContent').classList.add('hidden');
+        document.getElementById('transposerPlaceholder').classList.remove('hidden');
+        document.getElementById('transposerOutputBar').classList.add('hidden');
+        document.getElementById('transposerProgressBar').style.width = '0%';
+
+        const canvas = document.getElementById('transposerWaveCanvas');
+        if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+        document.getElementById('transposerStatus').textContent = 'Awaiting File...';
+        document.getElementById('transposerStatus').className = 'text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold';
+
+        // Reset file input so same file can be re-selected
+        document.getElementById('transposerFileInput').value = '';
+      }
+
+      // ============================================================
+      //  LYRIC STUDIO — CORE METHODS
+      // ============================================================
+
+      openLyricStudio() {
+        document.getElementById('mainView').style.display = 'none';
+        document.getElementById('lyricStudioView').classList.add('studio-open');
+        // Init Wavesurfer lazily when studio opens
+        if (!this.studioWavesurfer) {
+          this._initStudioWavesurfer();
+        }
+        this.renderLyricTable();
+      }
+
+      closeLyricStudio() {
+        document.getElementById('lyricStudioView').classList.remove('studio-open');
+        document.getElementById('mainView').style.display = '';
+        // Pause media if playing
+        const vid = document.getElementById('studioVideoEl');
+        if (vid) vid.pause();
+        this._updateStudioPlayPauseIcon(false);
+      }
+
+      // ---- Wavesurfer Init ----
+      _initStudioWavesurfer() {
+        try {
+          const TimelinePlugin = (typeof WaveSurfer !== 'undefined' && WaveSurfer.Timeline) ? WaveSurfer.Timeline : null;
+          const RegionsPlugin  = (typeof WaveSurfer !== 'undefined' && WaveSurfer.Regions)  ? WaveSurfer.Regions  : null;
+
+          const plugins = [];
+          if (RegionsPlugin) {
+            this.studioRegionsPlugin = RegionsPlugin.create();
+            plugins.push(this.studioRegionsPlugin);
+          }
+          if (TimelinePlugin) {
+            plugins.push(TimelinePlugin.create({ height: 18, timeInterval: 1, primaryLabelInterval: 5, style: { color: '#818cf8', fontSize: '9px' } }));
+          }
+
+          this.studioWavesurfer = WaveSurfer.create({
+            container: '#studioWaveContainer',
+            waveColor: 'rgba(99,102,241,0.6)',
+            progressColor: 'rgba(6,182,212,0.9)',
+            cursorColor: '#f0abfc',
+            cursorWidth: 2,
+            height: 90,
+            normalize: true,
+            interact: true,
+            minPxPerSec: this.studioZoomLevel,
+            plugins
+          });
+
+          // Sync wavesurfer cursor -> media element
+          this.studioWavesurfer.on('seek', (progress) => {
+            const vid = document.getElementById('studioVideoEl');
+            if (vid && vid.duration) {
+              vid.currentTime = progress * vid.duration;
+              vid.play();
+            }
+          });
+
+          // Regions drag/resize -> sync table
+          if (this.studioRegionsPlugin) {
+            this.studioRegionsPlugin.on('region-updated', (region) => {
+              const lineId = region.id;
+              const line = this.lyricLines.find(l => l.id === lineId);
+              if (line) {
+                line.startTime = this._secToTimeStr(region.start);
+                line.endTime   = this._secToTimeStr(region.end);
+                this.renderLyricTable();
+              }
+            });
+          }
+
+          // Playback progress -> update time display + highlight row
+          this.studioWavesurfer.on('timeupdate', (ct) => {
+            this._onStudioTimeUpdate(ct);
+          });
+          this.studioWavesurfer.on('play', () => this._updateStudioPlayPauseIcon(true));
+          this.studioWavesurfer.on('pause', () => this._updateStudioPlayPauseIcon(false));
+          this.studioWavesurfer.on('finish', () => this._updateStudioPlayPauseIcon(false));
+
+        } catch(e) {
+          console.warn('Wavesurfer studio init failed:', e);
+        }
+      }
+
+      // ---- Media Upload ----
+      handleStudioMediaUpload(file) {
+        if (!file) return;
+        this.studioMediaFile = file;
+        const isVideo = file.type.startsWith('video/');
+        const url = URL.createObjectURL(file);
+        const dropZone = document.getElementById('studioPlayerDropZone');
+
+        // --- Clear old state ---
+        dropZone.onclick = null;
+        dropZone.innerHTML = '';
+        dropZone.classList.add('has-media');
+        // Reset drop zone styles for media display & position: relative + overflow: hidden
+        dropZone.style.cssText = 'flex:1; display:flex; flex-direction:column; border:none; margin:0; padding:0; border-radius:0; background:#000; cursor:default; position:relative; overflow:hidden;';
+
+        // Destroy old wavesurfer before rebuilding
+        if (this.studioWavesurfer) {
+          try { this.studioWavesurfer.destroy(); } catch(e) {}
+          this.studioWavesurfer = null;
+          this.studioRegionsPlugin = null;
+        }
+
+        // --- Create media element ---
+        let mediaEl;
+        if (isVideo) {
+          mediaEl = document.createElement('video');
+          mediaEl.id = 'studioVideoEl';
+          mediaEl.controls = true;
+          mediaEl.preload = 'auto';
+          mediaEl.src = url;
+          mediaEl.style.cssText = 'width:100%; height:100%; object-fit:contain; background:#000; display:block;';
+          dropZone.appendChild(mediaEl);
+        } else {
+          // Audio: show icon + name + native controls
+          const icon = document.createElement('i');
+          icon.className = 'fa-solid fa-music';
+          icon.style.cssText = 'font-size:2.5rem; color: rgba(6,182,212,0.5); margin-bottom:10px;';
+          const nameEl = document.createElement('p');
+          nameEl.style.cssText = 'font-size:13px; font-weight:600; color:#a5b4fc; margin-bottom:12px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;';
+          nameEl.textContent = file.name;
+          mediaEl = document.createElement('audio');
+          mediaEl.id = 'studioAudioEl';
+          mediaEl.controls = true;
+          mediaEl.preload = 'auto';
+          mediaEl.src = url;
+          mediaEl.style.cssText = 'width:90%; border-radius:8px;';
+          dropZone.style.justifyContent = 'center';
+          dropZone.style.alignItems = 'center';
+          dropZone.style.background = 'rgba(6,8,28,0.9)';
+          dropZone.appendChild(icon);
+          dropZone.appendChild(nameEl);
+          dropZone.appendChild(mediaEl);
+        }
+        this.studioMediaEl = mediaEl;
+
+        // --- Re-append #studioCcOverlay so it floats strictly on top of video ---
+        let ccEl = document.getElementById('studioCcOverlay');
+        if (!ccEl) {
+          ccEl = document.createElement('div');
+          ccEl.id = 'studioCcOverlay';
+          ccEl.className = 'studio-cc-overlay';
+        }
+        ccEl.style.display = 'none';
+        dropZone.appendChild(ccEl);
+
+        // --- Update UI displays ---
+        const fnEl = document.getElementById('studioFileName');
+        if (fnEl) fnEl.textContent = file.name;
+
+        // Bind media timeupdate directly to _onStudioTimeUpdate
+        mediaEl.addEventListener('timeupdate', () => {
+          this._onStudioTimeUpdate(mediaEl.currentTime);
+        });
+
+        mediaEl.addEventListener('loadedmetadata', () => {
+          const el = document.getElementById('studioDuration');
+          if (el) el.textContent = this._secToTimeStr(mediaEl.duration);
+        });
+
+        // Enable controls
+        ['studioPlayPauseBtn','studioSkipBackBtn','studioSkipFwdBtn','studioInsertBtn'].forEach(id => {
+          const btn = document.getElementById(id);
+          if (btn) btn.disabled = false;
+        });
+
+        // Register spacebar shortcut
+        this._studioRegisterSpacebar();
+
+        // --- Rebuild Wavesurfer bound to this media element ---
+        // Using media: option makes Wavesurfer control THE SAME audio source
+        // as the player — perfect sync, no duplicate decoding.
+        const emptyMsg = document.getElementById('studioWaveEmptyMsg');
+        if (emptyMsg) emptyMsg.style.display = 'none';
+        const statusEl = document.getElementById('studioWaveStatus');
+        if (statusEl) statusEl.textContent = 'Loading waveform...';
+
+        try {
+          const RegionsPlugin  = (typeof WaveSurfer !== 'undefined' && WaveSurfer.Regions)  ? WaveSurfer.Regions  : null;
+          const TimelinePlugin = (typeof WaveSurfer !== 'undefined' && WaveSurfer.Timeline) ? WaveSurfer.Timeline : null;
+
+          const plugins = [];
+          if (RegionsPlugin) {
+            this.studioRegionsPlugin = RegionsPlugin.create();
+            plugins.push(this.studioRegionsPlugin);
+          }
+          if (TimelinePlugin) {
+            plugins.push(TimelinePlugin.create({
+              height: 18, timeInterval: 1, primaryLabelInterval: 5,
+              style: { color: '#818cf8', fontSize: '9px' }
+            }));
+          }
+
+          this.studioWavesurfer = WaveSurfer.create({
+            container: '#studioWaveContainer',
+            waveColor: 'rgba(99,102,241,0.6)',
+            progressColor: 'rgba(6,182,212,0.9)',
+            cursorColor: '#f0abfc',
+            cursorWidth: 2,
+            height: 90,
+            normalize: true,
+            interact: true,
+            minPxPerSec: this.studioZoomLevel,
+            media: mediaEl,   // KEY: bind waveform to same media element as player
+            url,
+            plugins
+          });
+
+          // Regions drag/resize/click -> sync table & seek
+          if (this.studioRegionsPlugin) {
+            this.studioRegionsPlugin.on('region-updated', (region) => {
+              const line = this.lyricLines.find(l => l.id === region.id);
+              if (line) {
+                line.startTime = this._secToTimeStr(region.start);
+                line.endTime   = this._secToTimeStr(region.end);
+                this.renderLyricTable();
+              }
+            });
+            this.studioRegionsPlugin.on('region-clicked', (region, e) => {
+              if (e) e.stopPropagation();
+              if (this.studioWavesurfer) {
+                this.studioWavesurfer.setTime(region.start);
+                this.studioWavesurfer.play();
+              } else {
+                const media = this._getActiveMediaEl();
+                if (media) {
+                  media.currentTime = region.start;
+                  media.play();
+                }
+              }
+            });
+          }
+
+          // Timeupdate -> UI sync
+          this.studioWavesurfer.on('timeupdate', ct => this._onStudioTimeUpdate(ct));
+          this.studioWavesurfer.on('play',   () => this._updateStudioPlayPauseIcon(true));
+          this.studioWavesurfer.on('pause',  () => this._updateStudioPlayPauseIcon(false));
+          this.studioWavesurfer.on('finish', () => this._updateStudioPlayPauseIcon(false));
+
+          this.studioWavesurfer.on('ready', () => {
+            if (statusEl) statusEl.textContent = file.name;
+            this._syncTableToRegions();
+          });
+          this.studioWavesurfer.on('error', e => {
+            if (statusEl) statusEl.textContent = 'Waveform error';
+            console.warn('Wavesurfer error:', e);
+          });
+        } catch(e) {
+          console.warn('Wavesurfer rebuild failed:', e);
+          if (statusEl) statusEl.textContent = 'Waveform unavailable';
+        }
+      }
+
+      // ---- Time update handler ----
+      _onStudioTimeUpdate(ct) {
+        const fmt = this._secToTimeStr(ct);
+        const el = document.getElementById('studioCurrentTime');
+        if (el) el.textContent = fmt;
+        const ph = document.getElementById('studioPlayheadLabel');
+        if (ph) ph.textContent = 'Playhead: ' + fmt;
+
+        let activeCcText = '';
+
+        // Match active lyric line from data array
+        const matchingLine = this.lyricLines.find(line => {
+          const s = this._timeStrToSec(line.startTime);
+          const e = this._timeStrToSec(line.endTime);
+          return ct >= s && ct <= e;
+        });
+
+        if (matchingLine) {
+          if (matchingLine.text && matchingLine.text.trim()) {
+            activeCcText = matchingLine.text.trim();
+          }
+          this._setActiveLyricLine(matchingLine);
+        }
+
+        // Highlight active row in table
+        const rows = document.querySelectorAll('#lyricTableBody tr[data-line-id]');
+        rows.forEach(row => {
+          const lineId = row.getAttribute('data-line-id');
+          if (matchingLine && lineId === matchingLine.id) {
+            row.classList.add('active-lyric-row');
+          } else {
+            row.classList.remove('active-lyric-row');
+          }
+        });
+
+        // Real-Time YouTube CC Subtitle Overlay sync
+        const ccEl = document.getElementById('studioCcOverlay');
+        if (ccEl) {
+          if (activeCcText) {
+            ccEl.textContent = activeCcText;
+            ccEl.style.display = 'block';
+          } else {
+            ccEl.textContent = '';
+            ccEl.style.display = 'none';
+          }
+        }
+      }
+
+      // ---- Lyric Table ----
+      renderLyricTable() {
+        const tbody = document.getElementById('lyricTableBody');
+        const countEl = document.getElementById('studioLineCount');
+        if (!tbody) return;
+
+        if (this.lyricLines.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 24px; color: #4f46e5; opacity: 0.5; font-size: 12px;">
+            <i class="fa-solid fa-arrow-right-to-bracket mr-2"></i>Add lines below or import an SRT / LRC file
+          </td></tr>`;
+          if (countEl) countEl.textContent = '0 lines';
+          return;
+        }
+
+        if (countEl) countEl.textContent = this.lyricLines.length + ' line' + (this.lyricLines.length !== 1 ? 's' : '');
+
+        tbody.innerHTML = this.lyricLines.map((line, idx) => {
+          const colorIdx = idx % this._studioRegionColors.length;
+          const dotColor = this._studioRegionColors[colorIdx].replace('0.35', '1');
+          const dur = this._calcDuration(line.startTime, line.endTime);
+          return `
+          <tr data-line-id="${line.id}" onclick="app.seekToLyricLine('${line.id}', event)" class="cursor-pointer">
+            <td>
+              <span class="region-dot" style="background: ${dotColor}; box-shadow: 0 0 4px ${dotColor};"></span>
+              <br><small>${idx + 1}</small>
+            </td>
+            <td>
+              <input class="lyric-cell-input time-input" type="text" value="${line.startTime}"
+                placeholder="00:00.000"
+                onchange="app.updateLyricLine('${line.id}', 'startTime', this.value)"
+                title="Start time (MM:SS.mmm)">
+              <button class="stamp-btn" onclick="app.stampTime('${line.id}', 'startTime')" title="Stamp current playhead time as start">&#9654; Set</button>
+            </td>
+            <td>
+              <input class="lyric-cell-input time-input" type="text" value="${line.endTime}"
+                placeholder="00:00.000"
+                onchange="app.updateLyricLine('${line.id}', 'endTime', this.value)"
+                title="End time (MM:SS.mmm)">
+              <button class="stamp-btn" onclick="app.stampTime('${line.id}', 'endTime')" title="Stamp current playhead time as end">&#9654; Set</button>
+            </td>
+            <td class="duration-cell">${dur}</td>
+            <td>
+              <input class="lyric-cell-input text-input" type="text" value="${line.text.replace(/"/g, '&quot;')}"
+                placeholder="Lyric text..."
+                oninput="app.updateLyricLine('${line.id}', 'text', this.value)">
+            </td>
+            <td>
+              <button class="delete-line-btn" onclick="app.deleteLyricLine('${line.id}')" title="Delete this line">
+                <i class="fa-solid fa-times"></i>
+              </button>
+            </td>
+          </tr>`;
+        }).join('');
+      }
+
+      addLyricLine() {
+        const lastLine = this.lyricLines[this.lyricLines.length - 1];
+        let startTime = '00:00.000';
+        if (lastLine && lastLine.endTime) startTime = lastLine.endTime;
+        this.lyricLineCounter++;
+        const id = 'line_' + this.lyricLineCounter;
+        this.lyricLines.push({ id, startTime, endTime: startTime, text: '' });
+        this.renderLyricTable();
+        this._syncTableToRegions();
+        // Scroll table to bottom
+        setTimeout(() => {
+          const scroll = document.querySelector('.lyric-table-scroll');
+          if (scroll) scroll.scrollTop = scroll.scrollHeight;
+        }, 50);
+      }
+
+      deleteLyricLine(lineId) {
+        this.lyricLines = this.lyricLines.filter(l => l.id !== lineId);
+        this._sortAndReindexLyricLines();
+      }
+
+      clearAllLines() {
+        if (!confirm('Clear all lyric lines?')) return;
+        this.lyricLines = [];
+        if (this.studioRegionsPlugin) {
+          try { this.studioRegionsPlugin.clearRegions(); } catch(e) {}
+        }
+        this.renderLyricTable();
+      }
+
+      updateLyricLine(lineId, field, value) {
+        const line = this.lyricLines.find(l => l.id === lineId);
+        if (!line) return;
+        line[field] = value;
+        // Re-sort & re-index if timing changed
+        if (field === 'startTime' || field === 'endTime') {
+          this._sortAndReindexLyricLines();
+        }
+      }
+
+      stampTime(lineId, field) {
+        const media = this._getActiveMediaEl();
+        const ct = media ? media.currentTime : (this.studioWavesurfer ? this.studioWavesurfer.getCurrentTime() : 0);
+        this.updateLyricLine(lineId, field, this._secToTimeStr(ct));
+      }
+
+      // ---- Chronological Sorting & Re-Indexing ----
+      _sortAndReindexLyricLines() {
+        this.lyricLines.sort((a, b) => this._timeStrToSec(a.startTime) - this._timeStrToSec(b.startTime));
+        this.renderLyricTable();
+        this._syncTableToRegions();
+      }
+
+      // ---- Region <-> Table Sync ----
+      _syncTableToRegions() {
+        if (!this.studioRegionsPlugin) return;
+        try {
+          this.studioRegionsPlugin.clearRegions();
+          this.lyricLines.forEach((line, idx) => {
+            const s = this._timeStrToSec(line.startTime);
+            const e = this._timeStrToSec(line.endTime);
+            const color = this._studioRegionColors[idx % this._studioRegionColors.length];
+            if (e > s) {
+              this.studioRegionsPlugin.addRegion({
+                id: line.id,
+                start: s,
+                end: e,
+                color,
+                drag: true,
+                resize: true,
+                content: (idx + 1).toString()
+              });
+            }
+          });
+        } catch(e) { console.warn('Region sync error:', e); }
+      }
+
+      _syncLineToRegion(line) {
+        if (!this.studioRegionsPlugin) return;
+        try {
+          const regions = this.studioRegionsPlugin.getRegions();
+          const existing = regions.find(r => r.id === line.id);
+          const s = this._timeStrToSec(line.startTime);
+          const e = this._timeStrToSec(line.endTime);
+          if (existing) {
+            if (e > s) existing.setOptions({ start: s, end: e });
+            else existing.remove();
+          } else if (e > s) {
+            const idx = this.lyricLines.indexOf(line);
+            const color = this._studioRegionColors[idx % this._studioRegionColors.length];
+            this.studioRegionsPlugin.addRegion({ id: line.id, start: s, end: e, color, drag: true, resize: true });
+          }
+        } catch(e) {}
+      }
+
+      // ---- Active Subtitle Input Box Two-Way Synchronization ----
+      _setActiveLyricLine(line) {
+        const input = document.getElementById('studioActiveTextInput');
+        const label = document.getElementById('studioActiveLineLabel');
+        if (!line) {
+          this.activeLyricLineId = null;
+          if (label) label.textContent = 'No active line';
+          if (input && document.activeElement !== input) {
+            input.value = '';
+            input.placeholder = 'Click a line or playhead to edit text here...';
+          }
+          return;
+        }
+
+        this.activeLyricLineId = line.id;
+        if (label) {
+          const idx = this.lyricLines.indexOf(line) + 1;
+          label.textContent = `Line #${idx} (${line.startTime} → ${line.endTime})`;
+        }
+
+        if (input && document.activeElement !== input) {
+          input.value = line.text || '';
+        }
+      }
+
+      onActiveInputTextChange(val) {
+        if (!this.activeLyricLineId) {
+          this.insertLineAtCurrentTime();
+        }
+        if (!this.activeLyricLineId) return;
+
+        const line = this.lyricLines.find(l => l.id === this.activeLyricLineId);
+        if (line) {
+          line.text = val;
+
+          // Live update row input in grid table
+          const rowInput = document.querySelector(`tr[data-line-id="${line.id}"] .text-input`);
+          if (rowInput && rowInput !== document.activeElement) {
+            rowInput.value = val;
+          }
+
+          // Live update subtitle overlay on video
+          const ccEl = document.getElementById('studioCcOverlay');
+          if (ccEl) {
+            if (val.trim()) {
+              ccEl.textContent = val.trim();
+              ccEl.style.display = 'block';
+            } else {
+              ccEl.textContent = '';
+              ccEl.style.display = 'none';
+            }
+          }
+        }
+      }
+
+      onActiveInputKeyDown(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const currentIdx = this.lyricLines.findIndex(l => l.id === this.activeLyricLineId);
+          if (currentIdx !== -1 && currentIdx < this.lyricLines.length - 1) {
+            const nextLine = this.lyricLines[currentIdx + 1];
+            this.seekToLyricLine(nextLine.id);
+          } else {
+            this.insertLineAtCurrentTime();
+          }
+        }
+      }
+
+      // ---- Seek to Lyric Line on Row Click & Play ----
+      seekToLyricLine(lineId, e) {
+        if (e && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('button'))) {
+          return;
+        }
+        const line = this.lyricLines.find(l => l.id === lineId);
+        if (!line) return;
+
+        this._setActiveLyricLine(line);
+
+        const sec = this._timeStrToSec(line.startTime);
+        if (this.studioWavesurfer) {
+          this.studioWavesurfer.setTime(sec);
+          this.studioWavesurfer.play();
+        } else {
+          const media = this._getActiveMediaEl();
+          if (media) {
+            media.currentTime = sec;
+            media.play();
+          }
+        }
+
+        // Focus dedicated input box
+        const input = document.getElementById('studioActiveTextInput');
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }
+
+      // ---- Insert Line at Playhead ----
+      insertLineAtCurrentTime() {
+        // Get current playhead time from wavesurfer or media element
+        let ct = 0;
+        if (this.studioWavesurfer) {
+          ct = this.studioWavesurfer.getCurrentTime();
+        } else {
+          const media = this._getActiveMediaEl();
+          if (media) ct = media.currentTime;
+        }
+
+        // Pause playback so user can type
+        if (this.studioWavesurfer && this.studioWavesurfer.isPlaying()) {
+          this.studioWavesurfer.pause();
+        } else {
+          const media = this._getActiveMediaEl();
+          if (media && !media.paused) media.pause();
+        }
+
+        // Find next existing region that starts after ct
+        const sortedLines = [...this.lyricLines].sort((a, b) => this._timeStrToSec(a.startTime) - this._timeStrToSec(b.startTime));
+        const nextLine = sortedLines.find(l => this._timeStrToSec(l.startTime) > ct);
+
+        let defaultEnd = ct + 3.0;
+        if (nextLine) {
+          const nextStart = this._timeStrToSec(nextLine.startTime);
+          if (nextStart > ct && nextStart < defaultEnd) {
+            defaultEnd = nextStart;
+          }
+        }
+
+        this.lyricLineCounter++;
+        const id = 'line_' + this.lyricLineCounter;
+        const newLine = {
+          id,
+          startTime: this._secToTimeStr(ct),
+          endTime:   this._secToTimeStr(defaultEnd),
+          text: ''
+        };
+
+        this.lyricLines.push(newLine);
+        this._sortAndReindexLyricLines();
+
+        // Focus text input of newly inserted row & scroll into view
+        setTimeout(() => {
+          const row = document.querySelector(`tr[data-line-id="${id}"]`);
+          if (row) {
+            row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            const textInput = row.querySelector('.text-input');
+            if (textInput) textInput.focus();
+          }
+        }, 60);
+      }
+
+      addLyricLine() {
+        this.insertLineAtCurrentTime();
+      }
+
+      // ---- Spacebar shortcut ----
+      _studioRegisterSpacebar() {
+        // Only register once
+        if (this._studioSpacebarRegistered) return;
+        this._studioSpacebarRegistered = true;
+        document.addEventListener('keydown', (e) => {
+          // Only fire when studio is open AND not typing in an input
+          const studioOpen = document.getElementById('lyricStudioView').classList.contains('studio-open');
+          if (!studioOpen) return;
+          const tag = document.activeElement.tagName;
+          if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+          if (e.code === 'Space') {
+            e.preventDefault();
+            this.insertLineAtCurrentTime();
+          }
+        });
+      }
+
+      // ---- Playback controls ----
+      studioTogglePlayback() {
+        if (this.studioWavesurfer) {
+          this.studioWavesurfer.playPause();
+        } else {
+          const media = this._getActiveMediaEl();
+          if (media) {
+            if (media.paused) media.play(); else media.pause();
+            this._updateStudioPlayPauseIcon(!media.paused);
+          }
+        }
+      }
+
+      studioSkipBackward() {
+        const media = this._getActiveMediaEl();
+        if (media) { media.currentTime = Math.max(0, media.currentTime - 5); }
+        if (this.studioWavesurfer) this.studioWavesurfer.skip(-5);
+      }
+
+      studioSkipForward() {
+        const media = this._getActiveMediaEl();
+        if (media) { media.currentTime = Math.min(media.duration || 0, media.currentTime + 5); }
+        if (this.studioWavesurfer) this.studioWavesurfer.skip(5);
+      }
+
+      studioZoom(delta) {
+        this.studioZoomLevel = Math.max(10, Math.min(1000, this.studioZoomLevel + delta));
+        if (this.studioWavesurfer) this.studioWavesurfer.zoom(this.studioZoomLevel);
+      }
+
+      _updateStudioPlayPauseIcon(playing) {
+        const icon = document.getElementById('studioPlayPauseIcon');
+        if (icon) {
+          icon.className = playing ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+        }
+      }
+
+      _getActiveMediaEl() {
+        const vid = document.getElementById('studioVideoEl');
+        if (vid && vid.src && vid.style.display !== 'none') return vid;
+        const aud = document.getElementById('studioAudioEl');
+        if (aud && aud.src) return aud;
+        return null;
+      }
+
+      // ---- SRT Import ----
+      handleSrtImport(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const text = e.target.result;
+            const parsed = this._parseSrt(text);
+            this.lyricLines = parsed;
+            this.renderLyricTable();
+            this._syncTableToRegions();
+            this.showToast(`Imported ${parsed.length} subtitle lines from SRT`, 'success');
+          } catch(err) {
+            this.showToast('Failed to parse SRT file: ' + err.message, 'error');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      _parseSrt(text) {
+        const lines = [];
+        const blocks = text.trim().split(/\n\s*\n/);
+        blocks.forEach(block => {
+          const rows = block.trim().split('\n');
+          if (rows.length < 2) return;
+          const timeLine = rows.find(r => r.includes('-->'));
+          if (!timeLine) return;
+          const [startRaw, endRaw] = timeLine.split('-->').map(s => s.trim());
+          const textContent = rows.slice(rows.indexOf(timeLine) + 1).join(' ').trim();
+          if (!startRaw || !textContent) return;
+          this.lyricLineCounter++;
+          lines.push({
+            id: 'line_' + this.lyricLineCounter,
+            startTime: this._srtTimeToStr(startRaw),
+            endTime: this._srtTimeToStr(endRaw),
+            text: textContent
+          });
+        });
+        return lines;
+      }
+
+      // Convert SRT time "00:00:01,500" to "00:01.500"
+      _srtTimeToStr(srtTime) {
+        // Format: HH:MM:SS,mmm
+        const match = srtTime.match(/(\d+):(\d+):(\d+)[,\.](\d+)/);
+        if (!match) return '00:00.000';
+        const h = parseInt(match[1]), m = parseInt(match[2]), s = parseInt(match[3]), ms = match[4].padEnd(3,'0').slice(0,3);
+        const totalMinutes = h * 60 + m;
+        return String(totalMinutes).padStart(2,'0') + ':' + String(s).padStart(2,'0') + '.' + ms;
+      }
+
+      // ---- LRC Import ----
+      handleLrcImport(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const text = e.target.result;
+            const parsed = this._parseLrc(text);
+            if (parsed.length === 0) throw new Error('No valid LRC timestamps found');
+            this.lyricLines = parsed;
+            this.renderLyricTable();
+            this._syncTableToRegions();
+            this.showToast(`Imported ${parsed.length} lyric lines from LRC`, 'success');
+          } catch(err) {
+            this.showToast('Failed to parse LRC file: ' + err.message, 'error');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      _parseLrc(text) {
+        const lines = [];
+        const regex = /\[(\d+):(\d+\.?\d*)\](.*)/g;
+        const matches = [...text.matchAll(regex)];
+        matches.forEach((match, idx) => {
+          const m = parseInt(match[1]), s = parseFloat(match[2]);
+          const totalSec = m * 60 + s;
+          const startStr = this._secToTimeStr(totalSec);
+          const textContent = match[3].trim();
+          // End time = next line's start, or start + 3s for last line
+          const nextMatch = matches[idx + 1];
+          let endSec = totalSec + 3;
+          if (nextMatch) {
+            endSec = parseInt(nextMatch[1]) * 60 + parseFloat(nextMatch[2]);
+          }
+          this.lyricLineCounter++;
+          lines.push({
+            id: 'line_' + this.lyricLineCounter,
+            startTime: startStr,
+            endTime: this._secToTimeStr(endSec),
+            text: textContent
+          });
+        });
+        return lines;
+      }
+
+      // ---- Export SRT ----
+      exportSrt() {
+        if (this.lyricLines.length === 0) {
+          this.showToast('No lyric lines to export', 'error'); return;
+        }
+        const lines = this.lyricLines
+          .slice()
+          .sort((a, b) => this._timeStrToSec(a.startTime) - this._timeStrToSec(b.startTime));
+        const srt = lines.map((line, idx) => {
+          const start = this._strToSrtTime(line.startTime);
+          const end   = this._strToSrtTime(line.endTime);
+          return `${idx + 1}\n${start} --> ${end}\n${line.text}`;
+        }).join('\n\n');
+        this._downloadFile(srt, 'subtitles.srt', 'text/plain');
+        this.showToast('SRT file downloaded!', 'success');
+      }
+
+      // Convert MM:SS.mmm to SRT format HH:MM:SS,mmm
+      _strToSrtTime(timeStr) {
+        const sec = this._timeStrToSec(timeStr);
+        const h = Math.floor(sec / 3600);
+        const m = Math.floor((sec % 3600) / 60);
+        const s = Math.floor(sec % 60);
+        const ms = Math.round((sec - Math.floor(sec)) * 1000);
+        return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')},${String(ms).padStart(3,'0')}`;
+      }
+
+      // ---- Export LRC ----
+      exportLrc() {
+        if (this.lyricLines.length === 0) {
+          this.showToast('No lyric lines to export', 'error'); return;
+        }
+        const lines = this.lyricLines
+          .slice()
+          .sort((a, b) => this._timeStrToSec(a.startTime) - this._timeStrToSec(b.startTime));
+        const header = `[ar:Artist Name]\n[ti:Track Title]\n[al:Album]\n[by:Sonvex Studio]\n\n`;
+        const body = lines.map(line => {
+          const sec = this._timeStrToSec(line.startTime);
+          const m = Math.floor(sec / 60);
+          const s = (sec % 60).toFixed(2).padStart(5, '0');
+          return `[${String(m).padStart(2,'0')}:${s}]${line.text}`;
+        }).join('\n');
+        this._downloadFile(header + body, 'lyrics.lrc', 'text/plain');
+        this.showToast('LRC file downloaded!', 'success');
+      }
+
+      // ---- Utility Helpers ----
+      // Seconds -> "MM:SS.mmm"
+      _secToTimeStr(sec) {
+        if (isNaN(sec) || sec < 0) sec = 0;
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        const ms = Math.round((sec - Math.floor(sec)) * 1000);
+        return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
+      }
+
+      // "MM:SS.mmm" or "MM:SS" -> seconds
+      _timeStrToSec(str) {
+        if (!str) return 0;
+        const parts = str.split(':');
+        if (parts.length < 2) return 0;
+        const m = parseFloat(parts[0]) || 0;
+        const rest = parts[1].split('.');
+        const s = parseFloat(rest[0]) || 0;
+        const ms = rest[1] ? parseFloat('0.' + rest[1]) : 0;
+        return m * 60 + s + ms;
+      }
+
+      // Calculate duration string from start/end time strings
+      _calcDuration(start, end) {
+        const s = this._timeStrToSec(start);
+        const e = this._timeStrToSec(end);
+        const dur = Math.max(0, e - s);
+        return this._secToTimeStr(dur);
+      }
+
+      _downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
     }
 
