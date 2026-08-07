@@ -1069,58 +1069,64 @@ CRITICAL FORMATTING INSTRUCTIONS:
         await this.streamGeminiResponse(lastPrompt);
       }
 
-      async streamGeminiResponse(promptText) {
-        const workerUrl = "https://fragrant-sound-d488.sonvexbeat.workers.dev";
-        const messageId = 'msg_' + Date.now();
-        const chatWindow = document.getElementById('chatConsoleWindow');
-        
-        if (!chatWindow) return;
+async streamGeminiResponse(promptText) {
+  const workerUrl = "https://fragrant-sound-d488.sonvexbeat.workers.dev";
+  const messageId = 'msg_' + Date.now();
+  const chatWindow = document.getElementById('chatConsoleWindow');
+  
+  if (!chatWindow) return;
 
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'flex items-start gap-3 animate-fadeIn';
-        msgDiv.innerHTML = `
-          <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
-            <i class="fa-solid fa-robot"></i>
-          </div>
-          <div class="glass-panel p-4 rounded-xl w-full max-w-3xl border-white/10 light:border-slate-300 space-y-2">
-            <p class="font-bold text-slate-200 light:text-slate-900 text-xs flex items-center justify-between">
-              <span>SONVEX AI Assistant</span>
-              <span id="${messageId}_typing" class="text-[10px] text-slate-300 light:text-slate-600 font-mono animate-pulse">Streaming lyrics...</span>
-            </p>
-            <div id="${messageId}" class="lyric-box p-3 rounded-lg text-slate-200 light:text-slate-900 leading-relaxed font-mono"></div>
-          </div>
-        `;
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'flex items-start gap-3 animate-fadeIn';
+  msgDiv.innerHTML = `
+    <div class="w-7 h-7 rounded-lg bg-slate-800 light:bg-slate-900 light:text-white text-slate-200 flex items-center justify-center font-bold text-xs shrink-0 border border-slate-700">
+      <i class="fa-solid fa-robot"></i>
+    </div>
+    <div class="glass-panel p-4 rounded-xl w-full max-w-3xl border-white/10 light:border-slate-300 space-y-2">
+      <p class="font-bold text-slate-200 light:text-slate-900 text-xs flex items-center justify-between">
+        <span>SONVEX AI Assistant</span>
+        <span id="${messageId}_typing" class="text-[10px] text-slate-300 light:text-slate-600 font-mono animate-pulse">Streaming lyrics...</span>
+      </p>
+      <div id="${messageId}" class="lyric-box p-3 rounded-lg text-slate-200 light:text-slate-900 leading-relaxed font-mono"></div>
+    </div>
+  `;
 
-        chatWindow.appendChild(msgDiv);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
+  chatWindow.appendChild(msgDiv);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 
-        const contentDiv = document.getElementById(messageId);
-        const typingIndicator = document.getElementById(`${messageId}_typing`);
+  const contentDiv = document.getElementById(messageId);
+  const typingIndicator = document.getElementById(`${messageId}_typing`);
 
-        try {
-          const response = await fetch(workerUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ promptText: promptText })
-          });
+  try {
+    const response = await fetch(workerUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ promptText: promptText })
+    });
 
-          const data = await response.json();
-          
-          if (data.candidates && data.candidates[0].content.parts[0].text) {
-            const generatedText = data.candidates[0].content.parts[0].text;
-            contentDiv.innerText = generatedText;
-            this.chatHistory.push({ role: 'model', text: generatedText });
-          } else {
-            contentDiv.innerText = "حدث خطأ أثناء استلام الرد من الذكاء الاصطناعي.";
-          }
-        } catch (error) {
-          console.error("Error:", error);
-          contentDiv.innerText = "تعذر الاتصال بالخادم.";
-          this.showToast("تعذر الاتصال بالخادم.", 'error');
-        } finally {
-          if (typingIndicator) typingIndicator.remove();
-        }
-      }
+    const data = await response.json();
+    console.log("API Response Data:", data); // لمراجعة الرد من Console المتصفح
+
+    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+      const generatedText = data.candidates[0].content.parts[0].text;
+      contentDiv.innerText = generatedText;
+      this.chatHistory.push({ role: 'model', text: generatedText });
+    } else if (data.error) {
+      // إظهار رسالة الخطأ القادمة من جوجل بالتفصيل لمعرفة السبب
+      const errorMsg = data.error.message || JSON.stringify(data.error);
+      contentDiv.innerText = `⚠️ خطأ من الـ API (${data.error.code || 'Error'}): ${errorMsg}`;
+      this.showToast(`خطأ: ${errorMsg}`, 'error');
+    } else {
+      contentDiv.innerText = "لم يتم إرجاع أي نص. قد يكون الرد حُجب بواسطة فلتر الأمان لدى جوجل.";
+    }
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    contentDiv.innerText = `تعذر الاتصال بالخادم: ${error.message}`;
+    this.showToast("تعذر الاتصال بالخادم.", 'error');
+  } finally {
+    if (typingIndicator) typingIndicator.remove();
+  }
+}
 
       appendChatMessage(role, text) {
         const chatWindow = document.getElementById('chatConsoleWindow');
