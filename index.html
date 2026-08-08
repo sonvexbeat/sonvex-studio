@@ -6793,8 +6793,10 @@
         this.videoShortsAudioExportGain=ctx.createGain();
         this.videoShortsAudioExportGain.gain.value=1;
         this.videoShortsMediaSource.connect(this.videoShortsAudioExportGain);
-        this.videoShortsAudioExportGain.connect(this.videoShortsAudioDestination);
       }
+      // Ensure the export gain is connected to the current MediaStreamDestination.
+      // This is safe to repeat and keeps subsequent Clip exports audible.
+      try { this.videoShortsAudioExportGain.connect(this.videoShortsAudioDestination); } catch(e) {}
       return this.videoShortsAudioDestination.stream;
     }
 
@@ -6847,7 +6849,12 @@
       const old={rate:video.playbackRate,muted:video.muted};
       video.pause(); video.playbackRate=settings.speed||1; video.muted=false;
       this._videoShortsApplyExportSettings(settings);
-      const cleanup=()=>{try{video.pause();}catch(e){} video.playbackRate=old.rate; video.muted=old.muted; try{this.videoShortsMediaSource&&this.videoShortsMediaSource.disconnect();}catch(e){} stream.getTracks().forEach(t=>{try{t.stop();}catch(e){}}); this.videoShortsExportStream=null; this.videoShortsExportRecorder=null;};
+      const cleanup=()=>{try{video.pause();}catch(e){} video.playbackRate=old.rate; video.muted=old.muted;
+        // Keep the MediaElementSource connected between exports. Disconnecting it here
+        // breaks the audio graph after the first clip, causing later clips to be rendered
+        // without an audio stream and FFmpeg to fail on '-c:a aac'. The export stream
+        // tracks are stopped below, but the persistent WebAudio graph remains intact.
+        stream.getTracks().forEach(t=>{try{t.stop();}catch(e){}}); this.videoShortsExportStream=null; this.videoShortsExportRecorder=null;};
       return await new Promise(async (resolve,reject)=>{
         let done=false;
         const finish=(err,blob)=>{if(done)return;done=true;cleanup();err?reject(err):resolve({blob,mime,width:w,height:h});};
