@@ -2711,11 +2711,11 @@
 
       <div class="video-panel">
         <div class="video-panel-title"><span><i class="fa-solid fa-file-video text-emerald-400 mr-1"></i> Export</span></div>
-        <label class="video-field-label">Resolution <strong id="videoResolutionValue">4K</strong></label>
+        <label class="video-field-label">Resolution <strong id="videoResolutionValue">1080p</strong></label>
         <select id="videoResolutionSelect" onchange="app.videoShortsUpdateResolutionLabel()">
           <option value="2160">4K — 2160p</option>
           <option value="1440">1440p</option>
-          <option value="1080">1080p</option>
+          <option value="1080" selected>1080p</option>
           <option value="720">720p</option>
         </select>
         <label class="video-field-label mt-3">Export Quality <strong id="videoBitrateValue">18 Mbps</strong></label>
@@ -3640,6 +3640,7 @@
       this.videoShortsOverlayPosition = 'center';
       this.videoShortsSpeed = 1;
       this.videoShortsAspect = '9:16';
+      this.videoShortsDefaultResolution = 1080;
       this.videoShortsTimelineZoom = 1;
       this.videoShortsClips = [];
       this.videoShortsActiveClipIndex = -1;
@@ -3648,6 +3649,10 @@
       this.videoShortsAudioContext = null;
       this.videoShortsMediaSource = null;
       this.videoShortsAudioDestination = null;
+      this.videoShortsPreviewGain = null;
+      this.videoShortsAudioExportGain = null;
+      this.videoShortsAudioGraphConnected = false;
+      this.videoShortsMp4Phase = null;
       this.videoShortsRenderRAF = null;
       this.videoShortsPreviewRAF = null;
       this.videoShortsExportTimer = null;
@@ -6262,9 +6267,35 @@
       return `${String(m).padStart(2,'0')}:${s.toFixed(2).padStart(5,'0')}`;
     }
 
+    async _ensureVideoShortsPreviewAudio() {
+      const video = this.videoShortsVideo;
+      if (!video) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!this.videoShortsAudioContext) {
+        this.videoShortsAudioContext = new AudioCtx();
+      }
+      const ctx = this.videoShortsAudioContext;
+      if (ctx.state === 'suspended') await ctx.resume();
+
+      if (!this.videoShortsMediaSource) {
+        this.videoShortsMediaSource = ctx.createMediaElementSource(video);
+      }
+      if (!this.videoShortsPreviewGain) {
+        this.videoShortsPreviewGain = ctx.createGain();
+        this.videoShortsPreviewGain.gain.value = 1;
+        this.videoShortsMediaSource.connect(this.videoShortsPreviewGain);
+        this.videoShortsPreviewGain.connect(ctx.destination);
+      }
+      this.videoShortsAudioGraphConnected = true;
+    }
+
     async videoShortsTogglePlay() {
       const video = this.videoShortsVideo;
       if (!video || !this.videoShortsDuration) return;
+      try { await this._ensureVideoShortsPreviewAudio(); } catch (audioErr) {
+        console.warn('Video preview audio graph unavailable; using native media audio.', audioErr);
+      }
       if (!video.paused) {
         video.pause();
         return;
@@ -6562,7 +6593,7 @@
         name: `Clip ${this.videoShortsClips.length + 1}`,
         settings: {
           aspect: this.videoShortsAspect,
-          resolution: parseInt(document.getElementById('videoResolutionSelect')?.value || '2160', 10),
+          resolution: parseInt(document.getElementById('videoResolutionSelect')?.value || '1080', 10),
           bitrate: parseInt(document.getElementById('videoBitrateRange')?.value || '18', 10),
           zoom: this.videoShortsZoom,
           posX: this.videoShortsPosX,
@@ -6646,7 +6677,7 @@
       };
       Object.entries(ids).forEach(([id,val])=>{const el=document.getElementById(id);if(el && id!=='videoOverlayText') el.textContent=val;});
       const res=document.getElementById('videoResolutionValue');
-      if(res) res.textContent=String(st.resolution||document.getElementById('videoResolutionSelect')?.value||2160)==='2160'?'4K':`${st.resolution||document.getElementById('videoResolutionSelect')?.value||2160}p`;
+      if(res) res.textContent=String(st.resolution||document.getElementById('videoResolutionSelect')?.value||1080)==='2160'?'4K':`${st.resolution||document.getElementById('videoResolutionSelect')?.value||1080}p`;
       const br=document.getElementById('videoBitrateValue');
       if(br) br.textContent=`${st.bitrate||document.getElementById('videoBitrateRange')?.value||18} Mbps`;
     }
@@ -6743,6 +6774,8 @@
       this.videoShortsCloudUid = null; this.videoShortsTusUpload = null; this.videoShortsCloudCancelRequested = false; this.videoShortsCloudCreatedUids = []; this.videoShortsZoom=1;this.videoShortsPosX=0;this.videoShortsPosY=0;this.videoShortsBrightness=1;this.videoShortsBlur=0;this.videoShortsOverlayText='';this.videoShortsSpeed=1;this.videoShortsAspect='9:16';this.videoShortsClips=[];this.videoShortsActiveClipIndex=-1;this.videoShortsTimelineZoom=1;
       const ids={videoZoomRange:100,videoOverlayText:'',videoSpeedRange:1}; Object.entries(ids).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
       const sel=document.getElementById('videoAspectSelect');if(sel)sel.value='9:16';
+      const resolutionSel=document.getElementById('videoResolutionSelect');
+      if(resolutionSel){ resolutionSel.value='1080'; this.videoShortsUpdateResolutionLabel(); }
       const z=document.getElementById('videoZoomValue');if(z)z.textContent='100%';
       const a=document.getElementById('videoAspectValue');if(a)a.textContent='9:16';
       this._renderVideoShortsClipList();this._renderVideoShortsTimeline();this.videoShortsRenderFrame();this._updateVideoShortsExportButtons();
@@ -6750,20 +6783,25 @@
 
     async _prepareVideoShortsAudioGraph() {
       const video=this.videoShortsVideo;
-      if(!video || !video.captureStream) return null;
-      if(!this.videoShortsAudioContext) this.videoShortsAudioContext=new (window.AudioContext||window.webkitAudioContext)();
-      if(this.videoShortsAudioContext.state==='suspended') await this.videoShortsAudioContext.resume();
-      if(!this.videoShortsMediaSource) this.videoShortsMediaSource=this.videoShortsAudioContext.createMediaElementSource(video);
-      if(!this.videoShortsAudioDestination) this.videoShortsAudioDestination=this.videoShortsAudioContext.createMediaStreamDestination();
-      try { this.videoShortsMediaSource.disconnect(); } catch(e) {}
-      this.videoShortsMediaSource.connect(this.videoShortsAudioDestination);
+      if(!video) return null;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if(!AudioCtx) return null;
+      await this._ensureVideoShortsPreviewAudio();
+      const ctx=this.videoShortsAudioContext;
+      if(!this.videoShortsAudioDestination) this.videoShortsAudioDestination=ctx.createMediaStreamDestination();
+      if(!this.videoShortsAudioExportGain) {
+        this.videoShortsAudioExportGain=ctx.createGain();
+        this.videoShortsAudioExportGain.gain.value=1;
+        this.videoShortsMediaSource.connect(this.videoShortsAudioExportGain);
+        this.videoShortsAudioExportGain.connect(this.videoShortsAudioDestination);
+      }
       return this.videoShortsAudioDestination.stream;
     }
 
     _videoShortsGetExportSettings(clip = null) {
       const s = clip?.settings || {};
       const aspect = s.aspect || this.videoShortsAspect;
-      const resolution = parseInt(s.resolution || document.getElementById('videoResolutionSelect')?.value || '2160',10);
+      const resolution = parseInt(s.resolution || document.getElementById('videoResolutionSelect')?.value || '1080',10);
       const bitrate = parseInt(s.bitrate || document.getElementById('videoBitrateRange')?.value || '18',10);
       return {
         aspect, resolution, bitrate,
@@ -6830,7 +6868,13 @@
             if(!this.videoShortsExporting){if(recorder.state!=='inactive')recorder.stop();return;}
             this.videoShortsRenderFrame(canvas);
             const pct=Math.max(0,Math.min(1,(video.currentTime-start)/(end-start)));
-            const fill=document.getElementById('videoExportProgressFill'); if(fill)fill.style.width=(pct*100).toFixed(1)+'%';
+            const fill=document.getElementById('videoExportProgressFill');
+            if(fill) {
+              const scaled = this.videoShortsMp4Phase === 'render' ? pct * 55 : pct * 100;
+              fill.style.width=scaled.toFixed(1)+'%';
+            }
+            const status=document.getElementById('videoExportStatus');
+            if(status && this.videoShortsMp4Phase === 'render') status.textContent=`Rendering video… ${(pct*100).toFixed(0)}%`;
             if(video.currentTime>=end-.02){video.pause();if(recorder.state!=='inactive')recorder.stop();return;}
             this.videoShortsRenderRAF=requestAnimationFrame(loop);
           };
@@ -6907,7 +6951,8 @@
             progress: ({ ratio }) => {
               if (this.videoShortsExporting && fill) {
                 const pct = Math.max(0, Math.min(1, Number(ratio) || 0));
-                fill.style.width = Math.max(5, pct * 100).toFixed(1) + '%';
+                const overall = this.videoShortsMp4Phase === 'encode' ? 55 + pct * 45 : pct * 100;
+                fill.style.width = Math.max(5, overall).toFixed(1) + '%';
                 if (status) status.textContent = `Encoding MP4… ${(pct * 100).toFixed(0)}%`;
               }
             }
@@ -6978,11 +7023,13 @@
       const status=document.getElementById('videoExportStatus'),fill=document.getElementById('videoExportProgressFill'),cancel=document.getElementById('videoExportCancelBtn');
       if(cancel)cancel.disabled=false; if(fill)fill.style.width='0%'; if(status)status.textContent='Preparing MP4…';
       this._updateVideoShortsExportButtons();
+      this.videoShortsMp4Phase='render';
       try {
         const idx=this.videoShortsActiveClipIndex;
         const rendered=await this._renderVideoShortRangeBlob(this.videoShortsClips[idx],'webm');
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
-        if(status)status.textContent='Encoding MP4…';
+        this.videoShortsMp4Phase='encode';
+        if(status)status.textContent='Encoding MP4… 0%';
         const mp4=await this._encodeVideoShortsWebmToMp4(rendered.blob,`sonvex-clip-${String(idx+1).padStart(2,'0')}`);
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
         const url=URL.createObjectURL(mp4);const a=document.createElement('a');a.href=url;a.download=`sonvex-clip-${String(idx+1).padStart(2,'0')}.mp4`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
@@ -6991,6 +7038,7 @@
         if(e.message==='CANCELLED'){if(status)status.textContent='Export cancelled';if(fill)fill.style.width='0%';}
         else {if(status)status.textContent='MP4 export failed';this.showToast(e.message||'MP4 export failed. Please try again.','error');}
       }
+      this.videoShortsMp4Phase=null;
       this.videoShortsExporting=false;this.videoShortsExportRecorder=null;this.videoShortsExportStream=null;if(cancel)cancel.disabled=true;this._updateVideoShortsExportButtons();
     }
 
@@ -7001,14 +7049,17 @@
       const status=document.getElementById('videoExportStatus'),fill=document.getElementById('videoExportProgressFill'),cancel=document.getElementById('videoExportCancelBtn');
       if(cancel)cancel.disabled=false;if(fill)fill.style.width='0%';this._updateVideoShortsExportButtons();
       const zip=new JSZip();
+      this.videoShortsMp4Phase='render';
       try {
         for(let i=0;i<this.videoShortsClips.length;i++){
           if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
           if(status)status.textContent=`Rendering Clip ${i+1} / ${this.videoShortsClips.length}…`;
           const rendered=await this._renderVideoShortRangeBlob(this.videoShortsClips[i],'webm');
           if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+          this.videoShortsMp4Phase='encode';
           if(status)status.textContent=`Encoding Clip ${i+1} / ${this.videoShortsClips.length}…`;
           const mp4=await this._encodeVideoShortsWebmToMp4(rendered.blob,`sonvex-clip-${String(i+1).padStart(2,'0')}`);
+          this.videoShortsMp4Phase='render';
           if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
           zip.file(`Clip_${String(i+1).padStart(2,'0')}.mp4`,mp4);
           if(fill)fill.style.width=(((i+1)/this.videoShortsClips.length)*100).toFixed(1)+'%';
@@ -7022,6 +7073,7 @@
         if(e.message==='CANCELLED'){if(status)status.textContent='Export cancelled';if(fill)fill.style.width='0%';this.showToast('MP4 export cancelled.','info');}
         else {if(status)status.textContent='MP4 export failed';this.showToast(e.message||'Could not export MP4 clips. Please try again.','error');}
       }
+      this.videoShortsMp4Phase=null;
       this.videoShortsExporting=false;this.videoShortsExportQueue=[];if(cancel)cancel.disabled=true;this._updateVideoShortsExportButtons();
     }
 
