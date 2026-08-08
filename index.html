@@ -700,7 +700,7 @@
       bottom: 10% !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
-      z-index: 999 !important; /* Float strictly ON TOP of the video */
+      z-index: 999 !important;
       pointer-events: none !important;
       text-align: center !important;
       color: #ffffff !important;
@@ -716,6 +716,245 @@
       line-height: 1.4 !important;
       transition: opacity 0.15s ease !important;
     }
+
+    /* STEM STUDIO FULL-SCREEN WORKSTATION VIEW */
+    #stemStudioView {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: #060814;
+      color: #e0e7ff;
+      flex-direction: column;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+    .stem-header {
+      height: 52px;
+      background: rgba(10, 12, 32, 0.95);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      backdrop-filter: blur(12px);
+    }
+    .stem-master-toolbar {
+      background: rgba(15, 18, 48, 0.9);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .stem-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 16px;
+      gap: 12px;
+      background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.05), transparent 70%);
+    }
+    .stem-global-playhead {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #00FFCC;
+      box-shadow: 0 0 10px #00FFCC, 0 0 4px #00FFCC;
+      z-index: 20;
+      pointer-events: none;
+      display: none;
+      left: 0;
+      transition: opacity 0.15s ease;
+    }
+    .stem-clips-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .audio-clip {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 6px;
+      cursor: grab;
+      user-select: none;
+      pointer-events: auto;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 4px 6px;
+      box-sizing: border-box;
+    }
+    .audio-clip:hover {
+      border-color: rgba(0, 255, 204, 0.6);
+      background: rgba(99, 102, 241, 0.3);
+    }
+    .audio-clip.selected {
+      border: 2px solid #00FFCC !important;
+      box-shadow: 0 0 12px rgba(0, 255, 204, 0.7), inset 0 0 8px rgba(0, 255, 204, 0.3) !important;
+      z-index: 10 !important;
+      background: rgba(0, 255, 204, 0.2) !important;
+    }
+    .audio-clip.silenced {
+      background: rgba(0, 0, 0, 0.8) !important;
+      border-color: rgba(239, 68, 68, 0.6) !important;
+    }
+    .audio-clip-header {
+      font-size: 9px;
+      font-family: monospace;
+      font-weight: bold;
+      color: #00FFCC;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+    .clip-handle-left, .clip-handle-right {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      cursor: ew-resize;
+      z-index: 15;
+      background: rgba(0, 255, 204, 0.2);
+      transition: background 0.15s ease;
+    }
+    .clip-handle-left {
+      left: 0;
+      border-radius: 4px 0 0 4px;
+      border-left: 2px solid #00FFCC;
+    }
+    .clip-handle-right {
+      right: 0;
+      border-radius: 0 4px 4px 0;
+      border-right: 2px solid #00FFCC;
+    }
+    .clip-handle-left:hover, .clip-handle-right:hover {
+      background: rgba(0, 255, 204, 0.6);
+    }
+    .audio-clip-seam {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #f43f5e;
+      box-shadow: 0 0 6px #f43f5e;
+    }
+    /* Dedicated Timeline Ruler & 2-Column DAW Structure */
+    .stem-ruler-row {
+      display: flex;
+      width: 100%;
+      height: 28px;
+      align-items: center;
+      background: rgba(10, 14, 38, 0.95);
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 8px 8px 0 0;
+      position: relative;
+      z-index: 10;
+    }
+    .stem-ruler-header {
+      width: 220px;
+      min-width: 220px;
+      padding: 0 12px;
+      font-size: 10px;
+      font-weight: bold;
+      color: #818cf8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .stem-ruler-timeline {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      background: rgba(15, 23, 42, 0.8);
+      border-left: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    .stem-ruler-mark {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      border-left: 1px solid rgba(148, 163, 184, 0.25);
+      font-size: 9px;
+      font-family: monospace;
+      color: #94a3b8;
+      padding-left: 4px;
+      line-height: 28px;
+      pointer-events: none;
+    }
+    .razor-mode .audio-clip {
+      cursor: crosshair !important;
+    }
+    .razor-mode .audio-clip:hover {
+      border-color: #f43f5e !important;
+      box-shadow: 0 0 12px rgba(244, 63, 94, 0.7) !important;
+    }
+    .stem-track-card {
+      background: rgba(13, 16, 42, 0.85);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: border-color 0.2s;
+    }
+    .stem-track-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+    .stem-track-controls {
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .stem-track-waveform-wrap {
+      flex: 1;
+      height: 70px;
+      background: rgba(6, 8, 24, 0.9);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .stem-track-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .stem-btn-mute, .stem-btn-solo {
+      width: 28px;
+      height: 24px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: all 0.15s;
+    }
+    .stem-btn-mute { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+    .stem-btn-mute.active { background: #ef4444; color: #fff; border-color: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
+    .stem-btn-solo { background: rgba(234, 179, 8, 0.15); color: #fef08a; }
+    .stem-btn-solo.active { background: #eab308; color: #000; border-color: #eab308; box-shadow: 0 0 10px rgba(234,179,8,0.5); }
   </style>
 </head>
 
@@ -746,8 +985,14 @@
         </h1>
       </div>
 
-      <!-- Right Controls: Language, Theme & Subtitle Studio -->
+      <!-- Right Controls: Language, Theme, Stem Studio & Subtitle Studio -->
       <div class="flex items-center gap-2">
+        <!-- Stem Studio Launcher -->
+        <button id="stemStudioBtn" onclick="app.openStemStudio()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 hover:border-purple-400 transition-all" title="Stem Studio & Audio Separator">
+          <i class="fa-solid fa-sliders text-purple-400 text-sm"></i>
+          <span class="hidden sm:inline text-purple-300 light:text-purple-700">Stem Studio</span>
+        </button>
+
         <!-- Subtitle Studio Launcher -->
         <button id="lyricStudioBtn" onclick="app.openLyricStudio()" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 hover:border-cyan-400 transition-all" title="Subtitle & Lyric Studio">
           <i class="fa-solid fa-closed-captioning text-cyan-400 text-sm"></i>
@@ -773,188 +1018,7 @@
   <div id="mainView">
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- ================= 1. AI LYRIC COMPOSITION & STUDIO GENERATOR ================= -->
-    <div class="glass-panel rounded-2xl p-6 lg:p-8 space-y-6">
-      <div class="flex items-center justify-between border-b border-indigo-500/10 light:border-indigo-200 pb-4">
-        <div>
-          <h2 class="text-lg font-bold flex items-center gap-2.5 text-indigo-100 light:text-indigo-950">
-            <i class="fa-solid fa-wand-magic-sparkles text-indigo-400"></i>
-            <span data-i18n="lyricsGeneratorTitle">AI Lyric Composition & Studio Generator</span>
-          </h2>
-          <p class="text-xs text-indigo-300 light:text-indigo-850 mt-1" data-i18n="lyricsGeneratorSubtitle">
-            Compose original lyrics with precise genre customization, verse structures, diacritics, and interactive streaming chat.
-          </p>
-        </div>
-        <div class="hidden sm:flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-          <span class="text-xs font-mono font-semibold text-indigo-300 light:text-indigo-900">Sonvex AI Engine Ready</span>
-        </div>
-      </div>
 
-      <!-- Generator controls grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- 1. Global Genre Selector -->
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-compact-disc"></i>
-            <span data-i18n="genreLabel">Global Genre</span>
-          </label>
-          <select id="genreSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
-            <option value="Hip-Hop / Rap" selected>Hip-Hop / Rap</option>
-            <option value="Trapsoul">Trapsoul</option>
-            <option value="RnB / Soul">RnB / Soul</option>
-            <option value="House">House</option>
-            <option value="Deep House">Deep House</option>
-            <option value="Melodic House">Melodic House</option>
-            <option value="Techno">Techno</option>
-            <option value="Pop">Pop</option>
-            <option value="Rock / Alternative">Rock / Alternative</option>
-            <option value="Reggaeton / Latin">Reggaeton / Latin</option>
-            <option value="Jazz / Blues">Jazz / Blues</option>
-            <option value="Acoustic / Folk">Acoustic / Folk</option>
-            <option value="Metal / Hardcore">Metal / Hardcore</option>
-            <option value="Funk / Disco">Funk / Disco</option>
-            <option value="Ambient / Chillout">Ambient / Chillout</option>
-            <option value="Synthwave / Retrowave">Synthwave / Retrowave</option>
-            <option value="Afrobeat">Afrobeat</option>
-            <option value="Drill">Drill</option>
-          </select>
-        </div>
-
-        <!-- 2. Language Selector -->
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-language"></i>
-            <span data-i18n="languageLabel">Lyric Language</span>
-          </label>
-          <select id="lyricLanguage" onchange="app.handleLyricLanguageChange(this.value)" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
-            <option value="en" selected>English</option>
-            <option value="ar_casual">Casual / Street Slang Arabic (عامية)</option>
-            <option value="ar_simple">Simple Standard Arabic (الفصحى البسيطة/البيضاء)</option>
-            <option value="ar_msa">Modern Standard Arabic (فصحى)</option>
-          </select>
-        </div>
-
-        <!-- 3. Verse Dropdown -->
-        <div class="space-y-1.5">
-          <label for="verseSelect" class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-list-ol"></i>
-            <span data-i18n="versesLimit">Verse</span>
-          </label>
-          <select id="verseSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-            <option value="3">3</option>
-          </select>
-        </div>
-
-        <!-- 4. Chorus Dropdown -->
-        <div class="space-y-1.5">
-          <label for="chorusSelect" class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-repeat"></i>
-            <span data-i18n="chorusLimit">Chorus</span>
-          </label>
-          <select id="chorusSelect" class="w-full glass-input text-xs font-semibold px-3 py-2.5 rounded-xl border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- CONDITIONAL DIACRITICS TOGGLE -->
-      <div id="diacriticsContainer" class="hidden p-3.5 rounded-xl bg-indigo-950/40 light:bg-indigo-50/60 border border-indigo-500/10 light:border-indigo-200 transition-all duration-300">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <div class="w-7 h-7 rounded-lg bg-indigo-950 light:bg-indigo-50/50 flex items-center justify-center text-indigo-100 light:text-indigo-955 font-bold border border-indigo-500/10 light:border-indigo-200">
-              أَ بْ
-            </div>
-            <div>
-              <p class="text-xs font-bold text-indigo-100 light:text-indigo-950" data-i18n="diacriticsTitle">Arabic Diacritics (التشكيل)</p>
-              <p class="text-[10px] text-indigo-300 light:text-indigo-850" data-i18n="diacriticsDesc">Enable vocal diacritics for rhythm flow.</p>
-            </div>
-          </div>
-          <label class="text-xs font-semibold cursor-pointer flex items-center gap-2">
-            <input type="checkbox" id="diacriticsToggle" class="w-4 h-4 rounded border-indigo-300 text-indigo-650 focus:ring-indigo-500">
-            <span id="diacriticsStatusText" class="text-[11px] text-indigo-200 light:text-indigo-900" data-i18n="withDiacritics">With Diacritics</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Prompt Topic & Vibe inputs -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-pen-nib"></i>
-            <span data-i18n="topicLabel">Song Concept / Topic Prompt</span>
-          </label>
-          <textarea id="songTopicInput" rows="2" class="w-full glass-input text-xs p-3 rounded-xl focus:outline-none placeholder:text-indigo-300/40" placeholder="e.g. Midnight reflections on success, driving through neon city streets..."></textarea>
-        </div>
-
-        <div class="space-y-1.5">
-          <label class="text-[11px] font-bold text-indigo-300 light:text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-sliders"></i>
-            <span data-i18n="vibeLabel">Custom Vibe / Mood</span>
-          </label>
-          <textarea id="songVibeInput" rows="2" class="w-full glass-input text-xs p-3 rounded-xl focus:outline-none placeholder:text-indigo-300/40" placeholder="e.g. Melancholic yet energetic, dark synth tones..."></textarea>
-        </div>
-      </div>
-
-      <!-- Generate button -->
-      <div class="pt-2">
-        <button id="generateLyricsBtn" onclick="app.generateLyrics()" class="w-full py-3 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 hover:from-indigo-600 hover:to-indigo-800 text-white shadow-lg shadow-indigo-500/10 active:scale-[0.99] transition-all">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <span data-i18n="generateLyricsAction">Generate Original Lyrics Stream</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- ================= 2. INTERACTIVE AI STUDIO CHAT ================= -->
-    <div class="glass-panel rounded-2xl p-6 lg:p-8 space-y-4">
-      <div class="flex items-center justify-between border-b border-indigo-500/10 light:border-indigo-200 pb-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-indigo-300 light:text-indigo-955">
-          <i class="fa-solid fa-comments text-indigo-455"></i>
-          <span data-i18n="chatConsoleTitle">Interactive AI Studio Chat & Lyrics Stream</span>
-        </h3>
-
-        <div class="flex items-center gap-2">
-          <button onclick="app.copyFullChatLyrics()" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 hover:border-indigo-400 transition-all">
-            <i class="fa-solid fa-copy text-indigo-300"></i>
-            <span data-i18n="copyScriptBtn">Copy Script</span>
-          </button>
-          <button onclick="app.regenerateVerse()" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 hover:border-indigo-400 transition-all">
-            <i class="fa-solid fa-rotate-right text-indigo-300"></i>
-            <span data-i18n="regenerateBtn">Re-generate</span>
-          </button>
-          <button onclick="app.clearChatConsole()" class="glass-input px-2.5 py-1 rounded-lg text-[10px] font-bold hover:border-red-400 hover:text-red-400 transition-all">
-            <i class="fa-solid fa-trash-can text-indigo-300"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Chat Console Box -->
-      <div id="chatConsoleWindow" class="w-full h-80 overflow-y-auto glass-input p-4 rounded-xl border border-indigo-500/10 light:border-indigo-200 space-y-4 font-sans text-xs">
-        <div class="flex items-start gap-2.5">
-          <div class="w-6.5 h-6.5 rounded-lg bg-indigo-950 text-indigo-100 flex items-center justify-center font-bold text-[10px] shrink-0 border border-indigo-500/10">
-            <i class="fa-solid fa-robot"></i>
-          </div>
-          <div class="glass-panel p-3.5 rounded-xl max-w-2xl">
-            <p class="font-bold text-indigo-100 light:text-indigo-955 mb-1 text-[11px]">SONVEX AI Assistant</p>
-            <p class="text-indigo-355 light:text-indigo-850 leading-relaxed" data-i18n="chatWelcome">
-              Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe, then click <strong>Generate Original Lyrics Stream</strong>. You can also chat directly with me to refine rhymes.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Prompt Input -->
-      <div class="relative flex items-center">
-        <input type="text" id="chatInputPrompt" onkeydown="if(event.key === 'Enter') app.sendChatMessage()" class="w-full glass-input text-xs py-3.5 pl-4 pr-20 rounded-xl focus:outline-none border border-indigo-500/10 light:border-indigo-200" placeholder="Ask AI to refine rhyme scheme, change line 2, etc...">
-        <button onclick="app.sendChatMessage()" class="absolute right-2 px-3.5 py-2 rounded-lg bg-indigo-650 hover:bg-indigo-700 text-white font-bold text-[11px] flex items-center gap-1 transition-all">
-          <span data-i18n="sendChat">Send</span>
-          <i class="fa-solid fa-paper-plane text-[9px]"></i>
-        </button>
-      </div>
-    </div>
 
     <!-- ================= 3. AI AUDIO REMASTERER MODULE (100% CLIENT-SIDE DSP WITH CUSTOM A/B PLAYERS) ================= -->
     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
@@ -1528,6 +1592,373 @@
   </div><!-- /#mainView -->
 
   <!-- ============================================================
+       STEM STUDIO — FULL-SCREEN WORKSTATION VIEW
+  ============================================================ -->
+  <div id="stemStudioView">
+    <!-- STEM HEADER -->
+    <div class="stem-header">
+      <button class="studio-btn" onclick="app.closeStemStudio()" title="Back to Sonvex Workbench">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Back</span>
+      </button>
+
+      <div class="flex items-center gap-2 flex-1">
+        <i class="fa-solid fa-sliders text-purple-400 text-lg"></i>
+        <span class="text-sm font-bold text-white">Stem Studio</span>
+        <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-mono">5-Track Non-Destructive DAW</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <label class="studio-btn purple cursor-pointer" style="font-size: 11px; padding: 5px 12px;" title="Load Project State (.sonvex)">
+          <i class="fa-solid fa-folder-open mr-1"></i> Load Project
+          <input type="file" accept=".sonvex,.json" class="hidden" onchange="app.loadSonvexProject(this.files[0])">
+        </label>
+
+        <button onclick="app.saveSonvexProject()" class="studio-btn emerald" style="font-size: 11px; padding: 5px 12px;" title="Save Project State (.sonvex)">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Save Project
+        </button>
+
+        <label class="studio-btn cyan cursor-pointer" style="font-size: 11px; padding: 5px 12px;">
+          <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Load Song File
+          <input type="file" id="stemFileInput" accept="audio/*,video/*" class="hidden" onchange="app.handleStemFileUpload(this.files[0])">
+        </label>
+      </div>
+    </div>
+
+    <!-- MASTER TRANSPORT TOOLBAR -->
+    <div class="stem-master-toolbar">
+      <div class="flex items-center gap-2">
+        <button id="stemPlayBtn" class="studio-btn cyan" onclick="app.stemTogglePlay()" disabled title="Play / Pause All Stems">
+          <i id="stemPlayIcon" class="fa-solid fa-play"></i>
+        </button>
+        <button class="studio-btn" onclick="app.stemStop()" disabled id="stemStopBtn" title="Stop & Reset">
+          <i class="fa-solid fa-stop"></i>
+        </button>
+        <button class="studio-btn" onclick="app.stemRewind()" disabled id="stemRewindBtn" title="Rewind to Beginning">
+          <i class="fa-solid fa-backward-fast"></i>
+        </button>
+
+        <!-- Select (V) vs Razor (C) Tool Modes -->
+        <div class="flex items-center gap-1 bg-indigo-950/80 p-1 rounded-xl border border-indigo-500/20">
+          <button id="stemToolSelect" class="studio-btn cyan active" onclick="app.setStemToolMode('select')" title="Select / Move Tool (V)">
+            <i class="fa-solid fa-hand-pointer text-cyan-400"></i>
+            <span>Select (V)</span>
+          </button>
+          <button id="stemToolRazor" class="studio-btn" onclick="app.setStemToolMode('razor')" title="Razor / Slice Tool (C)">
+            <i class="fa-solid fa-scissors text-purple-400"></i>
+            <span>Razor (C)</span>
+          </button>
+        </div>
+
+        <!-- Slice, Delete, Silence, Undo & Redo Tools -->
+        <button id="stemUndoBtn" class="studio-btn" onclick="app.undoStemAction()" disabled title="Undo Last Action (Ctrl + Z)">
+          <i class="fa-solid fa-rotate-left text-amber-300"></i>
+          <span>Undo</span>
+        </button>
+
+        <button id="stemRedoBtn" class="studio-btn" onclick="app.redoStemAction()" disabled title="Redo Action (Ctrl + Y)">
+          <i class="fa-solid fa-rotate-right text-blue-300"></i>
+          <span>Redo</span>
+        </button>
+
+        <button id="stemSliceBtn" class="studio-btn purple" onclick="app.sliceTracksAtPlayhead()" title="Slice / Split Clips at Playhead (Cut)">
+          <i class="fa-solid fa-scissors text-purple-300"></i>
+          <span>Slice</span>
+        </button>
+
+        <button id="stemDeleteBtn" class="studio-btn red" onclick="app.deleteSelectedClip()" title="Delete Selected Clip (Delete Key)">
+          <i class="fa-solid fa-trash-can text-red-300"></i>
+          <span>Delete Clip</span>
+        </button>
+
+        <button id="stemSilenceBtn" class="studio-btn" onclick="app.silenceSelectedClip()" title="Toggle Silence on Selected Clip">
+          <i class="fa-solid fa-volume-xmark text-slate-300"></i>
+          <span>Silence</span>
+        </button>
+      </div>
+
+      <!-- Timecode display -->
+      <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-950/80 border border-indigo-500/20 font-mono text-xs">
+        <i class="fa-solid fa-clock text-cyan-400"></i>
+        <span id="stemCurrentTime" class="text-cyan-300 font-bold">00:00.000</span>
+        <span class="text-indigo-400/50">/</span>
+        <span id="stemDurationTime" class="text-indigo-300">00:00.000</span>
+      </div>
+
+      <!-- Tempo / Speed Stretch -->
+      <div class="flex items-center gap-1.5 ml-1" title="Tempo / Speed Stretch (0.5x - 2.0x)">
+        <i class="fa-solid fa-gauge-high text-amber-400 text-xs"></i>
+        <span class="text-[10px] text-indigo-300 font-bold">Speed:</span>
+        <input type="range" id="stemSpeedSlider" min="0.5" max="2.0" step="0.05" value="1.0" oninput="app.setStemSpeed(this.value)" class="w-16 accent-amber-400 cursor-pointer">
+        <span id="stemSpeedVal" class="text-[10px] font-mono text-amber-300 w-8">1.00x</span>
+      </div>
+
+      <!-- Master Volume & Fades -->
+      <div class="flex items-center gap-2 border-l border-indigo-500/20 pl-2">
+        <i class="fa-solid fa-volume-high text-indigo-400 text-xs"></i>
+        <span class="text-[11px] text-indigo-300 font-bold">Master:</span>
+        <input type="range" id="stemMasterGainSlider" min="0" max="1.5" step="0.01" value="1" oninput="app.setStemMasterGain(this.value)" class="w-16 accent-cyan-400 cursor-pointer">
+        <span id="stemMasterGainValue" class="text-[10px] font-mono text-indigo-300 w-7">100%</span>
+      </div>
+
+      <!-- Master Fade In / Out Sliders (Up to 20s) -->
+      <div class="flex items-center gap-2 border-l border-indigo-500/20 pl-2">
+        <div class="flex items-center gap-1" title="Master Fade In (0.0s - 20.0s)">
+          <i class="fa-solid fa-chart-line text-cyan-400 text-[10px]"></i>
+          <span class="text-[10px] text-indigo-300 font-bold">In:</span>
+          <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setMasterFadeIn(this.value)" class="w-14 accent-cyan-400 cursor-pointer">
+          <span id="masterFadeInVal" class="text-[10px] font-mono text-cyan-300 w-6">0.0s</span>
+        </div>
+        <div class="flex items-center gap-1" title="Master Fade Out (0.0s - 20.0s)">
+          <i class="fa-solid fa-chart-line text-purple-400 text-[10px] transform -scale-x-100"></i>
+          <span class="text-[10px] text-indigo-300 font-bold">Out:</span>
+          <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setMasterFadeOut(this.value)" class="w-14 accent-purple-400 cursor-pointer">
+          <span id="masterFadeOutVal" class="text-[10px] font-mono text-purple-300 w-6">0.0s</span>
+        </div>
+      </div>
+
+      <!-- Export Actions -->
+      <div class="ml-auto flex items-center gap-2">
+        <button id="stemExportMixBtn" onclick="app.exportRemixedMasterWav()" class="studio-btn emerald" disabled title="Export Remixed Master WAV">
+          <i class="fa-solid fa-file-export"></i>
+          <span>Export Master WAV</span>
+        </button>
+        <button id="stemExportStemsBtn" onclick="app.exportIndividualStemsZip()" class="studio-btn purple" disabled title="Export All 5 Stems">
+          <i class="fa-solid fa-box-archive"></i>
+          <span>Export Stems</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN STEM BODY -->
+    <div class="stem-body">
+      <!-- Upload Dropzone (When no file loaded) -->
+      <div id="stemDropZone" class="border-2 border-dashed border-purple-500/30 hover:border-purple-400 rounded-2xl p-12 text-center cursor-pointer bg-purple-950/10 hover:bg-purple-900/20 transition-all flex flex-col items-center justify-center gap-3 my-auto" onclick="document.getElementById('stemFileInput').click()">
+        <div class="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-3xl mb-2">
+          <i class="fa-solid fa-sliders"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Upload Song to Separate Stems</h3>
+        <p class="text-xs text-indigo-300/70 max-w-md">Drag &amp; drop your song file (MP3, WAV, FLAC, AAC, OGG) to extract 4 synchronized tracks: <strong>Vocals, Drums, Bass &amp; Instruments</strong>.</p>
+        <button class="mt-2 glass-input px-4 py-2 rounded-xl text-xs font-bold text-purple-300 border border-purple-500/30">Select Audio File</button>
+      </div>
+
+      <!-- Processing Progress Overlay -->
+      <div id="stemProgressOverlay" class="hidden flex-col items-center justify-center p-12 rounded-2xl bg-indigo-950/80 border border-indigo-500/20 backdrop-blur-xl gap-4 my-auto">
+        <div class="w-12 h-12 border-4 border-purple-500/20 border-t-purple-400 rounded-full animate-spin"></div>
+        <p id="stemProgressText" class="text-sm font-bold text-purple-200">Separating audio into 4 stems…</p>
+        <div class="w-64 h-2 bg-indigo-900/60 rounded-full overflow-hidden">
+          <div id="stemProgressBar" class="h-full bg-gradient-to-r from-purple-500 to-cyan-400 w-0 transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <!-- DAW 5-TRACK MULTITRACK MIXER CONSOLE -->
+      <div id="stemMultitrackConsole" class="hidden flex-col gap-3 relative">
+        <!-- Unified Full-Height Playhead Cursor across all 5 channels -->
+        <div id="stemGlobalPlayhead" class="stem-global-playhead"></div>
+
+        <!-- Top Dedicated Timeline Ruler Row -->
+        <div class="stem-ruler-row">
+          <div class="stem-ruler-header"><i class="fa-solid fa-timeline text-cyan-400 mr-1"></i> TIMELINE</div>
+          <div id="stemTimelineRuler" class="stem-ruler-timeline" onclick="app.seekStemFromRuler(event)">
+            <!-- Ruler Marks rendered dynamically in JS -->
+          </div>
+        </div>
+
+        <!-- Track 0: Full Song / Original Master -->
+        <div class="stem-track-card" data-track="0">
+          <div class="stem-track-controls">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-compact-disc"></i> Original Master</span>
+              <div class="flex items-center gap-1">
+                <button class="stem-btn-mute" id="mute_0" onclick="app.toggleStemMute(0)" title="Mute Original Master">M</button>
+                <button class="stem-btn-solo" id="solo_0" onclick="app.toggleStemSolo(0)" title="Solo Original Master">S</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-indigo-300">
+              <span>Vol: <strong id="volVal_0">100%</strong></span>
+              <span>Pan: <strong id="panVal_0">C</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="range" min="0" max="1.5" step="0.01" value="1" oninput="app.setStemGain(0, this.value)" class="flex-1 accent-slate-400 cursor-pointer">
+              <input type="range" min="-1" max="1" step="0.05" value="0" oninput="app.setStemPan(0, this.value)" class="w-16 accent-indigo-400 cursor-pointer">
+            </div>
+            <!-- Per-Track Fade In / Out Controls (0 - 20s) -->
+            <div class="flex items-center justify-between text-[10px] text-indigo-300 pt-1 border-t border-indigo-500/10">
+              <div class="flex items-center gap-1" title="Track Fade In">
+                <span>In:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeIn(0, this.value)" class="w-14 accent-slate-400 cursor-pointer">
+                <span id="fadeInVal_0" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+              <div class="flex items-center gap-1" title="Track Fade Out">
+                <span>Out:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeOut(0, this.value)" class="w-14 accent-purple-400 cursor-pointer">
+                <span id="fadeOutVal_0" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+            </div>
+          </div>
+          <div class="stem-track-waveform-wrap" onclick="app.seekStemFromWaveform(event, 0)">
+            <div id="clipsLayer_0" class="stem-clips-layer"></div>
+            <canvas id="stemCanvas_0" class="stem-track-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Track 1: Vocals -->
+        <div class="stem-track-card" data-track="1">
+          <div class="stem-track-controls">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-cyan-300 flex items-center gap-1.5"><i class="fa-solid fa-microphone"></i> Vocals</span>
+              <div class="flex items-center gap-1">
+                <button class="stem-btn-mute" id="mute_1" onclick="app.toggleStemMute(1)" title="Mute Vocals">M</button>
+                <button class="stem-btn-solo" id="solo_1" onclick="app.toggleStemSolo(1)" title="Solo Vocals">S</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-indigo-300">
+              <span>Vol: <strong id="volVal_1">100%</strong></span>
+              <span>Pan: <strong id="panVal_1">C</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="range" min="0" max="1.5" step="0.01" value="1" oninput="app.setStemGain(1, this.value)" class="flex-1 accent-cyan-400 cursor-pointer">
+              <input type="range" min="-1" max="1" step="0.05" value="0" oninput="app.setStemPan(1, this.value)" class="w-16 accent-indigo-400 cursor-pointer">
+            </div>
+            <!-- Per-Track Fade In / Out Controls -->
+            <div class="flex items-center justify-between text-[10px] text-indigo-300 pt-1 border-t border-indigo-500/10">
+              <div class="flex items-center gap-1" title="Track Fade In">
+                <span>In:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeIn(1, this.value)" class="w-14 accent-cyan-400 cursor-pointer">
+                <span id="fadeInVal_1" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+              <div class="flex items-center gap-1" title="Track Fade Out">
+                <span>Out:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeOut(1, this.value)" class="w-14 accent-purple-400 cursor-pointer">
+                <span id="fadeOutVal_1" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+            </div>
+          </div>
+          <div class="stem-track-waveform-wrap" onclick="app.seekStemFromWaveform(event, 1)">
+            <div id="clipsLayer_1" class="stem-clips-layer"></div>
+            <canvas id="stemCanvas_1" class="stem-track-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Track 2: Drums -->
+        <div class="stem-track-card" data-track="2">
+          <div class="stem-track-controls">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-300 flex items-center gap-1.5"><i class="fa-solid fa-drum"></i> Drums</span>
+              <div class="flex items-center gap-1">
+                <button class="stem-btn-mute" id="mute_2" onclick="app.toggleStemMute(2)" title="Mute Drums">M</button>
+                <button class="stem-btn-solo" id="solo_2" onclick="app.toggleStemSolo(2)" title="Solo Drums">S</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-indigo-300">
+              <span>Vol: <strong id="volVal_2">100%</strong></span>
+              <span>Pan: <strong id="panVal_2">C</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="range" min="0" max="1.5" step="0.01" value="1" oninput="app.setStemGain(2, this.value)" class="flex-1 accent-purple-400 cursor-pointer">
+              <input type="range" min="-1" max="1" step="0.05" value="0" oninput="app.setStemPan(2, this.value)" class="w-16 accent-indigo-400 cursor-pointer">
+            </div>
+            <!-- Per-Track Fade In / Out Controls -->
+            <div class="flex items-center justify-between text-[10px] text-indigo-300 pt-1 border-t border-indigo-500/10">
+              <div class="flex items-center gap-1" title="Track Fade In">
+                <span>In:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeIn(2, this.value)" class="w-14 accent-cyan-400 cursor-pointer">
+                <span id="fadeInVal_2" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+              <div class="flex items-center gap-1" title="Track Fade Out">
+                <span>Out:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeOut(2, this.value)" class="w-14 accent-purple-400 cursor-pointer">
+                <span id="fadeOutVal_2" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+            </div>
+          </div>
+          <div class="stem-track-waveform-wrap" onclick="app.seekStemFromWaveform(event, 2)">
+            <div id="clipsLayer_2" class="stem-clips-layer"></div>
+            <canvas id="stemCanvas_2" class="stem-track-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Track 3: Bass -->
+        <div class="stem-track-card" data-track="3">
+          <div class="stem-track-controls">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-300 flex items-center gap-1.5"><i class="fa-solid fa-guitar"></i> Bass</span>
+              <div class="flex items-center gap-1">
+                <button class="stem-btn-mute" id="mute_3" onclick="app.toggleStemMute(3)" title="Mute Bass">M</button>
+                <button class="stem-btn-solo" id="solo_3" onclick="app.toggleStemSolo(3)" title="Solo Bass">S</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-indigo-300">
+              <span>Vol: <strong id="volVal_3">100%</strong></span>
+              <span>Pan: <strong id="panVal_3">C</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="range" min="0" max="1.5" step="0.01" value="1" oninput="app.setStemGain(3, this.value)" class="flex-1 accent-emerald-400 cursor-pointer">
+              <input type="range" min="-1" max="1" step="0.05" value="0" oninput="app.setStemPan(3, this.value)" class="w-16 accent-indigo-400 cursor-pointer">
+            </div>
+            <!-- Per-Track Fade In / Out Controls -->
+            <div class="flex items-center justify-between text-[10px] text-indigo-300 pt-1 border-t border-indigo-500/10">
+              <div class="flex items-center gap-1" title="Track Fade In">
+                <span>In:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeIn(3, this.value)" class="w-14 accent-cyan-400 cursor-pointer">
+                <span id="fadeInVal_3" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+              <div class="flex items-center gap-1" title="Track Fade Out">
+                <span>Out:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeOut(3, this.value)" class="w-14 accent-purple-400 cursor-pointer">
+                <span id="fadeOutVal_3" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+            </div>
+          </div>
+          <div class="stem-track-waveform-wrap" onclick="app.seekStemFromWaveform(event, 3)">
+            <div id="clipsLayer_3" class="stem-clips-layer"></div>
+            <canvas id="stemCanvas_3" class="stem-track-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- Track 4: Instruments -->
+        <div class="stem-track-card" data-track="4">
+          <div class="stem-track-controls">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5"><i class="fa-solid fa-keyboard"></i> Instruments</span>
+              <div class="flex items-center gap-1">
+                <button class="stem-btn-mute" id="mute_4" onclick="app.toggleStemMute(4)" title="Mute Synths &amp; Instruments">M</button>
+                <button class="stem-btn-solo" id="solo_4" onclick="app.toggleStemSolo(4)" title="Solo Synths &amp; Instruments">S</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-indigo-300">
+              <span>Vol: <strong id="volVal_4">100%</strong></span>
+              <span>Pan: <strong id="panVal_4">C</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="range" min="0" max="1.5" step="0.01" value="1" oninput="app.setStemGain(4, this.value)" class="flex-1 accent-amber-400 cursor-pointer">
+              <input type="range" min="-1" max="1" step="0.05" value="0" oninput="app.setStemPan(4, this.value)" class="w-16 accent-indigo-400 cursor-pointer">
+            </div>
+            <!-- Per-Track Fade In / Out Controls -->
+            <div class="flex items-center justify-between text-[10px] text-indigo-300 pt-1 border-t border-indigo-500/10">
+              <div class="flex items-center gap-1" title="Track Fade In">
+                <span>In:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeIn(4, this.value)" class="w-14 accent-cyan-400 cursor-pointer">
+                <span id="fadeInVal_4" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+              <div class="flex items-center gap-1" title="Track Fade Out">
+                <span>Out:</span>
+                <input type="range" min="0" max="20" step="0.1" value="0" onchange="app._renderAllStemCanvases()" oninput="app.setStemFadeOut(4, this.value)" class="w-14 accent-purple-400 cursor-pointer">
+                <span id="fadeOutVal_4" class="font-mono text-[9px] w-6">0.0s</span>
+              </div>
+            </div>
+          </div>
+          <div class="stem-track-waveform-wrap" onclick="app.seekStemFromWaveform(event, 4)">
+            <div id="clipsLayer_4" class="stem-clips-layer"></div>
+            <canvas id="stemCanvas_4" class="stem-track-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
        LYRIC STUDIO — FULL-SCREEN WORKSTATION VIEW
   ============================================================ -->
   <div id="lyricStudioView">
@@ -1884,6 +2315,19 @@
       }
     };
 
+    class AudioClip {
+      constructor(id, trackId, startTime, duration, audioBuffer, isSilenced = false, bufferOffset = 0, maxDuration = 0) {
+        this.id = id || ('clip_' + Date.now() + '_' + Math.floor(Math.random() * 1000000));
+        this.trackId = trackId;
+        this.startTime = startTime;
+        this.duration = duration;
+        this.audioBuffer = audioBuffer;
+        this.isSilenced = isSilenced;
+        this.bufferOffset = bufferOffset || 0;
+        this.maxDuration = maxDuration || (audioBuffer ? audioBuffer.duration : duration);
+      }
+    }
+
     class SonvexStudioApp {
       constructor() {
         this.currentLang = 'en';
@@ -1921,6 +2365,35 @@
           'rgba(245,158,11,0.35)', 'rgba(239,68,68,0.35)', 'rgba(168,85,247,0.35)',
           'rgba(20,184,166,0.35)', 'rgba(249,115,22,0.35)'
         ];
+
+        // Stem Studio State
+        this.stemAudioCtx = null;
+        this.stemBuffers = [null, null, null, null, null]; // Master, Vocals, Drums, Bass, Instruments
+        this.stemSources = [null, null, null, null, null];
+        this.stemGainNodes = [null, null, null, null, null];
+        this.stemPanNodes = [null, null, null, null, null];
+        this.stemMuted = [false, false, false, false, false];
+        this.stemSoloed = [false, false, false, false, false];
+        this.stemGains = [1, 1, 1, 1, 1];
+        this.stemPans = [0, 0, 0, 0, 0];
+        this.stemFadeIn = [0, 0, 0, 0, 0];
+        this.stemFadeOut = [0, 0, 0, 0, 0];
+        this.stemClips = [[], [], [], [], []];
+        this.selectedTrackIdx = 0;
+        this.selectedClipId = null;
+        this.undoStack = [];
+        this.redoStack = [];
+        this.stemSpeed = 1.0;
+        this.masterFadeIn = 0;
+        this.masterFadeOut = 0;
+        this.stemMasterGainNode = null;
+        this.stemMasterGainVal = 1;
+        this.stemIsPlaying = false;
+        this.stemStartTime = 0;
+        this.stemPauseTime = 0;
+        this.stemDuration = 0;
+        this.stemAnimFrame = null;
+        this.stemTrackColors = ['#94a3b8', '#06b6d4', '#c084fc', '#34d399', '#fbbf24'];
         
         // Supported Formats Configurations
         this.supportedFormats = [
@@ -1939,7 +2412,6 @@
 
       init() {
         this.setupDragAndDrop();
-        this.checkInitialDiacritics();
         this.updateFormatDropdown('');
         this.setupCustomPlayers();
         this.initBgMusicNotes();
@@ -1976,21 +2448,6 @@
         if (this.audioBuffer) {
           this.drawWaveform(this.audioBuffer);
         }
-      }
-
-      // DIACRITICS CONDITIONAL LOGIC
-      handleLyricLanguageChange(val) {
-        const container = document.getElementById('diacriticsContainer');
-        if (val === 'ar_casual' || val === 'ar_msa' || val === 'ar_simple') {
-          container.classList.remove('hidden');
-        } else {
-          container.classList.add('hidden');
-        }
-      }
-
-      checkInitialDiacritics() {
-        const val = document.getElementById('lyricLanguage').value;
-        this.handleLyricLanguageChange(val);
       }
 
       // DYNAMIC FORMAT SELECT OPTIONS FILTERING
@@ -2708,212 +3165,7 @@
         }
       }
 
-      // GEMINI AI LYRICS GENERATOR & STREAMING CHAT
-      async generateLyrics() {
-        this.messages = [];
-        this.chatHistory = [];
 
-        const genre = document.getElementById('genreSelect').value;
-        const lang = document.getElementById('lyricLanguage').value;
-        const verseCount = document.getElementById('verseSelect').value;
-        const chorusCount = document.getElementById('chorusSelect').value;
-        const topic = document.getElementById('songTopicInput').value.trim();
-        const vibe = document.getElementById('songVibeInput').value.trim();
-        const withDiacritics = document.getElementById('diacriticsToggle').checked;
-
-        let langDesc = "English";
-        if (lang === 'ar_casual') langDesc = "Casual / Street Slang Arabic (عامية)";
-        if (lang === 'ar_simple') langDesc = "Simple Standard Arabic (الفصحى البسيطة / البيضاء)";
-        if (lang === 'ar_msa') langDesc = "Modern Standard Arabic (فصحى)";
-
-        const prompt = `Act as a world-class professional music songwriter and lyricist. Compose complete original song lyrics based strictly on these studio parameters:
-- Genre: ${genre}
-- Lyric Language: ${langDesc}
-- Verses Count: ${verseCount}
-- Chorus Count: ${chorusCount}
-- Arabic Diacritics (Tashkeel): ${withDiacritics ? 'ENABLED (Include full vocal Tashkeel on Arabic words)' : 'DISABLED'}
-- Song Concept / Topic: ${topic || 'High energy anthem about ambition, power, and rhythm'}
-- Custom Mood / Vibe: ${vibe || 'Dynamic and captivating'}
-
-CRITICAL FORMATTING INSTRUCTIONS:
-1. ONLY compose lyrics. Do NOT include arrangement cues, instrumental descriptions, sound effects, or stage directions.
-2. Structure the output clearly using standard section headers in brackets: [Verse 1], [Chorus], [Verse 2], etc.
-3. Write rhythmically tight, rhyming, studio-ready lines.`;
-
-        // Push UI-only message
-        this.appendChatMessageUI('user', `🎵 Requesting lyrics composition:\n• Genre: ${genre}\n• Language: ${langDesc}\n• Verses: ${verseCount} | Choruses: ${chorusCount}\n• Topic: ${topic || 'Default'}`);
-
-        // Set state history to the initial parameters prompt
-        this.messages.push({ role: 'user', content: prompt });
-
-        await this.streamGeminiResponse();
-      }
-
-      async sendChatMessage() {
-        const input = document.getElementById('chatInputPrompt');
-        const text = input.value.trim();
-        if (!text) return;
-
-        input.value = '';
-        this.appendChatMessage('user', text);
-        
-        await this.streamGeminiResponse();
-      }
-
-      async regenerateVerse() {
-        if (this.chatHistory.length === 0) {
-          this.showToast('No previous generation to regenerate.', 'info');
-          return;
-        }
-        this.appendChatMessage('user', '🔄 Re-generate verse / lyrics with fresh rhymes');
-        await this.streamGeminiResponse();
-      }
-
-      async streamGeminiResponse() {
-        const workerUrl = "https://fragrant-sound-d488.sonvexbeat.workers.dev";
-        const messageId = 'msg_' + Date.now();
-        const chatWindow = document.getElementById('chatConsoleWindow');
-        
-        if (!chatWindow) return;
-
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'flex items-start gap-3 animate-fadeIn';
-        msgDiv.innerHTML = `
-          <div class="w-7 h-7 rounded-lg bg-indigo-950 text-indigo-100 flex items-center justify-center font-bold text-xs shrink-0 border border-indigo-500/10">
-            <i class="fa-solid fa-robot"></i>
-          </div>
-          <div class="glass-panel p-4 rounded-xl w-full max-w-3xl border-indigo-500/10 light:border-indigo-200 space-y-2">
-            <p class="font-bold text-indigo-100 light:text-indigo-955 text-xs flex items-center justify-between">
-              <span>SONVEX AI Assistant</span>
-              <span id="${messageId}_typing" class="text-[10px] text-indigo-355 light:text-indigo-655 font-mono animate-pulse">Streaming lyrics...</span>
-            </p>
-            <div id="${messageId}" class="lyric-box p-3 rounded-lg text-indigo-100 light:text-indigo-955 leading-relaxed font-mono"></div>
-          </div>
-        `;
-
-        chatWindow.appendChild(msgDiv);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-
-        const contentDiv = document.getElementById(messageId);
-        const typingIndicator = document.getElementById(`${messageId}_typing`);
-
-        // Build fallback concatenated promptText from last 10 messages context
-        const fallbackPromptText = this.messages.map(m => {
-          const label = m.role === 'user' ? 'User' : 'Assistant';
-          return `${label}: ${m.content}`;
-        }).join('\n\n');
-
-        try {
-          const response = await fetch(workerUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              promptText: fallbackPromptText,
-              messages: this.messages
-            })
-          });
-
-          const data = await response.json();
-          console.log("API Response Data:", data);
-
-          if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-            const generatedText = data.candidates[0].content.parts[0].text;
-            contentDiv.innerText = generatedText;
-            
-            this.chatHistory.push({ role: 'model', text: generatedText });
-            
-            // Push assistant response to history
-            this.messages.push({
-              role: 'assistant',
-              content: generatedText
-            });
-            if (this.messages.length > 10) {
-              this.messages = this.messages.slice(-10);
-            }
-          } else if (data.error) {
-            const errorMsg = data.error.message || JSON.stringify(data.error);
-            contentDiv.innerText = `⚠️ خطأ من الـ API (${data.error.code || 'Error'}): ${errorMsg}`;
-            this.showToast(`خطأ: ${errorMsg}`, 'error');
-          } else {
-            contentDiv.innerText = "لم يتم إرجاع أي نص. قد يكون الرد حُجب بواسطة فلتر الأمان لدى جوجل.";
-          }
-        } catch (error) {
-          console.error("Fetch Error:", error);
-          contentDiv.innerText = `تعذر الاتصال بالخادم: ${error.message}`;
-          this.showToast("تعذر الاتصال بالخادم.", 'error');
-        } finally {
-          if (typingIndicator) typingIndicator.remove();
-        }
-      }
-
-      appendChatMessageUI(role, text) {
-        const chatWindow = document.getElementById('chatConsoleWindow');
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'flex items-start gap-3 animate-fadeIn';
-        
-        if (role === 'user') {
-          msgDiv.innerHTML = `
-            <div class="w-7 h-7 rounded-lg bg-indigo-950 text-indigo-100 flex items-center justify-center font-bold text-xs shrink-0 border border-indigo-500/10">
-              <i class="fa-solid fa-user"></i>
-            </div>
-            <div class="glass-panel p-3.5 rounded-xl border-indigo-500/10 bg-indigo-950/60 light:bg-white max-w-xl text-indigo-100 light:text-indigo-955">
-              <p class="font-bold text-indigo-200 light:text-indigo-955 text-[11px] mb-1">Studio Producer</p>
-              <p class="whitespace-pre-wrap">${text}</p>
-            </div>
-          `;
-        }
-        chatWindow.appendChild(msgDiv);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-        this.chatHistory.push({ role, text });
-      }
-
-      appendChatMessage(role, text) {
-        this.appendChatMessageUI(role, text);
-        this.messages.push({
-          role: role === 'user' ? 'user' : 'assistant',
-          content: text
-        });
-        if (this.messages.length > 10) {
-          this.messages = this.messages.slice(-10);
-        }
-      }
-
-      copyFullChatLyrics() {
-        const boxes = document.querySelectorAll('.lyric-box');
-        if (boxes.length === 0) {
-          this.showToast('No lyrics available to copy.', 'info');
-          return;
-        }
-
-        let fullText = "";
-        boxes.forEach((box, i) => {
-          fullText += `--- SONVEX LYRIC TAKE #${i+1} ---\n` + box.textContent + "\n\n";
-        });
-
-        navigator.clipboard.writeText(fullText.trim()).then(() => {
-          this.showToast('Full lyrics copied to clipboard!', 'success');
-        });
-      }
-
-      clearChatConsole() {
-        const chatWindow = document.getElementById('chatConsoleWindow');
-        chatWindow.innerHTML = `
-          <div class="flex items-start gap-3">
-            <div class="w-7 h-7 rounded-lg bg-indigo-950 text-indigo-100 flex items-center justify-center font-bold text-xs shrink-0 border border-indigo-500/10">
-              <i class="fa-solid fa-robot"></i>
-            </div>
-            <div class="glass-panel p-4 rounded-xl max-w-2xl border-indigo-500/10 light:border-indigo-200">
-              <p class="font-bold text-indigo-100 light:text-indigo-955 mb-1">SONVEX AI Assistant</p>
-              <p class="text-indigo-350 light:text-indigo-850 leading-relaxed" data-i18n="chatWelcome">
-                ${translations[this.currentLang].chatWelcome}
-              </p>
-            </div>
-          </div>
-        `;
-        this.chatHistory = [];
-        this.messages = [];
-        this.showToast('Chat history cleared.', 'info');
-      }
 
       showToast(msg, type = 'info') {
         const container = document.getElementById('toastContainer');
@@ -3606,8 +3858,15 @@ CRITICAL FORMATTING INSTRUCTIONS:
       // ============================================================
 
       openLyricStudio() {
-        document.getElementById('mainView').style.display = 'none';
-        document.getElementById('lyricStudioView').classList.add('studio-open');
+        const main = document.getElementById('mainView');
+        const stem = document.getElementById('stemStudioView');
+        const lyric = document.getElementById('lyricStudioView');
+        if (main) main.style.display = 'none';
+        if (stem) stem.style.display = 'none';
+        if (lyric) {
+          lyric.style.display = 'flex';
+          lyric.classList.add('studio-open');
+        }
         // Init Wavesurfer lazily when studio opens
         if (!this.studioWavesurfer) {
           this._initStudioWavesurfer();
@@ -3616,8 +3875,16 @@ CRITICAL FORMATTING INSTRUCTIONS:
       }
 
       closeLyricStudio() {
-        document.getElementById('lyricStudioView').classList.remove('studio-open');
-        document.getElementById('mainView').style.display = '';
+        const main = document.getElementById('mainView');
+        const stem = document.getElementById('stemStudioView');
+        const lyric = document.getElementById('lyricStudioView');
+        if (lyric) {
+          lyric.style.display = 'none';
+          lyric.classList.remove('studio-open');
+        }
+        if (stem) stem.style.display = 'none';
+        if (main) main.style.display = 'block';
+
         // Pause media if playing
         const vid = document.getElementById('studioVideoEl');
         if (vid) vid.pause();
@@ -4460,13 +4727,1635 @@ CRITICAL FORMATTING INSTRUCTIONS:
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
+      // ============================================================
+      //  STEM STUDIO — MULTITRACK DAW MIXER ENGINE
+      // ============================================================
+
+      openStemStudio() {
+        const main = document.getElementById('mainView');
+        const lyric = document.getElementById('lyricStudioView');
+        const stem = document.getElementById('stemStudioView');
+        if (main) main.style.display = 'none';
+        if (lyric) {
+          lyric.style.display = 'none';
+          lyric.classList.remove('studio-open');
+        }
+        if (stem) {
+          stem.style.display = 'flex';
+          window.scrollTo(0, 0);
+        }
+      }
+
+      closeStemStudio() {
+        this.stemStop();
+        const main = document.getElementById('mainView');
+        const lyric = document.getElementById('lyricStudioView');
+        const stem = document.getElementById('stemStudioView');
+        if (stem) stem.style.display = 'none';
+        if (lyric) {
+          lyric.style.display = 'none';
+          lyric.classList.remove('studio-open');
+        }
+        if (main) main.style.display = 'block';
+      }
+
+      async handleStemFileUpload(file) {
+        if (!file) return;
+        this.stemStop();
+
+        const dropZone = document.getElementById('stemDropZone');
+        const progressOverlay = document.getElementById('stemProgressOverlay');
+        const progressText = document.getElementById('stemProgressText');
+        const progressBar = document.getElementById('stemProgressBar');
+        const consoleEl = document.getElementById('stemMultitrackConsole');
+
+        if (dropZone) dropZone.classList.add('hidden');
+        if (consoleEl) consoleEl.classList.add('hidden');
+        if (progressOverlay) {
+          progressOverlay.classList.remove('hidden');
+          progressOverlay.classList.add('flex');
+        }
+
+        const setProgress = (txt, pct) => {
+          if (progressText) progressText.textContent = txt;
+          if (progressBar) progressBar.style.width = pct + '%';
+        };
+
+        try {
+          setProgress('Reading audio file into memory…', 15);
+          const arrayBuffer = await file.arrayBuffer();
+
+          setProgress('Decoding full resolution audio stream…', 30);
+          if (!this.stemAudioCtx) {
+            this.stemAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          const fullBuffer = await this.stemAudioCtx.decodeAudioData(arrayBuffer);
+          this.stemDuration = fullBuffer.duration;
+
+          const timeDur = document.getElementById('stemDurationTime');
+          if (timeDur) timeDur.textContent = this._secToTimeStr(this.stemDuration);
+
+          setProgress('Extracting vocal frequencies (High/Mid Center band)…', 50);
+          const vocalBuffer = await this._extractStemVowels(fullBuffer);
+
+          setProgress('Extracting drum transients & percussive spectrum…', 70);
+          const drumBuffer = await this._extractStemDrums(fullBuffer);
+
+          setProgress('Extracting sub-bass & bass guitar harmonics…', 85);
+          const bassBuffer = await this._extractStemBass(fullBuffer);
+
+          setProgress('Synthesizing stereo instruments & synths…', 95);
+          const synthBuffer = await this._extractStemInstruments(fullBuffer);
+
+          this.stemBuffers = [fullBuffer, vocalBuffer, drumBuffer, bassBuffer, synthBuffer];
+
+          for (let i = 0; i < 5; i++) {
+            this.stemClips[i] = [
+              new AudioClip('clip_' + Date.now() + '_' + i, i, 0, fullBuffer.duration, this.stemBuffers[i], false)
+            ];
+          }
+
+          setProgress('Rendering 5 multitrack waveforms…', 100);
+
+          // Render waveforms on canvases, DOM clip layers, and timeline ruler
+          this._renderAllStemCanvases();
+          this._renderClipDOMElements();
+          this._renderTimelineRuler();
+
+          // Enable master controls & show console
+          setTimeout(() => {
+            if (progressOverlay) progressOverlay.classList.add('hidden');
+            if (consoleEl) {
+              consoleEl.classList.remove('hidden');
+              consoleEl.classList.add('flex');
+            }
+            ['stemPlayBtn','stemStopBtn','stemRewindBtn','stemExportMixBtn','stemExportStemsBtn'].forEach(id => {
+              const b = document.getElementById(id);
+              if (b) b.disabled = false;
+            });
+            this.showToast(`Separated "${file.name}" into 4 multitrack stems!`, 'success');
+          }, 500);
+
+        } catch (e) {
+          console.error('Stem separation error:', e);
+          this.showToast('Stem separation failed: ' + e.message, 'error');
+          if (progressOverlay) progressOverlay.classList.add('hidden');
+          if (dropZone) dropZone.classList.remove('hidden');
+        }
+      }
+
+      async _extractStemVowels(buffer) {
+        const offCtx = new OfflineAudioContext(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+        const src = offCtx.createBufferSource();
+        src.buffer = buffer;
+        const hp = offCtx.createBiquadFilter();
+        hp.type = 'highpass'; hp.frequency.value = 220;
+        const lp = offCtx.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 6500;
+        src.connect(hp); hp.connect(lp); lp.connect(offCtx.destination);
+        src.start(0);
+        return await offCtx.startRendering();
+      }
+
+      async _extractStemDrums(buffer) {
+        const offCtx = new OfflineAudioContext(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+        const src = offCtx.createBufferSource();
+        src.buffer = buffer;
+        const hp = offCtx.createBiquadFilter();
+        hp.type = 'highpass'; hp.frequency.value = 800;
+        const pk = offCtx.createBiquadFilter();
+        pk.type = 'peaking'; pk.frequency.value = 3500; pk.gain.value = 6;
+        src.connect(hp); hp.connect(pk); pk.connect(offCtx.destination);
+        src.start(0);
+        return await offCtx.startRendering();
+      }
+
+      async _extractStemBass(buffer) {
+        const offCtx = new OfflineAudioContext(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+        const src = offCtx.createBufferSource();
+        src.buffer = buffer;
+        const lp = offCtx.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 250;
+        src.connect(lp); lp.connect(offCtx.destination);
+        src.start(0);
+        return await offCtx.startRendering();
+      }
+
+      async _extractStemInstruments(buffer) {
+        const offCtx = new OfflineAudioContext(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+        const src = offCtx.createBufferSource();
+        src.buffer = buffer;
+        const bp = offCtx.createBiquadFilter();
+        bp.type = 'bandpass'; bp.frequency.value = 1200; bp.Q.value = 0.5;
+        src.connect(bp); bp.connect(offCtx.destination);
+        src.start(0);
+        return await offCtx.startRendering();
+      }
+
+      _renderClipDOMElements() {
+        for (let i = 0; i < 5; i++) {
+          const container = document.getElementById(`clipsLayer_${i}`);
+          if (!container) continue;
+          container.innerHTML = '';
+
+          const clips = this.stemClips[i] || [];
+          if (!this.stemDuration) continue;
+
+          clips.forEach(clip => {
+            const clipEl = document.createElement('div');
+            clipEl.className = 'audio-clip' + (clip.id === this.selectedClipId ? ' selected' : '') + (clip.isSilenced ? ' silenced' : '');
+            clipEl.dataset.clipId = clip.id;
+            clipEl.dataset.trackIdx = i;
+
+            const leftPct = (clip.startTime / this.stemDuration) * 100;
+            const widthPct = (clip.duration / this.stemDuration) * 100;
+
+            clipEl.style.left = leftPct + '%';
+            clipEl.style.width = Math.max(0.5, widthPct) + '%';
+
+            if (clip.startTime > 0) {
+              const seam = document.createElement('div');
+              seam.className = 'audio-clip-seam';
+              clipEl.appendChild(seam);
+            }
+
+            const label = document.createElement('div');
+            label.className = 'audio-clip-header';
+            label.textContent = clip.isSilenced ? 'MUTED' : `Start: ${this._secToTimeStr(clip.startTime)}`;
+            clipEl.appendChild(label);
+
+            // Left Trim Handle (<-> ew-resize)
+            const handleLeft = document.createElement('div');
+            handleLeft.className = 'clip-handle-left';
+            handleLeft.title = 'Trim Start';
+            clipEl.appendChild(handleLeft);
+
+            // Right Trim Handle (<-> ew-resize)
+            const handleRight = document.createElement('div');
+            handleRight.className = 'clip-handle-right';
+            handleRight.title = 'Trim End';
+            clipEl.appendChild(handleRight);
+
+            // Trim Left Handle Drag
+            handleLeft.onmousedown = (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+
+              this.selectedClipId = clip.id;
+              this.selectedTrackIdx = i;
+              this._renderClipDOMElements();
+
+              let isTrimming = true;
+              const startX = e.clientX;
+              const origStartSec = clip.startTime;
+              const origBufferOffset = clip.bufferOffset || 0;
+              const origDuration = clip.duration;
+
+              const parentWidth = container.clientWidth || 800;
+
+              const onMouseMove = (moveEvent) => {
+                if (!isTrimming) return;
+                const deltaX = moveEvent.clientX - startX;
+                const deltaSec = (deltaX / parentWidth) * this.stemDuration;
+
+                let newStart = origStartSec + deltaSec;
+                let newBufOffset = origBufferOffset + deltaSec;
+                let newDur = origDuration - deltaSec;
+
+                if (newStart < 0) {
+                  newStart = 0;
+                  newBufOffset = origBufferOffset - origStartSec;
+                  newDur = origDuration + origStartSec;
+                }
+
+                if (newDur < 0.1) {
+                  newDur = 0.1;
+                  newStart = origStartSec + origDuration - 0.1;
+                  newBufOffset = origBufferOffset + origDuration - 0.1;
+                }
+
+                clip.startTime = newStart;
+                clip.bufferOffset = Math.max(0, newBufOffset);
+                clip.duration = newDur;
+
+                clipEl.style.left = ((newStart / this.stemDuration) * 100) + '%';
+                clipEl.style.width = Math.max(0.5, (newDur / this.stemDuration) * 100) + '%';
+                label.textContent = `Trim In: ${this._secToTimeStr(clip.bufferOffset)} | Start: ${this._secToTimeStr(newStart)}`;
+
+                this._renderAllStemCanvases();
+              };
+
+              const onMouseUp = () => {
+                if (isTrimming) {
+                  isTrimming = false;
+                  window.removeEventListener('mousemove', onMouseMove);
+                  window.removeEventListener('mouseup', onMouseUp);
+
+                  this._pushUndoState('Trim Clip Start');
+                  this._updateStemNodes();
+                  this._renderClipDOMElements();
+                  this._renderAllStemCanvases();
+                }
+              };
+
+              window.addEventListener('mousemove', onMouseMove);
+              window.addEventListener('mouseup', onMouseUp);
+            };
+
+            // Trim Right Handle Drag
+            handleRight.onmousedown = (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+
+              this.selectedClipId = clip.id;
+              this.selectedTrackIdx = i;
+              this._renderClipDOMElements();
+
+              let isTrimming = true;
+              const startX = e.clientX;
+              const origDuration = clip.duration;
+              const maxDur = clip.maxDuration || (clip.audioBuffer ? clip.audioBuffer.duration : clip.duration);
+
+              const parentWidth = container.clientWidth || 800;
+
+              const onMouseMove = (moveEvent) => {
+                if (!isTrimming) return;
+                const deltaX = moveEvent.clientX - startX;
+                const deltaSec = (deltaX / parentWidth) * this.stemDuration;
+
+                let newDur = origDuration + deltaSec;
+                const maxAllowedDur = maxDur - (clip.bufferOffset || 0);
+
+                if (newDur < 0.1) newDur = 0.1;
+                if (newDur > maxAllowedDur) newDur = maxAllowedDur;
+
+                clip.duration = newDur;
+
+                clipEl.style.width = Math.max(0.5, (newDur / this.stemDuration) * 100) + '%';
+                label.textContent = `Dur: ${this._secToTimeStr(newDur)}`;
+
+                this._renderAllStemCanvases();
+              };
+
+              const onMouseUp = () => {
+                if (isTrimming) {
+                  isTrimming = false;
+                  window.removeEventListener('mousemove', onMouseMove);
+                  window.removeEventListener('mouseup', onMouseUp);
+
+                  this._pushUndoState('Trim Clip End');
+                  this._updateStemNodes();
+                  this._renderClipDOMElements();
+                  this._renderAllStemCanvases();
+                }
+              };
+
+              window.addEventListener('mousemove', onMouseMove);
+              window.addEventListener('mouseup', onMouseUp);
+            };
+
+            // Click & Body Drag Events (Select V vs Razor C)
+            clipEl.onmousedown = (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+
+              if (this.stemToolMode === 'razor') {
+                const rect = container.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickPct = Math.max(0, Math.min(1, clickX / rect.width));
+                const clickSec = clickPct * this.stemDuration;
+
+                if (clickSec > clip.startTime && clickSec < clip.startTime + clip.duration) {
+                  const localSplitSec = clickSec - clip.startTime;
+                  const [buf1, buf2] = this._sliceAudioBuffer(this.stemAudioCtx, clip.audioBuffer, localSplitSec);
+
+                  const clip1 = new AudioClip('clip_' + Date.now() + '_' + i + '_a', i, clip.startTime, localSplitSec, buf1, clip.isSilenced);
+                  const clip2 = new AudioClip('clip_' + Date.now() + '_' + i + '_b', i, clickSec, clip.duration - localSplitSec, buf2, clip.isSilenced);
+
+                  const idx = this.stemClips[i].indexOf(clip);
+                  if (idx !== -1) {
+                    this._pushUndoState('Razor Cut');
+                    this.stemClips[i].splice(idx, 1, clip1, clip2);
+                    this.selectedClipId = clip2.id;
+                    this.selectedTrackIdx = i;
+                    this._renderAllStemCanvases();
+                    this._renderClipDOMElements();
+                    this._updateStemNodes();
+                    this.showToast(`✂️ Razor split clip into 2 segments at ${this._secToTimeStr(clickSec)}!`, 'success');
+                  }
+                }
+                return;
+              }
+
+              this.selectedClipId = clip.id;
+              this.selectedTrackIdx = i;
+              this._renderClipDOMElements();
+              this._renderAllStemCanvases();
+
+              let isDragging = true;
+              const startX = e.clientX;
+              const origStartSec = clip.startTime;
+              clipEl.style.cursor = 'grabbing';
+
+              const parentWidth = container.clientWidth || 800;
+
+              const onMouseMove = (moveEvent) => {
+                if (!isDragging) return;
+                const deltaX = moveEvent.clientX - startX;
+                const deltaSec = (deltaX / parentWidth) * this.stemDuration;
+
+                let newStart = origStartSec + deltaSec;
+                if (newStart < 0) newStart = 0;
+                if (newStart + clip.duration > this.stemDuration) {
+                  newStart = Math.max(0, this.stemDuration - clip.duration);
+                }
+
+                clip.startTime = newStart;
+                const newLeftPct = (newStart / this.stemDuration) * 100;
+                clipEl.style.left = newLeftPct + '%';
+                label.textContent = `Start: ${this._secToTimeStr(newStart)}`;
+
+                this._renderAllStemCanvases();
+              };
+
+              const onMouseUp = () => {
+                if (isDragging) {
+                  isDragging = false;
+                  clipEl.style.cursor = 'grab';
+                  window.removeEventListener('mousemove', onMouseMove);
+                  window.removeEventListener('mouseup', onMouseUp);
+
+                  this._pushUndoState('Move Clip');
+                  this._updateStemNodes();
+                  this._renderClipDOMElements();
+                  this._renderAllStemCanvases();
+                }
+              };
+
+              window.addEventListener('mousemove', onMouseMove);
+              window.addEventListener('mouseup', onMouseUp);
+            };
+
+            container.appendChild(clipEl);
+          });
+        }
+      }
+
+      _renderAllStemCanvases() {
+        const colors = ['#94a3b8', '#06b6d4', '#c084fc', '#34d399', '#fbbf24'];
+        for (let i = 0; i < 5; i++) {
+          const canvas = document.getElementById(`stemCanvas_${i}`);
+          const buf = this.stemBuffers ? this.stemBuffers[i] : null;
+          if (!canvas || !buf) continue;
+          canvas.width = canvas.parentElement.clientWidth || 800;
+          canvas.height = canvas.parentElement.clientHeight || 70;
+          const ctx = canvas.getContext('2d');
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Render clips for this track
+          const clips = this.stemClips[i] || [];
+          if (clips.length === 0 && buf) {
+            clips.push(new AudioClip('clip_' + Date.now() + '_' + i, i, 0, this.stemDuration || buf.duration, buf, false));
+            this.stemClips[i] = clips;
+          }
+
+          clips.forEach(clip => {
+            if (!this.stemDuration || !clip.audioBuffer) return;
+            const clipStartX = Math.round((clip.startTime / this.stemDuration) * canvas.width);
+            const clipWidth = Math.max(2, Math.round((clip.duration / this.stemDuration) * canvas.width));
+            const clipEndX = clipStartX + clipWidth;
+
+            const clipChannelData = clip.audioBuffer.getChannelData(0);
+            const startSample = Math.floor((clip.bufferOffset || 0) * clip.audioBuffer.sampleRate);
+            const durSamples = Math.floor(clip.duration * clip.audioBuffer.sampleRate);
+            const endSample = Math.min(clipChannelData.length, startSample + durSamples);
+
+            const sampleCount = Math.max(1, endSample - startSample);
+            const step = Math.max(1, Math.ceil(sampleCount / clipWidth));
+            const amp = canvas.height / 2;
+
+            ctx.fillStyle = colors[i];
+
+            for (let x = 0; x < clipWidth && (clipStartX + x) < canvas.width; x++) {
+              let min = 1.0, max = -1.0;
+              for (let j = 0; j < step; j++) {
+                const idx = startSample + x * step + j;
+                if (idx < endSample) {
+                  const datum = clipChannelData[idx];
+                  if (datum < min) min = datum;
+                  if (datum > max) max = datum;
+                }
+              }
+              ctx.fillRect(clipStartX + x, (1 + min) * amp, 1, Math.max(1, (max - min) * amp));
+            }
+
+            // Highlight selected clip with bright neon glowing cyan box (#00FFCC) and live position badge
+            if (clip.id === this.selectedClipId) {
+              ctx.save();
+              ctx.shadowColor = '#00FFCC';
+              ctx.shadowBlur = 14;
+
+              ctx.fillStyle = 'rgba(0, 255, 204, 0.28)';
+              ctx.fillRect(clipStartX, 0, clipWidth, canvas.height);
+
+              ctx.strokeStyle = '#00FFCC';
+              ctx.lineWidth = 3;
+              ctx.strokeRect(clipStartX + 1, 1, clipWidth - 2, canvas.height - 2);
+              ctx.restore();
+
+              ctx.fillStyle = '#00FFCC';
+              ctx.font = 'bold 10px monospace';
+              ctx.fillText(`Start: ${this._secToTimeStr(clip.startTime)}`, clipStartX + 6, 14);
+            }
+
+            // If clip is silenced, draw dark semi-transparent overlay
+            if (clip.isSilenced) {
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+              ctx.fillRect(clipStartX, 0, clipWidth, canvas.height);
+
+              ctx.fillStyle = '#ef4444';
+              ctx.font = 'bold 10px monospace';
+              ctx.fillText('MUTED CLIP', clipStartX + 6, canvas.height / 2 + 3);
+            }
+
+            // Draw physical vertical split seam cut line
+            if (clip.startTime > 0) {
+              ctx.fillStyle = '#060814';
+              ctx.fillRect(clipStartX - 1, 0, 2, canvas.height);
+
+              ctx.strokeStyle = '#f43f5e';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.moveTo(clipStartX, 0);
+              ctx.lineTo(clipStartX, canvas.height);
+              ctx.stroke();
+            }
+          });
+
+          // Visual cue slope overlays for Fade In & Fade Out
+          const fadeInDur = Math.max(this.stemFadeIn[i] || 0, this.masterFadeIn || 0);
+          const fadeOutDur = Math.max(this.stemFadeOut[i] || 0, this.masterFadeOut || 0);
+
+          if (this.stemDuration > 0) {
+            // Fade In visual slope
+            if (fadeInDur > 0) {
+              const fadeX = Math.round((fadeInDur / this.stemDuration) * canvas.width);
+              ctx.fillStyle = 'rgba(6, 182, 212, 0.25)';
+              ctx.beginPath();
+              ctx.moveTo(0, 0);
+              ctx.lineTo(fadeX, 0);
+              ctx.lineTo(0, canvas.height);
+              ctx.closePath();
+              ctx.fill();
+
+              ctx.strokeStyle = '#06b6d4';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.moveTo(0, canvas.height);
+              ctx.lineTo(fadeX, 0);
+              ctx.stroke();
+            }
+
+            // Fade Out visual slope
+            if (fadeOutDur > 0) {
+              const fadeOutX = Math.round(((this.stemDuration - fadeOutDur) / this.stemDuration) * canvas.width);
+              ctx.fillStyle = 'rgba(192, 132, 252, 0.25)';
+              ctx.beginPath();
+              ctx.moveTo(fadeOutX, 0);
+              ctx.lineTo(canvas.width, 0);
+              ctx.lineTo(canvas.width, canvas.height);
+              ctx.closePath();
+              ctx.fill();
+
+              ctx.strokeStyle = '#c084fc';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.moveTo(fadeOutX, 0);
+              ctx.lineTo(canvas.width, canvas.height);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      stemTogglePlay() {
+        if (this.stemIsPlaying) {
+          this.stemPause();
+        } else {
+          this.stemPlay();
+        }
+      }
+
+      async stemPlay() {
+        if (!this.stemBuffers || !this.stemBuffers[0]) {
+          this.showToast('Please upload an audio file first', 'info');
+          return;
+        }
+
+        if (!this.stemAudioCtx) {
+          this.stemAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        if (this.stemAudioCtx.state === 'suspended') {
+          await this.stemAudioCtx.resume();
+        }
+
+        // Stop any existing playing source nodes
+        for (let i = 0; i < 5; i++) {
+          if (Array.isArray(this.stemSources[i])) {
+            this.stemSources[i].forEach(src => {
+              try { src.stop(); } catch(e) {}
+            });
+            this.stemSources[i] = [];
+          } else if (this.stemSources[i]) {
+            try { this.stemSources[i].stop(); } catch(e) {}
+            this.stemSources[i] = null;
+          }
+        }
+
+        const now = this.stemAudioCtx.currentTime;
+        const offset = Math.max(0, Math.min(this.stemDuration, this.stemPauseTime));
+
+        // Create Master Gain Node
+        this.stemMasterGainNode = this.stemAudioCtx.createGain();
+        this.stemMasterGainNode.gain.setValueAtTime(this.stemMasterGainVal || 1, now);
+        this.stemMasterGainNode.connect(this.stemAudioCtx.destination);
+
+        const anySolo = this.stemSoloed.some(s => s);
+
+        for (let i = 0; i < 5; i++) {
+          const clips = this.stemClips[i] || [];
+          const gainNode = this.stemAudioCtx.createGain();
+          const pannerNode = this.stemAudioCtx.createStereoPanner ? this.stemAudioCtx.createStereoPanner() : null;
+
+          let targetGain = this.stemGains[i];
+          if (this.stemMuted[i]) targetGain = 0;
+          if (anySolo && !this.stemSoloed[i]) targetGain = 0;
+
+          if (pannerNode) {
+            pannerNode.pan.setValueAtTime(this.stemPans[i], now);
+            gainNode.connect(pannerNode);
+            pannerNode.connect(this.stemMasterGainNode);
+          } else {
+            gainNode.connect(this.stemMasterGainNode);
+          }
+
+          this._applyRampsForTrack(i, gainNode, targetGain, offset, this.stemDuration);
+          this.stemGainNodes[i] = gainNode;
+          this.stemPanNodes[i] = pannerNode;
+
+          this.stemSources[i] = [];
+
+          clips.forEach(clip => {
+            if (clip.isSilenced || !clip.audioBuffer) return;
+
+            const clipStart = clip.startTime;
+            const clipEnd = clip.startTime + clip.duration;
+
+            if (offset >= clipEnd) return;
+
+            let bufferOffset = clip.bufferOffset || 0;
+            let playDuration = clip.duration;
+            let startDelay = 0;
+
+            if (offset > clipStart) {
+              const skipped = offset - clipStart;
+              bufferOffset += skipped;
+              playDuration = Math.max(0, clip.duration - skipped);
+              startDelay = 0;
+            } else {
+              startDelay = (clipStart - offset) / (this.stemSpeed || 1.0);
+            }
+
+            if (playDuration <= 0) return;
+
+            const src = this.stemAudioCtx.createBufferSource();
+            src.buffer = clip.audioBuffer;
+            src.playbackRate.value = this.stemSpeed || 1.0;
+            src.connect(gainNode);
+
+            src.start(now + startDelay, bufferOffset, playDuration);
+            this.stemSources[i].push(src);
+          });
+        }
+
+        this.stemStartTime = now - (offset / (this.stemSpeed || 1.0));
+        this.stemIsPlaying = true;
+
+        const icon = document.getElementById('stemPlayIcon');
+        if (icon) { icon.className = 'fa-solid fa-pause'; }
+
+        this._startStemAnimLoop();
+      }
+
+      _applyRampsForTrack(i, gainNode, targetGain, startSec, trackDur) {
+        if (!gainNode || !gainNode.gain || !this.stemAudioCtx) return;
+
+        const now = this.stemAudioCtx.currentTime;
+        const fadeInDur = Math.max(this.stemFadeIn[i] || 0, this.masterFadeIn || 0);
+        const fadeOutDur = Math.max(this.stemFadeOut[i] || 0, this.masterFadeOut || 0);
+
+        gainNode.gain.cancelScheduledValues(now);
+
+        if (targetGain <= 0) {
+          gainNode.gain.setValueAtTime(0, now);
+          return;
+        }
+
+        const fadeOutStartSec = Math.max(0, trackDur - fadeOutDur);
+
+        // Fade In Ramp
+        if (fadeInDur > 0 && startSec < fadeInDur) {
+          const currRatio = Math.max(0, Math.min(1, startSec / fadeInDur));
+          const startGain = targetGain * currRatio;
+          const remainingFadeIn = (fadeInDur - startSec) / (this.stemSpeed || 1.0);
+
+          gainNode.gain.setValueAtTime(startGain, now);
+          gainNode.gain.linearRampToValueAtTime(targetGain, now + remainingFadeIn);
+
+          if (fadeOutDur > 0 && fadeOutStartSec > fadeInDur) {
+            const timeUntilFadeOut = (fadeOutStartSec - startSec) / (this.stemSpeed || 1.0);
+            gainNode.gain.setValueAtTime(targetGain, now + timeUntilFadeOut);
+            gainNode.gain.linearRampToValueAtTime(0, now + ((trackDur - startSec) / (this.stemSpeed || 1.0)));
+          }
+        }
+        // Fade Out Ramp
+        else if (fadeOutDur > 0 && startSec >= fadeOutStartSec) {
+          const remainingTrackSec = Math.max(0, trackDur - startSec);
+          const currRatio = Math.max(0, Math.min(1, remainingTrackSec / fadeOutDur));
+          const currGain = targetGain * currRatio;
+
+          gainNode.gain.setValueAtTime(currGain, now);
+          gainNode.gain.linearRampToValueAtTime(0, now + (remainingTrackSec / (this.stemSpeed || 1.0)));
+        }
+        // Mid section
+        else {
+          gainNode.gain.setValueAtTime(targetGain, now);
+          if (fadeOutDur > 0 && startSec < fadeOutStartSec) {
+            const timeUntilFadeOut = (fadeOutStartSec - startSec) / (this.stemSpeed || 1.0);
+            gainNode.gain.setValueAtTime(targetGain, now + timeUntilFadeOut);
+            gainNode.gain.linearRampToValueAtTime(0, now + ((trackDur - startSec) / (this.stemSpeed || 1.0)));
+          }
+        }
+      }
+
+      _pushUndoState(actionName = 'Edit') {
+        const clonedClips = this.stemClips.map(trackClips => {
+          if (!trackClips) return [];
+          return trackClips.map(clip => new AudioClip(
+            clip.id,
+            clip.trackId,
+            clip.startTime,
+            clip.duration,
+            clip.audioBuffer,
+            clip.isSilenced,
+            clip.bufferOffset,
+            clip.maxDuration
+          ));
+        });
+
+        const stateSnapshot = {
+          actionName,
+          clips: clonedClips,
+          gains: [...this.stemGains],
+          pans: [...this.stemPans],
+          muted: [...this.stemMuted],
+          soloed: [...this.stemSoloed],
+          fadeIn: [...this.stemFadeIn],
+          fadeOut: [...this.stemFadeOut]
+        };
+
+        this.undoStack.push(stateSnapshot);
+        if (this.undoStack.length > 50) this.undoStack.shift();
+        this.redoStack = [];
+
+        const undoBtn = document.getElementById('stemUndoBtn');
+        if (undoBtn) undoBtn.disabled = false;
+        const redoBtn = document.getElementById('stemRedoBtn');
+        if (redoBtn) redoBtn.disabled = true;
+      }
+
+      undoStemAction() {
+        if (!this.undoStack || this.undoStack.length === 0) {
+          this.showToast('Nothing to undo', 'info');
+          return;
+        }
+
+        const currentClips = this.stemClips.map(trackClips => {
+          if (!trackClips) return [];
+          return trackClips.map(clip => new AudioClip(clip.id, clip.trackId, clip.startTime, clip.duration, clip.audioBuffer, clip.isSilenced));
+        });
+
+        this.redoStack.push({
+          actionName: 'Redo state',
+          clips: currentClips,
+          gains: [...this.stemGains],
+          pans: [...this.stemPans],
+          muted: [...this.stemMuted],
+          soloed: [...this.stemSoloed],
+          fadeIn: [...this.stemFadeIn],
+          fadeOut: [...this.stemFadeOut]
+        });
+
+        const lastState = this.undoStack.pop();
+        this.stemClips = lastState.clips;
+        this.stemGains = lastState.gains;
+        this.stemPans = lastState.pans;
+        this.stemMuted = lastState.muted;
+        this.stemSoloed = lastState.soloed;
+        this.stemFadeIn = lastState.fadeIn;
+        this.stemFadeOut = lastState.fadeOut;
+        this.selectedClipId = null;
+
+        const undoBtn = document.getElementById('stemUndoBtn');
+        if (undoBtn) undoBtn.disabled = this.undoStack.length === 0;
+        const redoBtn = document.getElementById('stemRedoBtn');
+        if (redoBtn) redoBtn.disabled = false;
+
+        this._renderAllStemCanvases();
+        this._renderClipDOMElements();
+        this._updateStemNodes();
+        this.showToast(`⎌ Undid action: ${lastState.actionName}`, 'success');
+      }
+
+      redoStemAction() {
+        if (!this.redoStack || this.redoStack.length === 0) {
+          this.showToast('Nothing to redo', 'info');
+          return;
+        }
+
+        const currentClips = this.stemClips.map(trackClips => {
+          if (!trackClips) return [];
+          return trackClips.map(clip => new AudioClip(clip.id, clip.trackId, clip.startTime, clip.duration, clip.audioBuffer, clip.isSilenced));
+        });
+
+        this.undoStack.push({
+          actionName: 'Undo state',
+          clips: currentClips,
+          gains: [...this.stemGains],
+          pans: [...this.stemPans],
+          muted: [...this.stemMuted],
+          soloed: [...this.stemSoloed],
+          fadeIn: [...this.stemFadeIn],
+          fadeOut: [...this.stemFadeOut]
+        });
+
+        const nextState = this.redoStack.pop();
+        this.stemClips = nextState.clips;
+        this.stemGains = nextState.gains;
+        this.stemPans = nextState.pans;
+        this.stemMuted = nextState.muted;
+        this.stemSoloed = nextState.soloed;
+        this.stemFadeIn = nextState.fadeIn;
+        this.stemFadeOut = nextState.fadeOut;
+        this.selectedClipId = null;
+
+        const undoBtn = document.getElementById('stemUndoBtn');
+        if (undoBtn) undoBtn.disabled = false;
+        const redoBtn = document.getElementById('stemRedoBtn');
+        if (redoBtn) redoBtn.disabled = this.redoStack.length === 0;
+
+        this._renderAllStemCanvases();
+        this._renderClipDOMElements();
+        this._updateStemNodes();
+        this.showToast('↷ Redid action', 'success');
+      }
+
+      _initCanvasDragEvents() {
+        for (let i = 0; i < 5; i++) {
+          const canvas = document.getElementById(`stemCanvas_${i}`);
+          if (!canvas) continue;
+
+          let isDragging = false;
+          let dragClip = null;
+          let dragStartMouseX = 0;
+          let origStartSec = 0;
+
+          canvas.style.cursor = 'pointer';
+
+          canvas.onmousedown = (e) => {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (!this.stemDuration) return;
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const pct = Math.max(0, Math.min(1, clickX / rect.width));
+            const clickSec = pct * this.stemDuration;
+
+            this.selectedTrackIdx = i;
+            const clickedClip = (this.stemClips[i] || []).find(c => clickSec >= c.startTime && clickSec <= c.startTime + c.duration);
+
+            if (clickedClip) {
+              isDragging = true;
+              dragClip = clickedClip;
+              dragStartMouseX = e.clientX;
+              origStartSec = clickedClip.startTime;
+              this.selectedClipId = clickedClip.id;
+              canvas.style.cursor = 'grabbing';
+            } else {
+              this.selectedClipId = null;
+            }
+
+            this.stemPauseTime = clickSec;
+            this._updateGlobalPlayhead(clickSec);
+            this._renderAllStemCanvases();
+          };
+
+          canvas.onmousemove = (e) => {
+            if (!isDragging || !dragClip || !this.stemDuration) return;
+            const rect = canvas.getBoundingClientRect();
+            const deltaX = e.clientX - dragStartMouseX;
+            const deltaSec = (deltaX / rect.width) * this.stemDuration;
+
+            let newStart = origStartSec + deltaSec;
+            if (newStart < 0) newStart = 0;
+            if (newStart + dragClip.duration > this.stemDuration) {
+              newStart = Math.max(0, this.stemDuration - dragClip.duration);
+            }
+
+            dragClip.startTime = newStart;
+            this._renderAllStemCanvases();
+          };
+
+          const endDrag = () => {
+            if (isDragging) {
+              isDragging = false;
+              if (dragClip) {
+                this._pushUndoState('Move Clip');
+              }
+              dragClip = null;
+              canvas.style.cursor = 'pointer';
+              this._updateStemNodes();
+            }
+          };
+
+          canvas.onmouseup = endDrag;
+          canvas.onmouseleave = endDrag;
+        }
+      }
+
+      _sliceAudioBuffer(audioCtx, originalBuffer, splitSec) {
+        const sampleRate = originalBuffer.sampleRate;
+        const totalSamples = originalBuffer.length;
+        const splitSample = Math.max(1, Math.min(totalSamples - 1, Math.round(splitSec * sampleRate)));
+
+        const channels = originalBuffer.numberOfChannels;
+        const dur1Samples = splitSample;
+        const dur2Samples = totalSamples - splitSample;
+
+        const buf1 = audioCtx.createBuffer(channels, dur1Samples, sampleRate);
+        const buf2 = audioCtx.createBuffer(channels, dur2Samples, sampleRate);
+
+        for (let ch = 0; ch < channels; ch++) {
+          const origData = originalBuffer.getChannelData(ch);
+          const data1 = buf1.getChannelData(ch);
+          const data2 = buf2.getChannelData(ch);
+
+          data1.set(origData.subarray(0, splitSample));
+          data2.set(origData.subarray(splitSample, totalSamples));
+        }
+
+        return [buf1, buf2];
+      }
+
+      sliceTracksAtPlayhead() {
+        if (!this.stemDuration || !this.stemAudioCtx) {
+          this.showToast('Please upload an audio file first', 'info');
+          return;
+        }
+
+        let targetTrackIdx = this.selectedTrackIdx !== undefined ? this.selectedTrackIdx : 1;
+        let targetClip = null;
+
+        if (this.selectedClipId) {
+          for (let i = 0; i < 5; i++) {
+            if (this.stemClips[i]) {
+              const c = this.stemClips[i].find(clip => clip.id === this.selectedClipId);
+              if (c) {
+                targetClip = c;
+                targetTrackIdx = i;
+                break;
+              }
+            }
+          }
+        }
+
+        let playheadTime = 0;
+        if (this.stemIsPlaying) {
+          const now = this.stemAudioCtx.currentTime;
+          playheadTime = Math.min(this.stemDuration, Math.max(0, (now - this.stemStartTime) * (this.stemSpeed || 1.0)));
+        } else {
+          playheadTime = this.stemPauseTime || (0.25 * this.stemDuration);
+        }
+
+        const clips = this.stemClips[targetTrackIdx];
+        if (!clips) return;
+
+        if (!targetClip) {
+          targetClip = clips.find(c => playheadTime > c.startTime && playheadTime < c.startTime + c.duration);
+        }
+
+        if (!targetClip) {
+          this.showToast('Click a clip to select it or place playhead over audio before slicing', 'info');
+          return;
+        }
+
+        const localSplitSec = playheadTime - targetClip.startTime;
+
+        if (localSplitSec <= 0.05 || localSplitSec >= targetClip.duration - 0.05) {
+          this.showToast(`Place playhead inside selected clip to slice`, 'info');
+          return;
+        }
+
+        this._pushUndoState('Slice Clip');
+
+        const targetIdx = clips.indexOf(targetClip);
+        const [buf1, buf2] = this._sliceAudioBuffer(this.stemAudioCtx, targetClip.audioBuffer, localSplitSec);
+
+        const clip1 = new AudioClip('clip_' + Date.now() + '_' + targetTrackIdx + '_a', targetTrackIdx, targetClip.startTime, localSplitSec, buf1, targetClip.isSilenced);
+        const clip2 = new AudioClip('clip_' + Date.now() + '_' + targetTrackIdx + '_b', targetTrackIdx, playheadTime, targetClip.duration - localSplitSec, buf2, targetClip.isSilenced);
+
+        clips.splice(targetIdx, 1, clip1, clip2);
+        this.selectedClipId = clip2.id;
+        this.selectedTrackIdx = targetTrackIdx;
+
+        this._renderAllStemCanvases();
+        this._renderClipDOMElements();
+        this._updateStemNodes();
+        this.showToast(`✂️ Sliced selected clip into Clip A & Clip B at ${this._secToTimeStr(playheadTime)}!`, 'success');
+      }
+
+      deleteSelectedClip() {
+        if (!this.stemDuration) {
+          this.showToast('Please upload an audio file first', 'info');
+          return;
+        }
+
+        let targetTrack = -1;
+        let targetClipId = this.selectedClipId;
+
+        if (targetClipId) {
+          for (let i = 0; i < 5; i++) {
+            if (!this.stemClips[i]) continue;
+            const c = this.stemClips[i].find(clip => clip.id === targetClipId);
+            if (c) {
+              targetTrack = i;
+              break;
+            }
+          }
+        }
+
+        if (targetTrack === -1 && this.selectedTrackIdx !== undefined && this.selectedTrackIdx !== null) {
+          const now = this.stemAudioCtx ? this.stemAudioCtx.currentTime : 0;
+          const currentSec = this.stemIsPlaying ? Math.min(this.stemDuration, Math.max(0, (now - this.stemStartTime) * (this.stemSpeed || 1.0))) : (this.stemPauseTime || 0);
+          const i = this.selectedTrackIdx;
+          if (this.stemClips[i]) {
+            const c = this.stemClips[i].find(clip => currentSec >= clip.startTime && currentSec <= clip.startTime + clip.duration);
+            if (c) {
+              targetTrack = i;
+              targetClipId = c.id;
+            }
+          }
+        }
+
+        if (targetTrack === -1 || !targetClipId) {
+          this.showToast('Click a clip segment on the waveform canvas to select and delete', 'info');
+          return;
+        }
+
+        // 1. Deep clone snapshot BEFORE deleting
+        this._pushUndoState('Delete Clip');
+
+        // 2. Immutably filter target clip out of array
+        this.stemClips[targetTrack] = (this.stemClips[targetTrack] || []).filter(clip => clip.id !== targetClipId);
+        this.selectedClipId = null;
+
+        // 3. Audio Engine Node Disconnection / Reschedule
+        this._updateStemNodes();
+
+        // 4. Immediate Canvas & DOM Redraw
+        this._renderClipDOMElements();
+        this._renderAllStemCanvases();
+
+        this.showToast(`🗑️ Erased clip segment from Track ${targetTrack}`, 'success');
+      }
+
+      silenceSelectedClip() {
+        if (!this.stemDuration) {
+          this.showToast('Please upload an audio file first', 'info');
+          return;
+        }
+
+        let targetClip = null;
+        let targetTrack = -1;
+
+        if (this.selectedClipId) {
+          for (let i = 0; i < 5; i++) {
+            if (!this.stemClips[i]) continue;
+            const c = this.stemClips[i].find(clip => clip.id === this.selectedClipId);
+            if (c) {
+              targetClip = c;
+              targetTrack = i;
+              break;
+            }
+          }
+        }
+
+        if (!targetClip && this.selectedTrackIdx !== undefined && this.selectedTrackIdx !== null) {
+          const now = this.stemAudioCtx ? this.stemAudioCtx.currentTime : 0;
+          const currentSec = this.stemIsPlaying ? Math.min(this.stemDuration, Math.max(0, (now - this.stemStartTime) * (this.stemSpeed || 1.0))) : (this.stemPauseTime || 0);
+          const i = this.selectedTrackIdx;
+          if (this.stemClips[i]) {
+            const c = this.stemClips[i].find(clip => currentSec >= clip.startTime && currentSec <= clip.startTime + c.duration);
+            if (c) {
+              targetClip = c;
+              targetTrack = i;
+            }
+          }
+        }
+
+        if (!targetClip) {
+          this.showToast('Click a clip segment on the waveform canvas to select and silence', 'info');
+          return;
+        }
+
+        this._pushUndoState('Toggle Silence');
+        targetClip.isSilenced = !targetClip.isSilenced;
+
+        this._renderAllStemCanvases();
+        this._renderClipDOMElements();
+        this._updateStemNodes();
+        this.showToast(targetClip.isSilenced ? `🔇 Silenced clip on Track ${targetTrack}` : `🔊 Un-silenced clip on Track ${targetTrack}`, 'success');
+      }
+
+      setStemSpeed(speed) {
+        speed = parseFloat(speed) || 1.0;
+        this.stemSpeed = speed;
+        const txt = document.getElementById('stemSpeedVal');
+        if (txt) txt.textContent = speed.toFixed(2) + 'x';
+
+        for (let i = 0; i < 5; i++) {
+          if (this.stemSources[i] && this.stemSources[i].playbackRate) {
+            this.stemSources[i].playbackRate.value = speed;
+          }
+        }
+      }
+
+      saveSonvexProject() {
+        if (!this.stemDuration) {
+          this.showToast('No active project to save', 'error');
+          return;
+        }
+        const projectData = {
+          version: '2.0',
+          appName: 'Sonvex Studio',
+          date: new Date().toISOString(),
+          duration: this.stemDuration,
+          masterGain: this.stemMasterGainVal,
+          masterFadeIn: this.masterFadeIn,
+          masterFadeOut: this.masterFadeOut,
+          speed: this.stemSpeed,
+          tracks: [0, 1, 2, 3, 4].map(i => ({
+            index: i,
+            gain: this.stemGains[i],
+            pan: this.stemPans[i],
+            muted: this.stemMuted[i],
+            soloed: this.stemSoloed[i],
+            fadeIn: this.stemFadeIn[i],
+            fadeOut: this.stemFadeOut[i],
+            clips: this.stemClips[i] || []
+          }))
+        };
+
+        const jsonStr = JSON.stringify(projectData, null, 2);
+        this._downloadFile(jsonStr, 'project.sonvex', 'application/json');
+        this.showToast('Saved Sonvex Studio project (.sonvex)!', 'success');
+      }
+
+      async loadSonvexProject(file) {
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (!data.tracks) throw new Error('Invalid project file format');
+
+          if (data.masterGain !== undefined) this.setStemMasterGain(data.masterGain);
+          if (data.masterFadeIn !== undefined) this.setMasterFadeIn(data.masterFadeIn);
+          if (data.masterFadeOut !== undefined) this.setMasterFadeOut(data.masterFadeOut);
+          if (data.speed !== undefined) this.setStemSpeed(data.speed);
+
+          data.tracks.forEach(t => {
+            const i = t.index;
+            if (i >= 0 && i < 5) {
+              this.stemGains[i] = t.gain ?? 1;
+              this.stemPans[i] = t.pan ?? 0;
+              this.stemMuted[i] = !!t.muted;
+              this.stemSoloed[i] = !!t.soloed;
+              this.stemFadeIn[i] = t.fadeIn ?? 0;
+              this.stemFadeOut[i] = t.fadeOut ?? 0;
+              this.stemClips[i] = t.clips || [];
+
+              // Update DOM UI
+              const volTxt = document.getElementById(`volVal_${i}`);
+              if (volTxt) volTxt.textContent = Math.round(this.stemGains[i] * 100) + '%';
+              const panTxt = document.getElementById(`panVal_${i}`);
+              if (panTxt) panTxt.textContent = this.stemPans[i] === 0 ? 'C' : (this.stemPans[i] < 0 ? `L${Math.round(Math.abs(this.stemPans[i])*100)}` : `R${Math.round(this.stemPans[i]*100)}`);
+              const muteBtn = document.getElementById(`mute_${i}`);
+              if (muteBtn) muteBtn.classList.toggle('active', this.stemMuted[i]);
+              const soloBtn = document.getElementById(`solo_${i}`);
+              if (soloBtn) soloBtn.classList.toggle('active', this.stemSoloed[i]);
+              const inTxt = document.getElementById(`fadeInVal_${i}`);
+              if (inTxt) inTxt.textContent = (this.stemFadeIn[i] || 0).toFixed(1) + 's';
+              const outTxt = document.getElementById(`fadeOutVal_${i}`);
+              if (outTxt) outTxt.textContent = (this.stemFadeOut[i] || 0).toFixed(1) + 's';
+            }
+          });
+
+          this._renderAllStemCanvases();
+          this._updateStemNodes();
+          this.showToast('Loaded Sonvex Studio project state!', 'success');
+        } catch (e) {
+          console.error('Failed to load project:', e);
+          this.showToast('Failed to load project file: ' + e.message, 'error');
+        }
+      }
+
+      stemPause() {
+        if (!this.stemIsPlaying) return;
+        const now = this.stemAudioCtx ? this.stemAudioCtx.currentTime : 0;
+        this.stemPauseTime = Math.min(this.stemDuration, Math.max(0, (now - this.stemStartTime) * (this.stemSpeed || 1.0)));
+
+        for (let i = 0; i < 5; i++) {
+          if (Array.isArray(this.stemSources[i])) {
+            this.stemSources[i].forEach(src => {
+              try { src.stop(); } catch(e) {}
+            });
+            this.stemSources[i] = [];
+          } else if (this.stemSources[i]) {
+            try { this.stemSources[i].stop(); } catch(e) {}
+            this.stemSources[i] = null;
+          }
+        }
+        this.stemIsPlaying = false;
+        const icon = document.getElementById('stemPlayIcon');
+        if (icon) { icon.className = 'fa-solid fa-play'; }
+        if (this.stemAnimFrame) cancelAnimationFrame(this.stemAnimFrame);
+      }
+
+      stemStop() {
+        this.stemPause();
+        this.stemPauseTime = 0;
+        const timeEl = document.getElementById('stemCurrentTime');
+        if (timeEl) timeEl.textContent = '00:00.000';
+        this._updateGlobalPlayhead(0);
+      }
+
+      stemRewind() {
+        this.stemStop();
+      }
+
+      setStemToolMode(mode) {
+        this.stemToolMode = mode;
+        const selBtn = document.getElementById('stemToolSelect');
+        const razBtn = document.getElementById('stemToolRazor');
+        if (selBtn) selBtn.classList.toggle('active', mode === 'select');
+        if (razBtn) razBtn.classList.toggle('active', mode === 'razor');
+
+        const consoleEl = document.getElementById('stemMultitrackConsole');
+        if (consoleEl) {
+          consoleEl.classList.toggle('razor-mode', mode === 'razor');
+        }
+        this.showToast(mode === 'razor' ? '✂️ Razor Tool active: Click any clip to split!' : '👆 Select Tool active: Click or drag clips', 'info');
+      }
+
+      _renderTimelineRuler() {
+        const ruler = document.getElementById('stemTimelineRuler');
+        if (!ruler || !this.stemDuration) return;
+        ruler.innerHTML = '';
+
+        const interval = Math.max(5, Math.ceil(this.stemDuration / 10));
+        for (let sec = 0; sec <= this.stemDuration; sec += interval) {
+          const mark = document.createElement('div');
+          mark.className = 'stem-ruler-mark';
+          const pct = (sec / this.stemDuration) * 100;
+          mark.style.left = pct + '%';
+          mark.textContent = this._secToTimeStr(sec);
+          ruler.appendChild(mark);
+        }
+      }
+
+      seekStemFromRuler(e) {
+        if (!this.stemDuration) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, clickX / rect.width));
+        const newTime = pct * this.stemDuration;
+
+        this.selectedClipId = null;
+
+        const wasPlaying = this.stemIsPlaying;
+        if (wasPlaying) this.stemPause();
+        this.stemPauseTime = newTime;
+        this._updateGlobalPlayhead(newTime);
+        this._renderAllStemCanvases();
+        this._renderClipDOMElements();
+        if (wasPlaying) this.stemPlay();
+      }
+
+      seekStemFromWaveform(e, trackIdx = 0) {
+        if (!this.stemDuration) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, clickX / rect.width));
+        const newTime = pct * this.stemDuration;
+
+        this.selectedTrackIdx = trackIdx;
+        this.selectedClipId = null;
+
+        const wasPlaying = this.stemIsPlaying;
+        if (wasPlaying) this.stemPause();
+        this.stemPauseTime = newTime;
+        this._updateGlobalPlayhead(newTime);
+        this._renderAllStemCanvases();
+        this._renderClipDOMElements();
+        if (wasPlaying) this.stemPlay();
+      }
+
+      _startStemAnimLoop() {
+        const loop = () => {
+          if (!this.stemIsPlaying) return;
+          const now = this.stemAudioCtx ? this.stemAudioCtx.currentTime : 0;
+          const currentSec = Math.min(this.stemDuration, Math.max(0, (now - this.stemStartTime) * (this.stemSpeed || 1.0)));
+          const timeEl = document.getElementById('stemCurrentTime');
+          if (timeEl) timeEl.textContent = this._secToTimeStr(currentSec);
+
+          this._updateGlobalPlayhead(currentSec);
+
+          if (currentSec >= this.stemDuration) {
+            this.stemStop();
+            return;
+          }
+          this.stemAnimFrame = requestAnimationFrame(loop);
+        };
+        this.stemAnimFrame = requestAnimationFrame(loop);
+      }
+
+      _updateGlobalPlayhead(currentSec) {
+        const playhead = document.getElementById('stemGlobalPlayhead');
+        if (!playhead || !this.stemDuration) return;
+
+        const waveformWrap = document.querySelector('.stem-track-waveform-wrap');
+        const multitrackConsole = document.getElementById('stemMultitrackConsole');
+        if (!waveformWrap || !multitrackConsole) return;
+
+        const wrapRect = waveformWrap.getBoundingClientRect();
+        const consoleRect = multitrackConsole.getBoundingClientRect();
+
+        const startX = wrapRect.left - consoleRect.left;
+        const width = wrapRect.width;
+        const pct = Math.max(0, Math.min(1, currentSec / this.stemDuration));
+        const leftPos = startX + (pct * width);
+
+        playhead.style.display = 'block';
+        playhead.style.left = leftPos + 'px';
+      }
+
+      setStemGain(idx, val) {
+        val = parseFloat(val) || 0;
+        this.stemGains[idx] = val;
+        const txt = document.getElementById(`volVal_${idx}`);
+        if (txt) txt.textContent = Math.round(val * 100) + '%';
+        this._updateStemNodes();
+      }
+
+      setStemPan(idx, val) {
+        val = parseFloat(val) || 0;
+        this.stemPans[idx] = val;
+        const txt = document.getElementById(`panVal_${idx}`);
+        if (txt) {
+          if (val === 0) txt.textContent = 'C';
+          else if (val < 0) txt.textContent = `L${Math.round(Math.abs(val)*100)}`;
+          else txt.textContent = `R${Math.round(val*100)}`;
+        }
+        if (this.stemPanNodes[idx] && this.stemPanNodes[idx].pan) {
+          const now = this.stemAudioCtx ? this.stemAudioCtx.currentTime : 0;
+          this.stemPanNodes[idx].pan.setValueAtTime(val, now);
+        }
+      }
+
+      setStemFadeIn(idx, val) {
+        val = parseFloat(val) || 0;
+        this.stemFadeIn[idx] = val;
+        const txt = document.getElementById(`fadeInVal_${idx}`);
+        if (txt) txt.textContent = val.toFixed(1) + 's';
+        this._updateStemNodes();
+      }
+
+      setStemFadeOut(idx, val) {
+        val = parseFloat(val) || 0;
+        this.stemFadeOut[idx] = val;
+        const txt = document.getElementById(`fadeOutVal_${idx}`);
+        if (txt) txt.textContent = val.toFixed(1) + 's';
+        this._updateStemNodes();
+      }
+
+      setMasterFadeIn(val) {
+        val = parseFloat(val) || 0;
+        this.masterFadeIn = val;
+        const txt = document.getElementById('masterFadeInVal');
+        if (txt) txt.textContent = val.toFixed(1) + 's';
+        this._updateStemNodes();
+      }
+
+      setMasterFadeOut(val) {
+        val = parseFloat(val) || 0;
+        this.masterFadeOut = val;
+        const txt = document.getElementById('masterFadeOutVal');
+        if (txt) txt.textContent = val.toFixed(1) + 's';
+        this._updateStemNodes();
+      }
+
+      toggleStemMute(idx) {
+        this.stemMuted[idx] = !this.stemMuted[idx];
+        const b = document.getElementById(`mute_${idx}`);
+        if (b) {
+          b.classList.toggle('active', this.stemMuted[idx]);
+          if (this.stemMuted[idx]) {
+            b.style.background = '#FF0055';
+            b.style.color = '#FFF';
+            b.style.boxShadow = '0 0 10px #FF0055';
+          } else {
+            b.style.background = '';
+            b.style.color = '';
+            b.style.boxShadow = '';
+          }
+        }
+        const card = document.querySelector(`.stem-track-card[data-track="${idx}"] .stem-track-waveform-wrap`);
+        if (card) {
+          card.style.opacity = this.stemMuted[idx] ? '0.3' : '1.0';
+        }
+        this._updateStemNodes();
+      }
+
+      toggleStemSolo(idx) {
+        this.stemSoloed[idx] = !this.stemSoloed[idx];
+        const b = document.getElementById(`solo_${idx}`);
+        if (b) b.classList.toggle('active', this.stemSoloed[idx]);
+        this._updateStemNodes();
+      }
+
+      setStemMasterGain(val) {
+        val = parseFloat(val) || 1;
+        this.stemMasterGainVal = val;
+        const txt = document.getElementById('stemMasterGainValue');
+        if (txt) txt.textContent = Math.round(val * 100) + '%';
+        if (this.stemMasterGainNode && this.stemMasterGainNode.gain) {
+          const now = this.stemAudioCtx ? this.stemAudioCtx.currentTime : 0;
+          this.stemMasterGainNode.gain.setValueAtTime(val, now);
+        }
+      }
+
+      _updateStemNodes() {
+        if (this.stemIsPlaying) {
+          this.stemPlay();
+          return;
+        }
+
+        const anySolo = this.stemSoloed.some(s => s);
+        const now = this.stemAudioCtx ? this.stemAudioCtx.currentTime : 0;
+        const currentSec = this.stemPauseTime || 0;
+
+        for (let i = 0; i < 5; i++) {
+          if (!this.stemGainNodes[i] || !this.stemGainNodes[i].gain) continue;
+          let targetGain = this.stemGains[i];
+          if (this.stemMuted[i]) targetGain = 0;
+          if (anySolo && !this.stemSoloed[i]) targetGain = 0;
+
+          const activeClip = this.stemClips[i] ? this.stemClips[i].find(c => currentSec >= c.startTime && currentSec <= c.startTime + c.duration) : null;
+          if (activeClip && activeClip.isSilenced) {
+            targetGain = 0;
+          }
+
+          this._applyRampsForTrack(i, this.stemGainNodes[i], targetGain, currentSec, this.stemDuration);
+        }
+      }
+
+      async exportRemixedMasterWav() {
+        if (!this.stemBuffers || !this.stemBuffers[0]) {
+          this.showToast('No stem audio buffers loaded', 'error');
+          return;
+        }
+        this.showToast('Rendering remixed master WAV mix with Slices, Fades & Speed…', 'info');
+
+        const sampleRate = this.stemBuffers[0].sampleRate;
+        const length = this.stemBuffers[0].length;
+        const duration = length / sampleRate;
+        const renderCtx = new OfflineAudioContext(2, length, sampleRate);
+
+        const masterGain = renderCtx.createGain();
+        masterGain.gain.setValueAtTime(this.stemMasterGainVal || 1, 0);
+        masterGain.connect(renderCtx.destination);
+
+        const anySolo = this.stemSoloed.some(s => s);
+
+        for (let i = 0; i < 5; i++) {
+          if (!this.stemBuffers[i]) continue;
+          let targetGain = this.stemGains[i];
+          if (this.stemMuted[i]) targetGain = 0;
+          if (anySolo && !this.stemSoloed[i]) targetGain = 0;
+
+          if (targetGain <= 0) continue;
+
+          const src = renderCtx.createBufferSource();
+          src.buffer = this.stemBuffers[i];
+          src.playbackRate.value = this.stemSpeed || 1.0;
+          const gainNode = renderCtx.createGain();
+
+          const fadeInDur = Math.max(this.stemFadeIn[i] || 0, this.masterFadeIn || 0);
+          const fadeOutDur = Math.max(this.stemFadeOut[i] || 0, this.masterFadeOut || 0);
+
+          gainNode.gain.setValueAtTime(fadeInDur > 0 ? 0 : targetGain, 0);
+          if (fadeInDur > 0) {
+            gainNode.gain.linearRampToValueAtTime(targetGain, fadeInDur);
+          }
+          if (fadeOutDur > 0) {
+            const fadeOutStart = Math.max(0, duration - fadeOutDur);
+            if (fadeOutStart > fadeInDur) {
+              gainNode.gain.setValueAtTime(targetGain, fadeOutStart);
+            }
+            gainNode.gain.linearRampToValueAtTime(0, duration);
+          }
+
+          // Schedule clip silences if any clips are silenced
+          if (this.stemClips[i]) {
+            this.stemClips[i].forEach(clip => {
+              if (clip.silenced) {
+                gainNode.gain.setValueAtTime(0, clip.startSec);
+                gainNode.gain.setValueAtTime(targetGain, clip.endSec);
+              }
+            });
+          }
+
+          const panner = renderCtx.createStereoPanner ? renderCtx.createStereoPanner() : null;
+          if (panner) {
+            panner.pan.setValueAtTime(this.stemPans[i], 0);
+            src.connect(gainNode);
+            gainNode.connect(panner);
+            panner.connect(masterGain);
+          } else {
+            src.connect(gainNode);
+            gainNode.connect(masterGain);
+          }
+          src.start(0);
+        }
+
+        const rendered = await renderCtx.startRendering();
+        const pcmLeft = rendered.getChannelData(0);
+        const pcmRight = rendered.numberOfChannels > 1 ? rendered.getChannelData(1) : pcmLeft;
+        const wavBlob = this._stereoPcmToWav(pcmLeft, pcmRight, sampleRate);
+        this._downloadFile(wavBlob, 'sonvex_remixed_master.wav', 'audio/wav');
+        this.showToast('Exported remixed master WAV successfully!', 'success');
+      }
+
+      async exportIndividualStemsZip() {
+        if (!this.stemBuffers || !this.stemBuffers[0]) {
+          this.showToast('No stem audio buffers loaded', 'error');
+          return;
+        }
+        this.showToast('Exporting 5 individual stem WAV files…', 'info');
+        const names = ['stem_original_master.wav', 'stem_vocals.wav', 'stem_drums.wav', 'stem_bass.wav', 'stem_instruments.wav'];
+        for (let i = 0; i < 5; i++) {
+          if (!this.stemBuffers[i]) continue;
+          const sampleRate = this.stemBuffers[i].sampleRate;
+          const left = this.stemBuffers[i].getChannelData(0);
+          const right = this.stemBuffers[i].numberOfChannels > 1 ? this.stemBuffers[i].getChannelData(1) : left;
+          const blob = this._stereoPcmToWav(left, right, sampleRate);
+          this._downloadFile(blob, names[i], 'audio/wav');
+        }
+        this.showToast('Exported all 5 individual stem files!', 'success');
+      }
+
+      _stereoPcmToWav(left, right, sampleRate) {
+        const numSamples = left.length;
+        const buffer = new ArrayBuffer(44 + numSamples * 4);
+        const view = new DataView(buffer);
+        const writeStr = (offset, str) => {
+          for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+        };
+        writeStr(0, 'RIFF');
+        view.setUint32(4, 36 + numSamples * 4, true);
+        writeStr(8, 'WAVE');
+        writeStr(12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true); // PCM
+        view.setUint16(22, 2, true); // stereo
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 4, true);
+        view.setUint16(34, 16, true);
+        writeStr(36, 'data');
+        view.setUint32(40, numSamples * 4, true);
+
+        let offset = 44;
+        for (let i = 0; i < numSamples; i++) {
+          const l = Math.max(-1, Math.min(1, left[i]));
+          const r = Math.max(-1, Math.min(1, right[i]));
+          view.setInt16(offset, l < 0 ? l * 0x8000 : l * 0x7FFF, true);
+          view.setInt16(offset + 2, r < 0 ? r * 0x8000 : r * 0x7FFF, true);
+          offset += 4;
+        }
+        return new Blob([buffer], { type: 'audio/wav' });
+      }
     }
 
-    // INITIALIZE APPLICATION AT DOM READY
-    let app;
-    document.addEventListener('DOMContentLoaded', () => {
-      app = new SonvexStudioApp();
-    });
+    // INITIALIZE APPLICATION GLOBALLY
+    var app = null;
+    window.app = null;
+    function initSonvexApp() {
+      if (!window.app) {
+        window.app = new SonvexStudioApp();
+        app = window.app;
+        console.log("SonvexStudioApp initialized successfully:", window.app);
+
+        // Bind Global Keyboard Shortcuts (Ctrl+Z => Undo, Ctrl+Y => Redo, Delete => Erase Clip, S => Slice)
+        window.addEventListener('keydown', (e) => {
+          const stemView = document.getElementById('stemStudioView');
+          if (!stemView || stemView.style.display !== 'flex') return;
+
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+            e.preventDefault();
+            if (e.shiftKey) {
+              window.app.redoStemAction();
+            } else {
+              window.app.undoStemAction();
+            }
+          } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+            e.preventDefault();
+            window.app.redoStemAction();
+          } else if (e.key === 'Delete' || e.key === 'Backspace') {
+            if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+            e.preventDefault();
+            window.app.deleteSelectedClip();
+          } else if (e.key.toLowerCase() === 'v') {
+            if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+            e.preventDefault();
+            window.app.setStemToolMode('select');
+          } else if (e.key.toLowerCase() === 'c') {
+            if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+            e.preventDefault();
+            window.app.setStemToolMode('razor');
+          } else if (e.key.toLowerCase() === 's') {
+            if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+            e.preventDefault();
+            window.app.sliceTracksAtPlayhead();
+          }
+        });
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSonvexApp);
+    } else {
+      initSonvexApp();
+    }
   </script>
 </body>
 </html>
