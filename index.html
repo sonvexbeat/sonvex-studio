@@ -2629,8 +2629,7 @@
       <div class="video-export-bar">
         <div class="video-export-progress"><div id="videoExportProgressFill"></div></div>
         <span id="videoExportStatus" class="text-[9px] font-mono text-slate-500 min-w-[110px] text-center">Ready</span>
-        <button id="videoExportBtn" onclick="app.exportVideoShortMp4()" class="video-studio-btn video-export-primary" disabled title="Export the selected clip as a real MP4"><i class="fa-solid fa-file-video"></i> Export Selected MP4</button>
-        <button id="videoExportAllBtn" onclick="app.exportAllVideoShortsMp4()" class="video-studio-btn video-export-primary" disabled title="Export all saved clips as real MP4 files in one ZIP"><i class="fa-solid fa-layer-group"></i> Export All Clips MP4</button>
+        <button id="videoExportBtn" onclick="app.exportVideoShortMp4()" class="video-studio-btn video-export-primary" disabled title="Export the clip as a real MP4"><i class="fa-solid fa-file-video"></i> Export MP4</button>
         <button id="videoExportCancelBtn" onclick="app.cancelVideoShortExport()" class="video-studio-btn video-export-cancel" disabled><i class="fa-solid fa-xmark"></i> Cancel</button>
       </div>
     </section>
@@ -2700,11 +2699,7 @@
       <div class="video-panel">
         <div class="video-panel-title"><span><i class="fa-solid fa-list text-indigo-400 mr-1"></i> Clips</span><span id="videoClipCount" class="text-[9px] text-slate-500">0</span></div>
         <div id="videoClipList" class="video-clip-list"></div>
-        <div class="grid grid-cols-2 gap-2 mt-2">
-          <button class="video-studio-btn" onclick="app.exportVideoShortMp4()" id="videoClipExportSelectedBtn"><i class="fa-solid fa-download"></i> Export Selected MP4</button>
-          <button class="video-studio-btn" onclick="app.clearAllVideoShortClips()" id="videoClipClearAllBtn"><i class="fa-solid fa-trash-can"></i> Clear All</button>
-        </div>
-        <p class="text-[9px] text-slate-500 mt-2 leading-relaxed">Each saved clip keeps its own crop/effect and export settings. MP4 is encoded locally in your browser and does not require a paid server.</p>
+        <p class="text-[9px] text-slate-500 mt-2 leading-relaxed">One clip at a time. Set IN / OUT, then click the scissors. Use the small download button on the clip or the main Export MP4 button below.</p>
       </div>
 
       <div class="video-panel">
@@ -2717,8 +2712,8 @@
           <option value="720">720p</option>
         </select>
         <label class="video-field-label mt-3">Export Quality <strong id="videoBitrateValue">18 Mbps</strong></label>
-        <input id="videoBitrateRange" type="range" min="8" max="45" step="1" value="18" oninput="document.getElementById('videoBitrateValue').textContent=this.value+' Mbps'">
-        <p class="text-[9px] text-slate-500 mt-2">MP4 uses the rendered clip, then encodes a real H.264/AAC MP4 locally in your browser. The first MP4 export downloads a small encoder package (~31 MB).</p>
+        <input id="videoBitrateRange" type="range" min="8" max="45" step="1" value="18" oninput="app.videoShortsUpdateBitrateSetting(this.value)">
+        <p class="text-[9px] text-slate-500 mt-2">MP4 is rendered locally in your browser as a real H.264/AAC MP4. Default export is 1080p; 1440p and 4K are available when needed.</p>
       </div>
     </aside>
   </div>
@@ -6490,6 +6485,15 @@
       const sel=document.getElementById('videoResolutionSelect');
       const out=document.getElementById('videoResolutionValue');
       if(sel && out) out.textContent=sel.value==='2160'?'4K':`${sel.value}p`;
+      const clip=this.videoShortsClips[this.videoShortsActiveClipIndex];
+      if(clip) { clip.settings = clip.settings || {}; clip.settings.resolution=parseInt(sel?.value || '1080',10); }
+    }
+
+    videoShortsUpdateBitrateSetting(value) {
+      const br=document.getElementById('videoBitrateValue');
+      if(br) br.textContent=`${value} Mbps`;
+      const clip=this.videoShortsClips[this.videoShortsActiveClipIndex];
+      if(clip) { clip.settings = clip.settings || {}; clip.settings.bitrate=parseInt(value || '18',10); }
     }
 
     videoShortsRenderFrame(targetCanvas) {
@@ -6588,7 +6592,7 @@
         start,
         end,
         id: Date.now() + Math.random(),
-        name: `Clip ${this.videoShortsClips.length + 1}`,
+        name: 'Clip 1',
         settings: {
           aspect: this.videoShortsAspect,
           resolution: parseInt(document.getElementById('videoResolutionSelect')?.value || '1080', 10),
@@ -6605,9 +6609,11 @@
           speed: this.videoShortsSpeed
         }
       };
-      this.videoShortsClips.push(clip);
+      // Video Studio intentionally supports one committed clip only.
+      // Creating a new clip replaces the previous clip instead of creating Clip 2, Clip 3, etc.
+      this.videoShortsClips = [clip];
       this.videoShortsSelectionActive = true;
-      this.videoShortsActiveClipIndex = this.videoShortsClips.length - 1;
+      this.videoShortsActiveClipIndex = 0;
 
       try { this.videoShortsVideo.pause(); } catch (e) {}
       try { this.videoShortsVideo.currentTime = start; } catch (e) {}
@@ -6618,10 +6624,10 @@
       this._updateVideoShortsTimeDisplay();
       this.videoShortsRenderFrame();
       this._updateVideoShortsExportButtons();
-      this.showToast(`${clip.name} saved: ${this._videoShortsFormatTime(start)} → ${this._videoShortsFormatTime(end)}`, 'success');
+      this.showToast(`Clip saved: ${this._videoShortsFormatTime(start)} → ${this._videoShortsFormatTime(end)}`, 'success');
     }
 
-    _loadVideoShortsClip(index, movePlayhead = true) {
+    _loadVideoShortsClip(index, movePlayhead = true, applySavedSettings = true) {
       const clip = this.videoShortsClips[index];
       if (!clip || !this.videoShortsVideo) return;
       this.videoShortsActiveClipIndex = index;
@@ -6629,18 +6635,20 @@
       this.videoShortsEnd = clip.end;
       this.videoShortsSelectionActive = true;
       const st = clip.settings || {};
-      if (st.aspect) this.videoShortsAspect = st.aspect;
-      if (Number.isFinite(st.zoom)) this.videoShortsZoom = st.zoom;
-      if (Number.isFinite(st.posX)) this.videoShortsPosX = st.posX;
-      if (Number.isFinite(st.posY)) this.videoShortsPosY = st.posY;
-      if (Number.isFinite(st.brightness)) this.videoShortsBrightness = st.brightness;
-      if (Number.isFinite(st.blur)) this.videoShortsBlur = st.blur;
-      if (st.fitMode) this.videoShortsFitMode = st.fitMode;
-      if (typeof st.overlayText === 'string') this.videoShortsOverlayText = st.overlayText;
-      if (Number.isFinite(st.overlaySize)) this.videoShortsOverlaySize = st.overlaySize;
-      if (st.overlayPosition) this.videoShortsOverlayPosition = st.overlayPosition;
-      if (Number.isFinite(st.speed)) this.videoShortsSpeed = st.speed;
-      this._syncVideoShortsControlsFromState(st);
+      if (applySavedSettings && st.aspect) this.videoShortsAspect = st.aspect;
+      if (applySavedSettings) {
+        if (Number.isFinite(st.zoom)) this.videoShortsZoom = st.zoom;
+        if (Number.isFinite(st.posX)) this.videoShortsPosX = st.posX;
+        if (Number.isFinite(st.posY)) this.videoShortsPosY = st.posY;
+        if (Number.isFinite(st.brightness)) this.videoShortsBrightness = st.brightness;
+        if (Number.isFinite(st.blur)) this.videoShortsBlur = st.blur;
+        if (st.fitMode) this.videoShortsFitMode = st.fitMode;
+        if (typeof st.overlayText === 'string') this.videoShortsOverlayText = st.overlayText;
+        if (Number.isFinite(st.overlaySize)) this.videoShortsOverlaySize = st.overlaySize;
+        if (st.overlayPosition) this.videoShortsOverlayPosition = st.overlayPosition;
+        if (Number.isFinite(st.speed)) this.videoShortsSpeed = st.speed;
+        this._syncVideoShortsControlsFromState(st);
+      }
       try { this.videoShortsVideo.pause(); } catch (e) {}
       this._stopVideoShortsPreviewLoop();
       this._updateVideoShortsPlayIcon(false);
@@ -6682,12 +6690,8 @@
 
     _updateVideoShortsExportButtons() {
       const hasMedia=!!(this.videoShortsVideo && this.videoShortsDuration);
-      const hasClips=this.videoShortsClips.length>0;
       const selected=this.videoShortsActiveClipIndex>=0 && !!this.videoShortsClips[this.videoShortsActiveClipIndex];
       const b=document.getElementById('videoExportBtn'); if(b) b.disabled=!hasMedia||!selected||this.videoShortsExporting;
-      const all=document.getElementById('videoExportAllBtn'); if(all) all.disabled=!hasMedia||!hasClips||this.videoShortsExporting;
-      const mp=document.getElementById('videoExportMp4Btn'); if(mp) mp.disabled=!hasMedia||!selected||this.videoShortsExporting;
-      const allMp4=document.getElementById('videoExportAllMp4Btn'); if(allMp4) allMp4.disabled=!hasMedia||!hasClips||this.videoShortsExporting;
       const cancel=document.getElementById('videoExportCancelBtn'); if(cancel) cancel.disabled=!this.videoShortsExporting;
     }
 
@@ -6724,7 +6728,13 @@
         exp.type='button';
         exp.title='Download this clip as MP4';
         exp.innerHTML='<i class="fa-solid fa-download"></i>';
-        exp.onclick=(e)=>{e.stopPropagation();this._loadVideoShortsClip(index,true);setTimeout(()=>this.exportVideoShortMp4(),0);};
+        exp.onclick=(e)=>{
+          e.stopPropagation();
+          this._loadVideoShortsClip(index,true,false);
+          // The export controls are the source of truth for the single clip.
+          // Do not restore an old resolution/bitrate from the clip when downloading.
+          setTimeout(()=>this.exportVideoShortMp4(),0);
+        };
         const del=document.createElement('button');
         del.type='button';
         del.title='Delete clip';
@@ -6799,22 +6809,22 @@
     }
 
     _videoShortsGetExportSettings(clip = null) {
-      const s = clip?.settings || {};
-      const aspect = s.aspect || this.videoShortsAspect;
-      const resolution = parseInt(s.resolution || document.getElementById('videoResolutionSelect')?.value || '1080',10);
-      const bitrate = parseInt(s.bitrate || document.getElementById('videoBitrateRange')?.value || '18',10);
+      // Single-clip editor: the live Export controls are always the source of truth.
+      // This prevents the small Download button from restoring an old 1080p/default value.
       return {
-        aspect, resolution, bitrate,
-        zoom: Number.isFinite(s.zoom) ? s.zoom : this.videoShortsZoom,
-        posX: Number.isFinite(s.posX) ? s.posX : this.videoShortsPosX,
-        posY: Number.isFinite(s.posY) ? s.posY : this.videoShortsPosY,
-        brightness: Number.isFinite(s.brightness) ? s.brightness : this.videoShortsBrightness,
-        blur: Number.isFinite(s.blur) ? s.blur : this.videoShortsBlur,
-        fitMode: s.fitMode || this.videoShortsFitMode,
-        overlayText: typeof s.overlayText === 'string' ? s.overlayText : this.videoShortsOverlayText,
-        overlaySize: Number.isFinite(s.overlaySize) ? s.overlaySize : this.videoShortsOverlaySize,
-        overlayPosition: s.overlayPosition || this.videoShortsOverlayPosition,
-        speed: Number.isFinite(s.speed) ? s.speed : this.videoShortsSpeed
+        aspect: this.videoShortsAspect,
+        resolution: parseInt(document.getElementById('videoResolutionSelect')?.value || '1080', 10),
+        bitrate: parseInt(document.getElementById('videoBitrateRange')?.value || '18', 10),
+        zoom: this.videoShortsZoom,
+        posX: this.videoShortsPosX,
+        posY: this.videoShortsPosY,
+        brightness: this.videoShortsBrightness,
+        blur: this.videoShortsBlur,
+        fitMode: this.videoShortsFitMode,
+        overlayText: this.videoShortsOverlayText,
+        overlaySize: this.videoShortsOverlaySize,
+        overlayPosition: this.videoShortsOverlayPosition,
+        speed: this.videoShortsSpeed
       };
     }
 
