@@ -2629,10 +2629,8 @@
       <div class="video-export-bar">
         <div class="video-export-progress"><div id="videoExportProgressFill"></div></div>
         <span id="videoExportStatus" class="text-[9px] font-mono text-slate-500 min-w-[110px] text-center">Ready</span>
-        <button id="videoExportBtn" onclick="app.exportVideoShort()" class="video-studio-btn video-export-primary" disabled><i class="fa-solid fa-file-export"></i> Export Selected</button>
-        <button id="videoExportAllBtn" onclick="app.exportAllVideoShorts()" class="video-studio-btn video-export-primary" disabled><i class="fa-solid fa-layer-group"></i> Export All Clips</button>
-        <button id="videoExportMp4Btn" onclick="app.exportVideoShortMp4()" class="video-studio-btn" disabled title="Render the selected clip as a real H.264/AAC MP4 locally in your browser"><i class="fa-solid fa-file-video"></i> MP4</button>
-        <button id="videoExportAllMp4Btn" onclick="app.exportAllVideoShortsMp4()" class="video-studio-btn" disabled title="Render all saved clips as real H.264/AAC MP4 files locally in your browser"><i class="fa-solid fa-layer-group"></i> All MP4</button>
+        <button id="videoExportBtn" onclick="app.exportVideoShortMp4()" class="video-studio-btn video-export-primary" disabled title="Export the selected clip as a real MP4"><i class="fa-solid fa-file-video"></i> Export Selected MP4</button>
+        <button id="videoExportAllBtn" onclick="app.exportAllVideoShortsMp4()" class="video-studio-btn video-export-primary" disabled title="Export all saved clips as real MP4 files in one ZIP"><i class="fa-solid fa-layer-group"></i> Export All Clips MP4</button>
         <button id="videoExportCancelBtn" onclick="app.cancelVideoShortExport()" class="video-studio-btn video-export-cancel" disabled><i class="fa-solid fa-xmark"></i> Cancel</button>
       </div>
     </section>
@@ -2703,10 +2701,10 @@
         <div class="video-panel-title"><span><i class="fa-solid fa-list text-indigo-400 mr-1"></i> Clips</span><span id="videoClipCount" class="text-[9px] text-slate-500">0</span></div>
         <div id="videoClipList" class="video-clip-list"></div>
         <div class="grid grid-cols-2 gap-2 mt-2">
-          <button class="video-studio-btn" onclick="app.exportVideoShort()" id="videoClipExportSelectedBtn"><i class="fa-solid fa-download"></i> Export Selected</button>
+          <button class="video-studio-btn" onclick="app.exportVideoShortMp4()" id="videoClipExportSelectedBtn"><i class="fa-solid fa-download"></i> Export Selected MP4</button>
           <button class="video-studio-btn" onclick="app.clearAllVideoShortClips()" id="videoClipClearAllBtn"><i class="fa-solid fa-trash-can"></i> Clear All</button>
         </div>
-        <p class="text-[9px] text-slate-500 mt-2 leading-relaxed">Each saved clip keeps its own crop/effect and export settings. WebM export is fast; MP4 is encoded locally in your browser and does not require a paid server.</p>
+        <p class="text-[9px] text-slate-500 mt-2 leading-relaxed">Each saved clip keeps its own crop/effect and export settings. MP4 is encoded locally in your browser and does not require a paid server.</p>
       </div>
 
       <div class="video-panel">
@@ -2720,7 +2718,7 @@
         </select>
         <label class="video-field-label mt-3">Export Quality <strong id="videoBitrateValue">18 Mbps</strong></label>
         <input id="videoBitrateRange" type="range" min="8" max="45" step="1" value="18" oninput="document.getElementById('videoBitrateValue').textContent=this.value+' Mbps'">
-        <p class="text-[9px] text-slate-500 mt-2">Local WebM keeps your browser effects and selected canvas size. MP4 uses the same rendered clip, then encodes a real H.264/AAC MP4 locally. The first MP4 export downloads a small encoder package (~31 MB).</p>
+        <p class="text-[9px] text-slate-500 mt-2">MP4 uses the rendered clip, then encodes a real H.264/AAC MP4 locally in your browser. The first MP4 export downloads a small encoder package (~31 MB).</p>
       </div>
     </aside>
   </div>
