@@ -1710,6 +1710,55 @@
       box-shadow: 0 0 10px rgba(0,255,204,.18);
     }
 
+
+    /* Centered blocking MP4 export overlay */
+    #videoExportOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 4, 15, .72);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      padding: 20px;
+    }
+    #videoExportOverlay.active { display: flex; }
+    #videoExportOverlayCard {
+      width: min(390px, calc(100vw - 40px));
+      border: 1px solid rgba(99,102,241,.32);
+      border-radius: 16px;
+      background: rgba(10, 13, 34, .97);
+      box-shadow: 0 24px 80px rgba(0,0,0,.55), 0 0 35px rgba(99,102,241,.10);
+      padding: 20px;
+      text-align: center;
+    }
+    #videoExportOverlayIcon {
+      width: 46px; height: 46px; margin: 0 auto 12px;
+      display:flex; align-items:center; justify-content:center;
+      border-radius: 50%;
+      background: rgba(6,182,212,.10);
+      border: 1px solid rgba(6,182,212,.24);
+      color: #67e8f9;
+      font-size: 18px;
+    }
+    #videoExportOverlayTitle { font-size: 15px; font-weight: 800; color: #f8fafc; margin-bottom: 4px; }
+    #videoExportOverlayStatus { font-size: 11px; color: #94a3b8; min-height: 18px; margin-bottom: 13px; }
+    #videoExportOverlayProgress { height: 7px; border-radius: 999px; overflow:hidden; background: rgba(99,102,241,.12); margin-bottom: 15px; }
+    #videoExportOverlayProgressFill { width:0%; height:100%; background: linear-gradient(90deg,#06b6d4,#6366f1); transition: width .12s linear; }
+    #videoExportOverlayCancel {
+      border: 1px solid rgba(239,68,68,.38);
+      background: rgba(239,68,68,.09);
+      color: #fca5a5;
+      border-radius: 8px;
+      padding: 7px 18px;
+      font-size: 11px; font-weight: 700;
+      cursor: pointer;
+    }
+    #videoExportOverlayCancel:hover { background: rgba(239,68,68,.16); color:#fecaca; }
+    #videoExportOverlayCancel:disabled { opacity:.5; cursor:not-allowed; }
+
     .video-export-bar {
       display: flex;
       align-items: center;
@@ -1754,7 +1803,21 @@
 
 <body class="min-h-screen font-sans transition-colors duration-300 selection:bg-indigo-200 selection:text-black">
 
- <!-- SONVEX CUSTOM CONFIRMATION MODAL -->
+
+  <!-- Blocking MP4 export progress dialog -->
+  <div id="videoExportOverlay" aria-modal="true" role="dialog" aria-live="polite">
+    <div id="videoExportOverlayCard">
+      <div id="videoExportOverlayIcon"><i class="fa-solid fa-file-video"></i></div>
+      <div id="videoExportOverlayTitle">Preparing MP4…</div>
+      <div id="videoExportOverlayStatus">Please wait while the video is being processed.</div>
+      <div id="videoExportOverlayProgress"><div id="videoExportOverlayProgressFill"></div></div>
+      <button id="videoExportOverlayCancel" type="button" onclick="app.cancelVideoShortExport()">
+        <i class="fa-solid fa-xmark mr-1"></i> Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- SONVEX CUSTOM CONFIRMATION MODAL -->
   <div id="sonvexConfirmModal" class="fixed inset-0 z-[99999] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-md transition-all">
     <div class="glass-panel w-full max-w-md rounded-2xl p-6 shadow-2xl border border-indigo-500/30 transform transition-all scale-95 opacity-0 animate-modal-pop" id="sonvexConfirmCard">
       <div class="flex items-center gap-3 mb-4">
@@ -7198,11 +7261,60 @@
       }
     }
 
+    _showVideoExportOverlay() {
+      const overlay=document.getElementById('videoExportOverlay');
+      const title=document.getElementById('videoExportOverlayTitle');
+      const status=document.getElementById('videoExportOverlayStatus');
+      const fill=document.getElementById('videoExportOverlayProgressFill');
+      const cancel=document.getElementById('videoExportOverlayCancel');
+      if(overlay) overlay.classList.add('active');
+      if(title) title.textContent='Preparing MP4…';
+      if(status) status.textContent='Please wait while the video is being processed.';
+      if(fill) fill.style.width='0%';
+      if(cancel) cancel.disabled=false;
+      this._videoExportOverlaySync=true;
+      const mainStatus=document.getElementById('videoExportStatus');
+      const mainFill=document.getElementById('videoExportProgressFill');
+      if(!this._videoExportOverlayObserver && mainStatus && mainFill) {
+        this._videoExportOverlayObserver=new MutationObserver(()=>this._syncVideoExportOverlay());
+        this._videoExportOverlayObserver.observe(mainStatus,{childList:true,characterData:true,subtree:true});
+        this._videoExportOverlayFillObserver=new MutationObserver(()=>this._syncVideoExportOverlay());
+        this._videoExportOverlayFillObserver.observe(mainFill,{attributes:true,attributeFilter:['style']});
+      }
+      this._syncVideoExportOverlay();
+    }
+
+    _syncVideoExportOverlay() {
+      if(!this._videoExportOverlaySync) return;
+      const mainStatus=document.getElementById('videoExportStatus');
+      const mainFill=document.getElementById('videoExportProgressFill');
+      const title=document.getElementById('videoExportOverlayTitle');
+      const status=document.getElementById('videoExportOverlayStatus');
+      const fill=document.getElementById('videoExportOverlayProgressFill');
+      if(!title||!status||!fill) return;
+      const text=(mainStatus?.textContent||'Preparing MP4…').trim();
+      status.textContent=text;
+      if(/Preparing MP4/i.test(text)) title.textContent='Preparing MP4…';
+      else if(/Encoding/i.test(text)) title.textContent='Encoding MP4…';
+      else if(/Rendering/i.test(text)) title.textContent='Rendering video…';
+      else title.textContent='Exporting MP4…';
+      fill.style.width=mainFill?.style.width || '0%';
+    }
+
+    _hideVideoExportOverlay() {
+      this._videoExportOverlaySync=false;
+      const overlay=document.getElementById('videoExportOverlay');
+      const cancel=document.getElementById('videoExportOverlayCancel');
+      if(cancel) cancel.disabled=true;
+      if(overlay) overlay.classList.remove('active');
+    }
+
     async exportVideoShortMp4() {
       if(this.videoShortsExporting || !this.videoShortsVideo || this.videoShortsActiveClipIndex<0) return;
       this.videoShortsExporting=true;this.videoShortsExportCancelRequested=false;
       const status=document.getElementById('videoExportStatus'),fill=document.getElementById('videoExportProgressFill'),cancel=document.getElementById('videoExportCancelBtn');
       if(cancel)cancel.disabled=false; if(fill)fill.style.width='0%'; if(status)status.textContent='Preparing MP4…';
+      this._showVideoExportOverlay();
       this._updateVideoShortsExportButtons();
       this.videoShortsMp4Phase='render';
       try {
@@ -7225,6 +7337,7 @@
         this.videoShortsExportRecorder=null;
         this.videoShortsExportStream=null;
         if(cancel)cancel.disabled=true;
+        this._hideVideoExportOverlay();
         this._updateVideoShortsExportButtons();
       }
     }
@@ -7309,6 +7422,7 @@
         if(fill)fill.style.width='0%';
         if(btn)btn.disabled=false;
         if(cancelBtn)cancelBtn.disabled=true;
+        const overlayCancel=document.getElementById('videoExportOverlayCancel'); if(overlayCancel)overlayCancel.disabled=true;
         if(this.videoShortsExportStream){this.videoShortsExportStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});this.videoShortsExportStream=null;}
         this._updateVideoShortsExportButtons();
         this.showToast('Video export cancelled.', 'info');
