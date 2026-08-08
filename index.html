@@ -6809,26 +6809,15 @@
       if(!AudioCtx) return null;
       await this._ensureVideoShortsPreviewAudio();
       const ctx=this.videoShortsAudioContext;
-
-      // IMPORTANT: MediaStreamDestination audio tracks cannot be restarted after
-      // their tracks are stopped. A previous export stops its temporary track,
-      // so reusing the same destination makes the next MP4 lose its audio stream
-      // and FFmpeg then fails. Create a fresh destination for every export.
-      const currentDest=this.videoShortsAudioDestination;
-      const hasLiveTrack=!!currentDest?.stream?.getAudioTracks?.().some(t=>t.readyState==='live');
-      if(!currentDest || !hasLiveTrack) {
-        this.videoShortsAudioDestination=ctx.createMediaStreamDestination();
-      }
-
+      if(!this.videoShortsAudioDestination) this.videoShortsAudioDestination=ctx.createMediaStreamDestination();
       if(!this.videoShortsAudioExportGain) {
         this.videoShortsAudioExportGain=ctx.createGain();
         this.videoShortsAudioExportGain.gain.value=1;
         this.videoShortsMediaSource.connect(this.videoShortsAudioExportGain);
       }
-
-      // Connect the persistent source/gain to the NEW temporary destination.
+      // Ensure the export gain is connected to the current MediaStreamDestination.
+      // This is safe to repeat and keeps subsequent Clip exports audible.
       try { this.videoShortsAudioExportGain.connect(this.videoShortsAudioDestination); } catch(e) {}
-
       return this.videoShortsAudioDestination.stream;
     }
 
@@ -6861,68 +6850,114 @@
     async _renderVideoShortRangeBlob(clip, format='webm') {
       const video=this.videoShortsVideo;
       const settings=this._videoShortsGetExportSettings(clip);
-      const start=clip.start, end=clip.end;
+      const start=Number(clip.start)||0, end=Number(clip.end)||0;
+      if(end<=start) throw new Error('Invalid clip range.');
+
       const ratio=this._videoShortsAspectRatio(settings.aspect);
       let h=settings.resolution, w=Math.round(h*ratio);
       if(settings.aspect==='16:9'){w=settings.resolution;h=Math.round(w/ratio);}
       if(settings.aspect==='1:1'){w=h=settings.resolution;}
       if(settings.aspect==='4:5'){w=Math.round(h*.8);}
-      const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+
+      // IMPORTANT:
+      // Export video only. The original audio file is NEVER routed through
+      // WebAudio/MediaRecorder. This avoids Opus/AAC intermediate compression,
+      // avoids the noisy audio, and also removes the audio-stream lifecycle
+      // problem that caused the second export to fail.
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
       const stream=canvas.captureStream(24);
-      let audioStream=null;
-      try { audioStream=await this._prepareVideoShortsAudioGraph(); } catch(e) {}
-      if(audioStream) audioStream.getAudioTracks().forEach(t=>stream.addTrack(t));
-      let mime = format==='mp4' ? this._videoShortsMp4Mime() : null;
-      if(!mime) mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(x=>MediaRecorder.isTypeSupported(x))||'';
-      if(!mime) throw new Error('No supported recording format.');
-      const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:settings.bitrate*1000000,audioBitsPerSecond:192000});
+
+      let mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
+        .find(x=>MediaRecorder.isTypeSupported(x))||'';
+      if(!mime) throw new Error('No supported video recording format.');
+
+      const recorder=new MediaRecorder(stream,{
+        mimeType:mime,
+        videoBitsPerSecond:settings.bitrate*1000000
+      });
       const chunks=[];
-      this.videoShortsExportRecorder=recorder; this.videoShortsExportStream=stream;
+      this.videoShortsExportRecorder=recorder;
+      this.videoShortsExportStream=stream;
+
       const old={rate:video.playbackRate,muted:video.muted};
-      video.pause(); video.playbackRate=settings.speed||1; video.muted=false;
+      video.pause();
+      video.playbackRate=1;
+      video.muted=true;
       this._videoShortsApplyExportSettings(settings);
-      const cleanup=()=>{try{video.pause();}catch(e){} video.playbackRate=old.rate; video.muted=old.muted;
-        // Keep the persistent MediaElementSource/preview graph alive.
-        // The export MediaStream is temporary: its tracks are stopped here and
-        // the next export will create a fresh MediaStreamDestination.
+
+      const cleanup=()=>{
+        try{video.pause();}catch(e){}
+        video.playbackRate=old.rate;
+        video.muted=old.muted;
         stream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});
-        if(this.videoShortsAudioDestination && !this.videoShortsAudioDestination.stream.getAudioTracks().some(t=>t.readyState==='live')){
-          this.videoShortsAudioDestination=null;
-        }
-        this.videoShortsExportStream=null; this.videoShortsExportRecorder=null;};
+        this.videoShortsExportStream=null;
+        this.videoShortsExportRecorder=null;
+      };
+
       return await new Promise(async (resolve,reject)=>{
         let done=false;
-        const finish=(err,blob)=>{if(done)return;done=true;cleanup();err?reject(err):resolve({blob,mime,width:w,height:h});};
-        recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
-        recorder.onerror=()=>finish(new Error('Recorder error'));
+        const finish=(err,blob)=>{
+          if(done)return;
+          done=true;
+          cleanup();
+          err?reject(err):resolve({blob,mime,width:w,height:h});
+        };
+
+        recorder.ondataavailable=e=>{
+          if(e.data&&e.data.size)chunks.push(e.data);
+        };
+        recorder.onerror=()=>finish(new Error('Video recorder error.'));
         recorder.onstop=()=>{
-          if(this.videoShortsExportCancelRequested){finish(new Error('CANCELLED'));return;}
+          if(this.videoShortsExportCancelRequested){
+            finish(new Error('CANCELLED'));
+            return;
+          }
           finish(null,new Blob(chunks,{type:mime}));
         };
-        try {
+
+        try{
           video.currentTime=start;
           await new Promise(resolveSeek=>{
             if(Math.abs((video.currentTime||0)-start)<.01){resolveSeek();return;}
             video.addEventListener('seeked',resolveSeek,{once:true});
           });
+
           recorder.start(250);
+
           const loop=()=>{
-            if(!this.videoShortsExporting){if(recorder.state!=='inactive')recorder.stop();return;}
+            if(!this.videoShortsExporting){
+              if(recorder.state!=='inactive')recorder.stop();
+              return;
+            }
+
             this.videoShortsRenderFrame(canvas);
+
             const pct=Math.max(0,Math.min(1,(video.currentTime-start)/(end-start)));
             const fill=document.getElementById('videoExportProgressFill');
-            if(fill) {
-              const scaled = this.videoShortsMp4Phase === 'render' ? pct * 55 : pct * 100;
+            if(fill){
+              const scaled=this.videoShortsMp4Phase==='render'?pct*55:pct*100;
               fill.style.width=scaled.toFixed(1)+'%';
             }
             const status=document.getElementById('videoExportStatus');
-            if(status && this.videoShortsMp4Phase === 'render') status.textContent=`Rendering video… ${(pct*100).toFixed(0)}%`;
-            if(video.currentTime>=end-.02){video.pause();if(recorder.state!=='inactive')recorder.stop();return;}
+            if(status&&this.videoShortsMp4Phase==='render'){
+              status.textContent=`Rendering video… ${(pct*100).toFixed(0)}%`;
+            }
+
+            if(video.currentTime>=end-.02){
+              video.pause();
+              if(recorder.state!=='inactive')recorder.stop();
+              return;
+            }
             this.videoShortsRenderRAF=requestAnimationFrame(loop);
           };
+
           this.videoShortsRenderRAF=requestAnimationFrame(loop);
           await video.play();
-        } catch(e){if(recorder.state!=='inactive')try{recorder.stop();}catch(_e){} finish(e);}
+        }catch(e){
+          if(recorder.state!=='inactive')try{recorder.stop();}catch(_e){}
+          finish(e);
+        }
       });
     }
 
@@ -7015,47 +7050,89 @@
       finally { this.videoShortsFfmpegLoading = null; }
     }
 
-    async _encodeVideoShortsWebmToMp4(webmBlob, label = 'clip') {
-      const ffmpeg = await this._loadVideoShortsFfmpeg();
-      if (this.videoShortsExportCancelRequested) throw new Error('CANCELLED');
-      const safe = label.replace(/[^a-z0-9_-]/gi, '_');
-      const inputName = `${safe}.webm`;
-      const outputName = `${safe}.mp4`;
-      try {
-        const fetchFile = window.FFmpeg?.fetchFile;
-        if (!fetchFile) throw new Error('FFmpeg file helper is unavailable.');
-        const inputData = await fetchFile(webmBlob);
-        ffmpeg.FS('writeFile', inputName, inputData);
-        if (this.videoShortsExportCancelRequested) throw new Error('CANCELLED');
+    async _encodeVideoShortsWebmToMp4(webmBlob, label='clip', clip=null) {
+      const ffmpeg=await this._loadVideoShortsFfmpeg();
+      if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
 
-        // The 0.11 browser build's documented transcode path.
+      if(!this.videoShortsSourceFile){
+        throw new Error('The original source file is no longer available. Please reselect the video.');
+      }
+
+      const safe=label.replace(/[^a-z0-9_-]/gi,'_');
+      const inputVideoName=`${safe}.webm`;
+      const sourceExt=(this.videoShortsSourceFile.name.match(/\.([a-z0-9]+)$/i)?.[1]||'bin').toLowerCase();
+      const sourceName=`original_audio_source.${sourceExt}`;
+      const outputName=`${safe}.mp4`;
+
+      const startTime=Math.max(0,Number(clip?.start)||0);
+      const duration=Math.max(0,(Number(clip?.end)||0)-startTime);
+      if(!duration)throw new Error('Invalid clip duration.');
+
+      try{
+        const fetchFile=window.FFmpeg?.fetchFile;
+        if(!fetchFile)throw new Error('FFmpeg file helper is unavailable.');
+
+        const renderedData=await fetchFile(webmBlob);
+        const sourceData=await fetchFile(this.videoShortsSourceFile);
+
+        ffmpeg.FS('writeFile',inputVideoName,renderedData);
+        ffmpeg.FS('writeFile',sourceName,sourceData);
+
+        if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+
+        // Audio policy:
+        // NEVER pass the original audio through WebAudio, MediaRecorder, Opus,
+        // AAC, resampling, gain, or any other processing.
+        //
+        // FFmpeg receives the original source as a separate input and copies
+        // its audio packets byte-for-byte into the final container.
+        //
+        // This means the audio codec is NOT changed. If that codec cannot be
+        // legally muxed into MP4 without conversion, we fail instead of secretly
+        // changing the user's audio.
+        const speed=Number(this.videoShortsSpeed||1);
+        if(Math.abs(speed-1)>0.0001){
+          throw new Error('Original audio can only be preserved exactly when Playback Speed is 1.00x.');
+        }
+
         await ffmpeg.run(
-          '-i', inputName,
-          '-c:v', 'libx264',
-          '-preset', 'ultrafast',
-          '-crf', '23',
-          '-pix_fmt', 'yuv420p',
-          '-c:a', 'aac',
-          '-b:a', '160k',
-          '-movflags', '+faststart',
+          '-i',inputVideoName,
+          '-ss',String(startTime),
+          '-t',String(duration),
+          '-i',sourceName,
+          '-map','0:v:0',
+          '-map','1:a:0?',
+          '-c:v','libx264',
+          '-preset','ultrafast',
+          '-crf','23',
+          '-pix_fmt','yuv420p',
+          '-c:a','copy',
+          '-movflags','+faststart',
           '-shortest',
           outputName
         );
 
-        if (this.videoShortsExportCancelRequested) throw new Error('CANCELLED');
-        const data = ffmpeg.FS('readFile', outputName);
-        const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
-        if (!bytes.byteLength) throw new Error('MP4 encoder returned an empty file.');
-        const signature = new TextDecoder().decode(bytes.slice(4, 8));
-        if (signature !== 'ftyp') throw new Error('The encoder did not produce a valid MP4 file.');
-        return new Blob([bytes], { type: 'video/mp4' });
-      } catch (e) {
-        if (e?.message === 'CANCELLED') throw e;
-        console.error('Sonvex MP4 encoding failed:', e);
-        throw new Error('MP4 encoding failed. Try a shorter clip or lower resolution.');
-      } finally {
-        try { ffmpeg.FS('unlink', inputName); } catch (e) {}
-        try { ffmpeg.FS('unlink', outputName); } catch (e) {}
+        if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+
+        const data=ffmpeg.FS('readFile',outputName);
+        const bytes=data instanceof Uint8Array?data:new Uint8Array(data);
+        if(!bytes.byteLength)throw new Error('MP4 encoder returned an empty file.');
+
+        const signature=new TextDecoder().decode(bytes.slice(4,8));
+        if(signature!=='ftyp')throw new Error('The encoder did not produce a valid MP4 file.');
+
+        return new Blob([bytes],{type:'video/mp4'});
+      }catch(e){
+        if(e?.message==='CANCELLED')throw e;
+        console.error('Sonvex MP4 encoding/muxing failed:',e);
+        throw new Error(
+          e?.message ||
+          'MP4 export failed. The original audio codec may not be compatible with MP4 without re-encoding.'
+        );
+      }finally{
+        try{ffmpeg.FS('unlink',inputVideoName);}catch(e){}
+        try{ffmpeg.FS('unlink',sourceName);}catch(e){}
+        try{ffmpeg.FS('unlink',outputName);}catch(e){}
       }
     }
 
@@ -7072,17 +7149,13 @@
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
         this.videoShortsMp4Phase='encode';
         if(status)status.textContent='Encoding MP4… 0%';
-        const mp4=await this._encodeVideoShortsWebmToMp4(rendered.blob,`sonvex-clip-${String(idx+1).padStart(2,'0')}`);
+        const mp4=await this._encodeVideoShortsWebmToMp4(rendered.blob,`sonvex-clip-${String(idx+1).padStart(2,'0')}`,this.videoShortsClips[idx]);
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
         const url=URL.createObjectURL(mp4);const a=document.createElement('a');a.href=url;a.download=`sonvex-clip-${String(idx+1).padStart(2,'0')}.mp4`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
-        if(fill)fill.style.width='100%';if(status)status.textContent='MP4 exported';this.showToast('Real H.264/AAC MP4 exported locally.', 'success');
+        if(fill)fill.style.width='100%';if(status)status.textContent='MP4 exported';this.showToast('MP4 exported. Original audio was copied without re-encoding.', 'success');
       }catch(e){
         if(e.message==='CANCELLED'){if(status)status.textContent='Export cancelled';if(fill)fill.style.width='0%';}
-        else {
-          console.error('MP4 export failed:', e);
-          if(status)status.textContent='MP4 export failed';
-          this.showToast(e.message||'MP4 export failed. Please try again.','error');
-        }
+        else {if(status)status.textContent='MP4 export failed';this.showToast(e.message||'MP4 export failed. Please try again.','error');}
       }
       this.videoShortsMp4Phase=null;
       this.videoShortsExporting=false;this.videoShortsExportRecorder=null;this.videoShortsExportStream=null;if(cancel)cancel.disabled=true;this._updateVideoShortsExportButtons();
