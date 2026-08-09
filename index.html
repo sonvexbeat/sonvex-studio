@@ -2032,9 +2032,24 @@
 
   <!-- Preview Waveform -->
         <div class="relative w-full h-20 bg-[#04040f]/70 rounded-xl overflow-hidden border border-purple-500/15 light:border-purple-200 flex items-center justify-center shadow-inner">
-          <canvas id="transposerWaveCanvas" class="w-full h-full"></canvas>
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <canvas id="transposerWaveCanvas"
+            class="w-full h-full cursor-crosshair"
+            onpointerdown="app.handleTransposerWavePointerDown(event)"
+            onpointermove="app.handleTransposerWavePointerMove(event)"
+            onpointerup="app.handleTransposerWavePointerUp(event)"
+            onpointercancel="app.handleTransposerWavePointerUp(event)"></canvas>
+          <div class="absolute inset-0 pointer-events-none">
             <div id="transposerProgressBar" class="absolute left-0 top-0 h-full bg-purple-500/10 transition-all duration-100" style="width:0%"></div>
+            <div id="transposerPlayhead"
+              class="absolute top-0 bottom-0 w-[2px] bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)] -translate-x-1/2"
+              style="left:0%">
+              <div class="absolute -top-0.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,1)]"></div>
+            </div>
+          </div>
+          <div class="absolute bottom-1.5 right-2 z-10 pointer-events-none px-2 py-0.5 rounded bg-black/50 border border-cyan-400/10 text-[9px] font-mono text-cyan-200">
+            <span id="transposerTimeCurrent">00:00</span>
+            <span class="text-indigo-400"> / </span>
+            <span id="transposerTimeTotal">00:00</span>
           </div>
         </div>
         <!-- Action Row -->
@@ -3033,6 +3048,7 @@
       this.transposerStartTime = 0;
       this.transposerPauseOffset = 0;
       this.transposerAnimFrame = null;
+      this.transposerWaveDragging = false;
 
       // Lyric Studio state
       this.lyricLines = [];
@@ -4448,8 +4464,8 @@
       const canvas = document.getElementById('transposerWaveCanvas');
       if (!canvas || !this.transposerBuffer) return;
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = canvas.offsetWidth * dpr;
-      canvas.height = canvas.offsetHeight * dpr;
+      canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * dpr));
+      canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * dpr));
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const data = this.transposerBuffer.getChannelData(0);
@@ -4477,6 +4493,76 @@
         ctx.lineTo(i, y2);
       }
       ctx.stroke();
+
+      const total = this.transposerBuffer.duration || 0;
+      const totalEl = document.getElementById('transposerTimeTotal');
+      if (totalEl) totalEl.textContent = this.formatTransposerTime(total);
+      this.updateTransposerPlayhead(this.transposerPauseOffset || 0);
+    }
+
+    formatTransposerTime(seconds) {
+      seconds = Math.max(0, Number(seconds) || 0);
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+    }
+
+    updateTransposerPlayhead(seconds) {
+      if (!this.transposerBuffer) return;
+      const duration = this.transposerBuffer.duration || 0;
+      const pct = duration ? Math.max(0, Math.min(100, (seconds / duration) * 100)) : 0;
+      const head = document.getElementById('transposerPlayhead');
+      const bar = document.getElementById('transposerProgressBar');
+      const current = document.getElementById('transposerTimeCurrent');
+      if (head) head.style.left = pct + '%';
+      if (bar) bar.style.width = pct + '%';
+      if (current) current.textContent = this.formatTransposerTime(seconds);
+    }
+
+    _transposerWaveTimeFromPointer(event) {
+      const canvas = document.getElementById('transposerWaveCanvas');
+      if (!canvas || !this.transposerBuffer) return 0;
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+      return (x / rect.width) * this.transposerBuffer.duration;
+    }
+
+    seekTransposerTo(seconds, resumeIfPlaying = false) {
+      if (!this.transposerBuffer) return;
+      const duration = this.transposerBuffer.duration || 0;
+      const target = Math.max(0, Math.min(duration, Number(seconds) || 0));
+      const wasPlaying = !!this.transposerIsPlaying;
+
+      if (wasPlaying) this.stopTransposerPlayback();
+      this.transposerPauseOffset = target;
+      this.updateTransposerPlayhead(target);
+
+      if (wasPlaying || resumeIfPlaying) {
+        this.startTransposerPlayback();
+      }
+    }
+
+    handleTransposerWavePointerDown(event) {
+      if (!this.transposerBuffer) return;
+      this.transposerWaveDragging = true;
+      const canvas = document.getElementById('transposerWaveCanvas');
+      if (canvas && canvas.setPointerCapture) {
+        try { canvas.setPointerCapture(event.pointerId); } catch (_) {}
+      }
+      this.seekTransposerTo(this._transposerWaveTimeFromPointer(event), false);
+    }
+
+    handleTransposerWavePointerMove(event) {
+      if (!this.transposerWaveDragging || !this.transposerBuffer) return;
+      this.seekTransposerTo(this._transposerWaveTimeFromPointer(event), false);
+    }
+
+    handleTransposerWavePointerUp(event) {
+      this.transposerWaveDragging = false;
+      const canvas = document.getElementById('transposerWaveCanvas');
+      if (canvas && canvas.releasePointerCapture) {
+        try { canvas.releasePointerCapture(event.pointerId); } catch (_) {}
+      }
     }
 
     setSemitones(val) {
@@ -4601,8 +4687,7 @@
           this.transposerPauseOffset = 0;
           const icon = document.getElementById('transposerPlayIcon');
           if (icon) icon.className = 'fa-solid fa-circle-play text-purple-400 text-sm';
-          const bar = document.getElementById('transposerProgressBar');
-          if (bar) bar.style.width = '0%';
+          this.updateTransposerPlayhead(0);
           cancelAnimationFrame(this.transposerAnimFrame);
         }
       };
@@ -4610,9 +4695,8 @@
       const animate = () => {
         if (!this.transposerIsPlaying) return;
         const elapsed = (this.transposerCtx.currentTime - this.transposerStartTime) * this.transposerSpeed;
-        const pct = Math.min(100, (elapsed / this.transposerBuffer.duration) * 100);
-        const bar = document.getElementById('transposerProgressBar');
-        if (bar) bar.style.width = pct + '%';
+        const elapsedClamped = Math.min(this.transposerBuffer.duration, Math.max(0, elapsed));
+        this.updateTransposerPlayhead(elapsedClamped);
         this.transposerAnimFrame = requestAnimationFrame(animate);
       };
 
@@ -4704,7 +4788,8 @@
       document.getElementById('transposerContent').classList.add('hidden');
       document.getElementById('transposerPlaceholder').classList.remove('hidden');
       document.getElementById('transposerOutputBar').classList.add('hidden');
-      document.getElementById('transposerProgressBar').style.width = '0%';
+      this.transposerWaveDragging = false;
+      this.updateTransposerPlayhead(0);
 
       const canvas = document.getElementById('transposerWaveCanvas');
       if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
