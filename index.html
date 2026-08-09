@@ -6911,11 +6911,10 @@
     }
 
     async _renderVideoShortRangeBlob(clip, format='webm') {
-      // Stable video renderer: use a dedicated video element and
-      // requestVideoFrameCallback so every canvas frame is drawn only after
-      // the decoder has actually presented that frame. This avoids the
-      // "moving progress bar / frozen picture" problem caused by drawing
-      // immediately after a seek.
+      // Stable continuous renderer:
+      // seek once to the exact IN point, then PLAY and draw only frames that
+      // the decoder actually presents. This avoids repeated seek timeouts and
+      // avoids the frozen-canvas problem caused by drawing stale frames.
       const sourceFile=this.videoShortsSourceFile;
       if(!sourceFile) throw new Error('Original source file is unavailable.');
       const settings=this._videoShortsGetExportSettings(clip);
@@ -6957,7 +6956,12 @@
       this.videoShortsExportStream=stream;
 
       let ended=false;
+      let frameCallbackId=null;
+      let stopTimer=null;
+
       const cleanup=()=>{
+        try{if(frameCallbackId!=null && v.cancelVideoFrameCallback)v.cancelVideoFrameCallback(frameCallbackId);}catch(e){}
+        try{if(stopTimer)clearTimeout(stopTimer);}catch(e){}
         try{v.pause();}catch(e){}
         try{v.removeAttribute('src');v.load();v.remove();}catch(e){}
         try{URL.revokeObjectURL(srcUrl);}catch(e){}
@@ -6966,47 +6970,36 @@
         this.videoShortsExportStream=null;
       };
 
-      const waitLoaded=()=>new Promise((resolve,reject)=>{
-        if(v.readyState>=2)return resolve();
-        let timer=setTimeout(()=>{cleanupListeners();reject(new Error('Source video load timed out.'));},20000);
+      const waitMetadata=()=>new Promise((resolve,reject)=>{
+        if(v.readyState>=1)return resolve();
+        let timer=setTimeout(()=>{cleanupListeners();reject(new Error('Source video metadata timed out.'));},20000);
         const ok=()=>{cleanupListeners();resolve();};
         const bad=()=>{cleanupListeners();reject(new Error('Source video could not be loaded.'));};
         const cleanupListeners=()=>{
           clearTimeout(timer);
-          v.removeEventListener('loadeddata',ok);
+          v.removeEventListener('loadedmetadata',ok);
           v.removeEventListener('error',bad);
         };
-        v.addEventListener('loadeddata',ok,{once:true});
+        v.addEventListener('loadedmetadata',ok,{once:true});
         v.addEventListener('error',bad,{once:true});
       });
 
-      const seekAndWaitFrame=(time)=>new Promise((resolve,reject)=>{
+      const seekExact=()=>new Promise((resolve,reject)=>{
         let done=false;
-        let timer=setTimeout(()=>finish(new Error('Video frame seek timed out.')),20000);
         const finish=(err)=>{
           if(done)return;
-          done=true;
-          clearTimeout(timer);
-          v.removeEventListener('seeked',onSeeked);
-          v.removeEventListener('error',onError);
+          done=true;clearTimeout(timer);
+          v.removeEventListener('seeked',ok);v.removeEventListener('error',bad);
           err?reject(err):resolve();
         };
-        const onError=()=>finish(new Error('Source video seek failed.'));
-        const onFrame=()=>finish();
-        const onSeeked=()=>{
-          // seeked means the timeline moved, not necessarily that a decoded
-          // frame has been painted. Wait for the decoder to present it.
-          if(typeof v.requestVideoFrameCallback==='function'){
-            v.requestVideoFrameCallback(onFrame);
-          }else{
-            requestAnimationFrame(()=>requestAnimationFrame(onFrame));
-          }
-        };
-        v.addEventListener('seeked',onSeeked,{once:true});
-        v.addEventListener('error',onError,{once:true});
+        const ok=()=>finish();
+        const bad=()=>finish(new Error('Source video seek failed.'));
+        const timer=setTimeout(()=>finish(new Error('Could not seek to the selected IN point.')),20000);
+        v.addEventListener('seeked',ok,{once:true});
+        v.addEventListener('error',bad,{once:true});
         try{
-          v.currentTime=Math.min(Math.max(0,time),Math.max(0,(v.duration||time)-0.001));
-          if(Math.abs((v.currentTime||0)-time)<0.001)onSeeked();
+          v.currentTime=Math.min(startTime,Math.max(0,(v.duration||startTime)-0.001));
+          if(Math.abs((v.currentTime||0)-startTime)<0.01)finish();
         }catch(e){finish(e);}
       });
 
@@ -7026,44 +7019,72 @@
         };
 
         try{
-          await waitLoaded();
+          await waitMetadata();
+          await seekExact();
 
-          // Draw one guaranteed first frame at the exact IN point before
-          // starting the recorder, so the first encoded frame is not stale.
-          await seekAndWaitFrame(startTime);
           this._videoShortsApplyExportSettings(settings);
           this.videoShortsRenderFrame(canvas,v);
           await new Promise(r=>setTimeout(r,30));
 
-          const fps=24;
-          const total=Math.max(1,Math.ceil(duration*fps));
           recorder.start(250);
 
-          for(let i=0;i<total;i++){
-            if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+          const renderFrame=(now,metadata)=>{
+            if(ended)return;
 
-            const target=startTime+Math.min(duration-0.001,i/fps);
-            await seekAndWaitFrame(target);
-
-            this._videoShortsApplyExportSettings(settings);
-            this.videoShortsRenderFrame(canvas,v);
-
-            // Give captureStream/MediaRecorder a real browser turn after the
-            // decoded frame has been painted.
-            await new Promise(r=>setTimeout(r,12));
-
-            const pct=(i+1)/total;
-            const fill=document.getElementById('videoExportProgressFill');
-            if(fill){
-              fill.style.width=((this.videoShortsMp4Phase==='render'?pct*.55:pct)*100).toFixed(1)+'%';
+            if(this.videoShortsExportCancelRequested){
+              try{v.pause();}catch(e){}
+              if(recorder.state!=='inactive')recorder.stop();
+              else finish(new Error('CANCELLED'));
+              return;
             }
-            const status=document.getElementById('videoExportStatus');
-            if(status&&this.videoShortsMp4Phase==='render'){
-              status.textContent=`Rendering video… ${(pct*100).toFixed(0)}%`;
+
+            const current=Number(v.currentTime)||startTime;
+
+            // Only draw decoded/presented frames inside IN/OUT.
+            if(current>=startTime-0.02 && current<endTime){
+              this._videoShortsApplyExportSettings(settings);
+              this.videoShortsRenderFrame(canvas,v);
+
+              const pct=Math.max(0,Math.min(1,(current-startTime)/duration));
+              const fill=document.getElementById('videoExportProgressFill');
+              if(fill)fill.style.width=((this.videoShortsMp4Phase==='render'?pct*.55:pct)*100).toFixed(1)+'%';
+              const status=document.getElementById('videoExportStatus');
+              if(status&&this.videoShortsMp4Phase==='render'){
+                status.textContent=`Rendering video… ${(pct*100).toFixed(0)}%`;
+              }
             }
+
+            if(current>=endTime-0.02){
+              try{v.pause();}catch(e){}
+              if(recorder.state!=='inactive')recorder.stop();
+              return;
+            }
+
+            if(typeof v.requestVideoFrameCallback==='function'){
+              frameCallbackId=v.requestVideoFrameCallback(renderFrame);
+            }else{
+              frameCallbackId=requestAnimationFrame(()=>renderFrame(performance.now(),null));
+            }
+          };
+
+          if(typeof v.requestVideoFrameCallback==='function'){
+            frameCallbackId=v.requestVideoFrameCallback(renderFrame);
+          }else{
+            frameCallbackId=requestAnimationFrame(()=>renderFrame(performance.now(),null));
           }
 
-          if(recorder.state!=='inactive')recorder.stop();
+          await v.play();
+
+          // Safety timeout: if the media decoder stops progressing, fail with
+          // a useful message instead of hanging the page indefinitely.
+          stopTimer=setTimeout(()=>{
+            if(!ended){
+              try{v.pause();}catch(e){}
+              if(recorder.state!=='inactive')try{recorder.stop();}catch(e){}
+              finish(new Error('Video playback stopped responding during rendering.'));
+            }
+          },Math.max(30000,(duration*1000)+30000));
+
         }catch(err){
           if(recorder.state!=='inactive')try{recorder.stop();}catch(e){}
           finish(err);
