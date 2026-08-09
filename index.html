@@ -2709,43 +2709,31 @@
       </div>
 
       <div class="video-panel">
-        <div class="video-panel-title"><span><i class="fa-solid fa-crop-simple text-emerald-400 mr-1"></i> Canvas</span></div>
-        <label class="video-field-label">Aspect Ratio <strong id="videoAspectValue">9:16</strong></label>
+        <div class="video-panel-title"><span><i class="fa-solid fa-crop-simple text-emerald-400 mr-1"></i> Output</span></div>
+        <label class="video-field-label">Output Format <strong id="videoAspectValue">9:16</strong></label>
         <select id="videoAspectSelect" onchange="app.videoShortsSetAspect(this.value)">
-          <option value="9:16">9:16 — Shorts / Reels / TikTok</option>
-          <option value="16:9">16:9 — YouTube</option>
-          <option value="1:1">1:1 — Square</option>
-          <option value="4:5">4:5 — Social</option>
+          <option value="9:16">Short 9:16</option>
+          <option value="original">Original</option>
         </select>
-        <div class="grid grid-cols-2 gap-2 mt-3">
-          <button class="video-studio-btn" onclick="app.videoShortsFitMode='cover';app.videoShortsRenderFrame()">Cover</button>
-          <button class="video-studio-btn" onclick="app.videoShortsFitMode='contain';app.videoShortsRenderFrame()">Contain</button>
+        <div id="videoShortPositionPanel" class="mt-3">
+          <label class="video-field-label">Position X <strong id="videoPosXValue">0%</strong></label>
+          <input id="videoPosXRange" type="range" min="-100" max="100" step="1" value="0"
+                 oninput="app.videoShortsPosX=this.value/100;document.getElementById('videoPosXValue').textContent=this.value+'%';app.videoShortsRenderFrame()">
+          <p class="text-[9px] text-slate-500 mt-2 leading-relaxed">For landscape videos, move the frame left or right to choose what appears in the Short.</p>
         </div>
       </div>
 
       <div class="video-panel">
-        <div class="video-panel-title"><span><i class="fa-solid fa-wand-magic-sparkles text-purple-400 mr-1"></i> Effects</span></div>
-        <label class="video-field-label">Zoom <strong id="videoZoomValue">100%</strong></label>
-        <input id="videoZoomRange" type="range" min="100" max="250" step="1" value="100" oninput="app.videoShortsZoom=this.value/100;document.getElementById('videoZoomValue').textContent=this.value+'%';app.videoShortsRenderFrame()">
-        <label class="video-field-label mt-3">Position X <strong id="videoPosXValue">0%</strong></label>
-        <input type="range" min="-100" max="100" step="1" value="0" oninput="app.videoShortsPosX=this.value/100;document.getElementById('videoPosXValue').textContent=this.value+'%';app.videoShortsRenderFrame()">
-        <label class="video-field-label mt-3">Position Y <strong id="videoPosYValue">0%</strong></label>
-        <input type="range" min="-100" max="100" step="1" value="0" oninput="app.videoShortsPosY=this.value/100;document.getElementById('videoPosYValue').textContent=this.value+'%';app.videoShortsRenderFrame()">
-        <label class="video-field-label mt-3">Brightness <strong id="videoBrightnessValue">100%</strong></label>
-        <input type="range" min="50" max="150" step="1" value="100" oninput="app.videoShortsBrightness=this.value/100;document.getElementById('videoBrightnessValue').textContent=this.value+'%';app.videoShortsRenderFrame()">
-        <label class="video-field-label mt-3">Blur <strong id="videoBlurValue">0px</strong></label>
-        <input type="range" min="0" max="18" step="1" value="0" oninput="app.videoShortsBlur=parseFloat(this.value);document.getElementById('videoBlurValue').textContent=this.value+'px';app.videoShortsRenderFrame()">
+        <div class="video-panel-title"><span><i class="fa-solid fa-list text-indigo-400 mr-1"></i> Clips</span><span id="videoClipCount" class="text-[9px] text-slate-500">0</span></div>
+        <div id="videoClipList" class="video-clip-list"></div>
+        <p class="text-[9px] text-slate-500 mt-2 leading-relaxed">Set IN / OUT, then click the scissors. Use the small download button on the clip or the main Export MP4 button below.</p>
       </div>
 
       <div class="video-panel">
-        <div class="video-panel-title"><span><i class="fa-solid fa-font text-cyan-400 mr-1"></i> Text Overlay</span></div>
-        <input id="videoOverlayText" type="text" placeholder="Add a title / hook..." oninput="app.videoShortsOverlayText=this.value;app.videoShortsRenderFrame()">
-        <div class="grid grid-cols-2 gap-2 mt-2">
-          <input id="videoOverlaySize" type="range" min="16" max="96" value="42" oninput="app.videoShortsOverlaySize=parseInt(this.value);app.videoShortsRenderFrame()" title="Text size">
-          <select id="videoOverlayPosition" onchange="app.videoShortsOverlayPosition=this.value;app.videoShortsRenderFrame()">
-            <option value="top">Top</option><option value="center" selected>Center</option><option value="bottom">Bottom</option>
-          </select>
-        </div>
+        <div class="video-panel-title"><span><i class="fa-solid fa-file-video text-emerald-400 mr-1"></i> Export</span></div>
+        <p class="text-[9px] text-slate-500 leading-relaxed">
+          The output keeps the source video's resolution. <b>Original</b> aims for a direct trim/remux with no video or audio re-encode. <b>Short 9:16</b> crops the landscape frame while keeping the source height. Audio is never processed by Sonvex.
+        </p>
       </div>
 
       <div class="video-panel">
@@ -2759,25 +2747,6 @@
         <p class="text-[9px] text-slate-500 mt-2 leading-relaxed">The first version uses a fast local heuristic to choose a compact section. AI scene / speech analysis can be added later without changing the editor.</p>
       </div>
 
-      <div class="video-panel">
-        <div class="video-panel-title"><span><i class="fa-solid fa-list text-indigo-400 mr-1"></i> Clips</span><span id="videoClipCount" class="text-[9px] text-slate-500">0</span></div>
-        <div id="videoClipList" class="video-clip-list"></div>
-        <p class="text-[9px] text-slate-500 mt-2 leading-relaxed">One clip at a time. Set IN / OUT, then click the scissors. Use the small download button on the clip or the main Export MP4 button below.</p>
-      </div>
-
-      <div class="video-panel">
-        <div class="video-panel-title"><span><i class="fa-solid fa-file-video text-emerald-400 mr-1"></i> Export</span></div>
-        <label class="video-field-label">Resolution <strong id="videoResolutionValue">1080p</strong></label>
-        <select id="videoResolutionSelect" onchange="app.videoShortsUpdateResolutionLabel()">
-          <option value="2160">4K — 2160p</option>
-          <option value="1440">1440p</option>
-          <option value="1080" selected>1080p</option>
-          <option value="720">720p</option>
-        </select>
-        <label class="video-field-label mt-3">Export Quality <strong id="videoBitrateValue">18 Mbps</strong></label>
-        <input id="videoBitrateRange" type="range" min="8" max="45" step="1" value="18" oninput="app.videoShortsUpdateBitrateSetting(this.value)">
-        <p class="text-[9px] text-slate-500 mt-2">MP4 is rendered locally in your browser as a real H.264/AAC MP4. Default export is 1080p; 1440p and 4K are available when needed.</p>
-      </div>
     </aside>
   </div>
 </div>
@@ -6598,95 +6567,58 @@
     }
 
     videoShortsSetAspect(value) {
-      this.videoShortsAspect = value;
-      const label=document.getElementById('videoAspectValue'); if(label) label.textContent=value;
+      this.videoShortsAspect = value === 'original' ? 'original' : '9:16';
+      const label=document.getElementById('videoAspectValue');
+      if(label) label.textContent=this.videoShortsAspect==='original' ? 'Original' : '9:16';
+      const posPanel=document.getElementById('videoShortPositionPanel');
+      if(posPanel) posPanel.style.display=this.videoShortsAspect==='original' ? 'none' : '';
       this.videoShortsRenderFrame();
     }
 
-    videoShortsUpdateResolutionLabel() {
-      const sel=document.getElementById('videoResolutionSelect');
-      const out=document.getElementById('videoResolutionValue');
-      if(sel && out) out.textContent=sel.value==='2160'?'4K':`${sel.value}p`;
-      const clip=this.videoShortsClips[this.videoShortsActiveClipIndex];
-      if(clip) { clip.settings = clip.settings || {}; clip.settings.resolution=parseInt(sel?.value || '1080',10); }
-    }
-
-    videoShortsUpdateBitrateSetting(value) {
-      const br=document.getElementById('videoBitrateValue');
-      if(br) br.textContent=`${value} Mbps`;
-      const clip=this.videoShortsClips[this.videoShortsActiveClipIndex];
-      if(clip) { clip.settings = clip.settings || {}; clip.settings.bitrate=parseInt(value || '18',10); }
-    }
+    videoShortsUpdateResolutionLabel() {}
+    videoShortsUpdateBitrateSetting() {}
 
     videoShortsRenderFrame(targetCanvas, sourceVideo) {
-      // When exporting, use the dedicated export video element. The previous
-      // exporter passed that element as a second argument, but this method
-      // ignored it and always drew the preview video. That caused a frozen
-      // picture and made the exported frame unrelated to the export timeline.
       const video=sourceVideo || this.videoShortsVideo;
       const canvas=targetCanvas || document.getElementById('videoShortsCanvas');
       if(!canvas) return;
-      const ratio=this._videoShortsAspectRatio(this.videoShortsAspect);
-      let outW=720, outH=Math.round(outW/ratio);
-      if(this.videoShortsAspect==='9:16'){outW=540;outH=960;}
-      if(this.videoShortsAspect==='16:9'){outW=960;outH=540;}
-      if(this.videoShortsAspect==='1:1'){outW=720;outH=720;}
-      if(this.videoShortsAspect==='4:5'){outW=720;outH=900;}
-      if(targetCanvas && targetCanvas.dataset.exportWidth) { outW=parseInt(targetCanvas.dataset.exportWidth,10); outH=parseInt(targetCanvas.dataset.exportHeight,10); }
+
+      const isOriginal=this.videoShortsAspect==='original';
+      const vw=video?.videoWidth||0, vh=video?.videoHeight||0;
+
+      let outW=540, outH=960;
+      if(isOriginal && vw && vh){ outW=vw; outH=vh; }
+      if(targetCanvas && targetCanvas.dataset.exportWidth){
+        outW=parseInt(targetCanvas.dataset.exportWidth,10);
+        outH=parseInt(targetCanvas.dataset.exportHeight,10);
+      }
+
       canvas.width=outW; canvas.height=outH;
       const ctx=canvas.getContext('2d');
-      ctx.fillStyle='#000';ctx.fillRect(0,0,outW,outH);
+      ctx.fillStyle='#000'; ctx.fillRect(0,0,outW,outH);
       if(!video || !this.videoShortsDuration) return;
-      if(!video.videoWidth || !video.videoHeight) {
-        // Audio-only input: render a lightweight visualizer/background so an uploaded song
-        // can still become a vertical Short instead of exporting a black frame.
-        const t = Number(video.currentTime || 0);
-        const grad = ctx.createLinearGradient(0, 0, outW, outH);
-        grad.addColorStop(0, '#070a24');
-        grad.addColorStop(.5, '#10154a');
-        grad.addColorStop(1, '#050611');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, outW, outH);
-        const bars = 42;
-        const barW = outW / (bars * 1.65);
-        for (let i = 0; i < bars; i++) {
-          const wave = Math.abs(Math.sin(t * 4.7 + i * .47) * .55 + Math.sin(t * 2.1 + i * .19) * .3);
-          const h = Math.max(10, wave * outH * .32);
-          const x = (i + .32) * (outW / bars);
-          ctx.fillStyle = i % 3 === 0 ? '#00ffcc' : '#06b6d4';
-          ctx.globalAlpha = .45 + wave * .45;
-          ctx.fillRect(x, (outH - h) / 2, barW, h);
-        }
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = 'rgba(255,255,255,.88)';
-        ctx.font = '800 22px Outfit, Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('SONVEX AUDIO SHORT', outW / 2, outH * .15);
-      } else {
-      const vw=video.videoWidth, vh=video.videoHeight;
-      const scale=this.videoShortsFitMode==='contain' ? Math.min(outW/vw,outH/vh) : Math.max(outW/vw,outH/vh);
-      const dw=vw*scale*this.videoShortsZoom, dh=vh*scale*this.videoShortsZoom;
-      const dx=(outW-dw)/2 + this.videoShortsPosX*outW*.5;
-      const dy=(outH-dh)/2 + this.videoShortsPosY*outH*.5;
+
+      if(!vw || !vh) return;
+
       ctx.save();
-      ctx.filter=`brightness(${this.videoShortsBrightness}) blur(${this.videoShortsBlur}px)`;
-      ctx.drawImage(video,dx,dy,dw,dh);
+      if(isOriginal){
+        ctx.drawImage(video,0,0,outW,outH);
+      }else{
+        // Preview the exact same 9:16 crop that export will use.
+        const cropH=vh;
+        const cropW=Math.max(2,Math.floor((cropH*9/16)/2)*2);
+        const maxLeft=Math.max(0,vw-cropW);
+        const left=Math.round((maxLeft/2) + (this.videoShortsPosX||0)*(maxLeft/2));
+        ctx.drawImage(video,left,0,cropW,cropH,0,0,outW,outH);
+      }
       ctx.restore();
-      }
-      if(this.videoShortsOverlayText){
-        const size=Math.max(12,Number(this.videoShortsOverlaySize)||42);
-        ctx.save();ctx.font=`900 ${size}px Outfit, Arial, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-        const y=this.videoShortsOverlayPosition==='top'?size*1.4:this.videoShortsOverlayPosition==='bottom'?outH-size*1.6:outH/2;
-        const maxW=outW*.86; let text=this.videoShortsOverlayText;
-        while(ctx.measureText(text).width>maxW && text.length>4) text=text.slice(0,-1);
-        ctx.lineWidth=Math.max(4,size*.12);ctx.strokeStyle='rgba(0,0,0,.78)';ctx.strokeText(text,outW/2,y);ctx.fillStyle='#fff';ctx.fillText(text,outW/2,y);ctx.restore();
-      }
+
       const hint=document.getElementById('videoPreviewHint');
       if(hint) hint.style.display=this.videoShortsDuration?'none':'block';
-      if(!targetCanvas) {
-        this._updateVideoShortsTimeDisplay();
-        if(!this.videoShortsExporting) this._renderVideoShortsTimeline();
-      }
+    }
+
+    _videoShortsAspectRatio(aspect) {
+      return aspect==='original' ? ((this.videoShortsVideo?.videoWidth||16)/(this.videoShortsVideo?.videoHeight||9)) : 9/16;
     }
 
     _videoShortsAspectRatio(aspect) {
@@ -6719,21 +6651,7 @@
         end,
         id: Date.now() + Math.random(),
         name: 'Clip 1',
-        settings: {
-          aspect: this.videoShortsAspect,
-          resolution: parseInt(document.getElementById('videoResolutionSelect')?.value || '1080', 10),
-          bitrate: parseInt(document.getElementById('videoBitrateRange')?.value || '18', 10),
-          zoom: this.videoShortsZoom,
-          posX: this.videoShortsPosX,
-          posY: this.videoShortsPosY,
-          brightness: this.videoShortsBrightness,
-          blur: this.videoShortsBlur,
-          fitMode: this.videoShortsFitMode,
-          overlayText: this.videoShortsOverlayText,
-          overlaySize: this.videoShortsOverlaySize,
-          overlayPosition: this.videoShortsOverlayPosition,
-          speed: this.videoShortsSpeed
-        }
+        settings:{aspect:this.videoShortsAspect,posX:this.videoShortsPosX}
       };
       // Video Studio intentionally supports one committed clip only.
       // Creating a new clip replaces the previous clip instead of creating Clip 2, Clip 3, etc.
@@ -6789,40 +6707,19 @@
     }
 
     _syncVideoShortsControlsFromState(st = {}) {
-      const setVal=(id,val)=>{const el=document.getElementById(id);if(el && val!==undefined) el.value=val;};
-      setVal('videoAspectSelect',this.videoShortsAspect);
-      setVal('videoZoomRange',Math.round(this.videoShortsZoom*100));
-      setVal('videoOverlayText',this.videoShortsOverlayText);
-      setVal('videoOverlaySize',this.videoShortsOverlaySize);
-      setVal('videoOverlayPosition',this.videoShortsOverlayPosition);
-      setVal('videoSpeedRange',this.videoShortsSpeed);
-      if(st.resolution) setVal('videoResolutionSelect',st.resolution);
-      if(st.bitrate) setVal('videoBitrateRange',st.bitrate);
-      const ids={
-        videoZoomValue:Math.round(this.videoShortsZoom*100)+'%',
-        videoAspectValue:this.videoShortsAspect,
-        videoOverlayText:this.videoShortsOverlayText,
-        videoOverlaySize:this.videoShortsOverlaySize,
-        videoSpeedValue:(this.videoShortsSpeed||1).toFixed(2)+'x',
-        videoBrightnessValue:Math.round(this.videoShortsBrightness*100)+'%',
-        videoBlurValue:(this.videoShortsBlur||0)+'px'
-      };
-      Object.entries(ids).forEach(([id,val])=>{const el=document.getElementById(id);if(el && id!=='videoOverlayText') el.textContent=val;});
-      const res=document.getElementById('videoResolutionValue');
-      if(res) res.textContent=String(st.resolution||document.getElementById('videoResolutionSelect')?.value||1080)==='2160'?'4K':`${st.resolution||document.getElementById('videoResolutionSelect')?.value||1080}p`;
-      const br=document.getElementById('videoBitrateValue');
-      if(br) br.textContent=`${st.bitrate||document.getElementById('videoBitrateRange')?.value||18} Mbps`;
-    }
-
-    _updateVideoShortsExportButtons() {
-      const hasMedia=!!(this.videoShortsVideo && this.videoShortsDuration);
-      const selected=this.videoShortsActiveClipIndex>=0 && !!this.videoShortsClips[this.videoShortsActiveClipIndex];
-      const b=document.getElementById('videoExportBtn'); if(b) b.disabled=!hasMedia||!selected||this.videoShortsExporting;
-      const cancel=document.getElementById('videoExportCancelBtn'); if(cancel) cancel.disabled=!this.videoShortsExporting;
-    }
-
-    _videoShortsMp4Mime() {
-      return 'video/mp4';
+      const aspect=st.aspect==='original' ? 'original' : '9:16';
+      this.videoShortsAspect=aspect;
+      this.videoShortsPosX=Number(st.posX)||0;
+      const aspectSel=document.getElementById('videoAspectSelect');
+      if(aspectSel) aspectSel.value=aspect;
+      const aspectValue=document.getElementById('videoAspectValue');
+      if(aspectValue) aspectValue.textContent=aspect==='original'?'Original':'9:16';
+      const pos=document.getElementById('videoPosXRange');
+      if(pos) pos.value=String(Math.round(this.videoShortsPosX*100));
+      const posLabel=document.getElementById('videoPosXValue');
+      if(posLabel) posLabel.textContent=Math.round(this.videoShortsPosX*100)+'%';
+      const posPanel=document.getElementById('videoShortPositionPanel');
+      if(posPanel) posPanel.style.display=aspect==='original'?'none':'';
     }
 
     _renderVideoShortsClipList() {
@@ -6906,13 +6803,11 @@
       this.videoShortsStart=0; this.videoShortsEnd=Math.min(30,this.videoShortsDuration||0); this.videoShortsSelectionActive=true;
       this.videoShortsSourceFile = this.videoShortsSourceFile;
       this.videoShortsCloudUid = null; this.videoShortsTusUpload = null; this.videoShortsCloudCancelRequested = false; this.videoShortsCloudCreatedUids = []; this.videoShortsZoom=1;this.videoShortsPosX=0;this.videoShortsPosY=0;this.videoShortsBrightness=1;this.videoShortsBlur=0;this.videoShortsOverlayText='';this.videoShortsSpeed=1;this.videoShortsAspect='9:16';this.videoShortsClips=[];this.videoShortsActiveClipIndex=-1;this.videoShortsTimelineZoom=1;
-      const ids={videoZoomRange:100,videoOverlayText:'',videoSpeedRange:1}; Object.entries(ids).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
-      const sel=document.getElementById('videoAspectSelect');if(sel)sel.value='9:16';
-      const resolutionSel=document.getElementById('videoResolutionSelect');
-      if(resolutionSel){ resolutionSel.value='1080'; this.videoShortsUpdateResolutionLabel(); }
-      const z=document.getElementById('videoZoomValue');if(z)z.textContent='100%';
-      const a=document.getElementById('videoAspectValue');if(a)a.textContent='9:16';
-      this._renderVideoShortsClipList();this._renderVideoShortsTimeline();this.videoShortsRenderFrame();this._updateVideoShortsExportButtons();
+       const pos=document.getElementById('videoPosXRange');if(pos)pos.value='0';
+       const posLabel=document.getElementById('videoPosXValue');if(posLabel)posLabel.textContent='0%';
+       this.videoShortsPosX=0;
+       this.videoShortsSetAspect('9:16');
+       this._renderVideoShortsClipList();this._renderVideoShortsTimeline();this.videoShortsRenderFrame();this._updateVideoShortsExportButtons();
     }
 
     async _prepareVideoShortsAudioGraph() {
@@ -6935,29 +6830,17 @@
     }
 
     _videoShortsGetExportSettings(clip = null) {
-      // Single-clip editor: the live Export controls are always the source of truth.
-      // This prevents the small Download button from restoring an old 1080p/default value.
       return {
         aspect: this.videoShortsAspect,
-        resolution: parseInt(document.getElementById('videoResolutionSelect')?.value || '1080', 10),
-        bitrate: parseInt(document.getElementById('videoBitrateRange')?.value || '18', 10),
-        zoom: this.videoShortsZoom,
-        posX: this.videoShortsPosX,
-        posY: this.videoShortsPosY,
-        brightness: this.videoShortsBrightness,
-        blur: this.videoShortsBlur,
-        fitMode: this.videoShortsFitMode,
-        overlayText: this.videoShortsOverlayText,
-        overlaySize: this.videoShortsOverlaySize,
-        overlayPosition: this.videoShortsOverlayPosition,
-        speed: this.videoShortsSpeed
+        posX: Number(this.videoShortsPosX)||0,
+        fitMode: 'cover'
       };
     }
 
     _videoShortsApplyExportSettings(settings) {
-      this.videoShortsAspect=settings.aspect; this.videoShortsZoom=settings.zoom; this.videoShortsPosX=settings.posX; this.videoShortsPosY=settings.posY;
-      this.videoShortsBrightness=settings.brightness; this.videoShortsBlur=settings.blur; this.videoShortsFitMode=settings.fitMode;
-      this.videoShortsOverlayText=settings.overlayText; this.videoShortsOverlaySize=settings.overlaySize; this.videoShortsOverlayPosition=settings.overlayPosition; this.videoShortsSpeed=settings.speed;
+      this.videoShortsAspect=settings?.aspect==='original' ? 'original' : '9:16';
+      this.videoShortsPosX=Number(settings?.posX)||0;
+      this.videoShortsSetAspect(this.videoShortsAspect);
     }
 
     async _renderVideoShortRangeBlob(clip, format='webm') {
@@ -7471,6 +7354,12 @@
       if(overlay) overlay.classList.remove('active');
     }
 
+    async _ensureMediabunnySupport() {
+      if(typeof VideoDecoder==='undefined' || typeof VideoEncoder==='undefined'){
+        throw new Error('This browser does not support native WebCodecs MP4 export. Please use a current Chrome, Edge, or Safari browser.');
+      }
+    }
+
     async exportVideoShortMp4() {
       if(this.videoShortsExporting || !this.videoShortsVideo || this.videoShortsActiveClipIndex<0) return;
 
@@ -7482,201 +7371,135 @@
       const status=document.getElementById('videoExportStatus');
       const fill=document.getElementById('videoExportProgressFill');
       const cancel=document.getElementById('videoExportCancelBtn');
-
       if(cancel) cancel.disabled=false;
       if(fill) fill.style.width='1%';
-      if(status) status.textContent='Preparing MP4 encoder…';
+      if(status) status.textContent='Preparing MP4 export…';
       this._showVideoExportOverlay();
       this._updateVideoShortsExportButtons();
 
-      let ffmpeg=null;
-      let inName=null;
-      let outName=null;
+      let conversion=null;
+      let input=null;
+      let output=null;
 
       const cleanup=()=>{
-        try{
-          if(ffmpeg && inName){
-            try{ffmpeg.FS('unlink',inName);}catch(e){}
-          }
-          if(ffmpeg && outName){
-            try{ffmpeg.FS('unlink',outName);}catch(e){}
-          }
-        }catch(e){}
         this.videoShortsMp4Phase=null;
         this.videoShortsMp4CurrentDuration=0;
         this.videoShortsExporting=false;
         this.videoShortsExportCancelRequested=false;
-        this.videoShortsExportRecorder=null;
-        this.videoShortsExportStream=null;
         this.videoShortsExportWorker=null;
+        this.videoShortsMediabunnyConversion=null;
         if(cancel) cancel.disabled=true;
         this._hideVideoExportOverlay();
         this._updateVideoShortsExportButtons();
       };
 
       try{
-        const idx=this.videoShortsActiveClipIndex;
-        const clip=this.videoShortsClips[idx];
-        if(!clip) throw new Error('No clip is selected.');
-
-        const settings=this._videoShortsGetExportSettings(clip);
+        const clip=this.videoShortsClips[this.videoShortsActiveClipIndex];
         const source=this.videoShortsSourceFile;
+        if(!clip) throw new Error('No clip is selected.');
         if(!source) throw new Error('Original source file is unavailable.');
 
         const start=Math.max(0,Number(clip.start)||0);
         const end=Math.max(start,Number(clip.end)||0);
         const duration=end-start;
-        if(duration<=0) throw new Error('Invalid clip duration.');
-
+        if(duration<=0) throw new Error('Invalid clip range.');
         this.videoShortsMp4CurrentDuration=duration;
 
-        // IMPORTANT:
-        // Use the FFmpeg instance already loaded by the page. FFmpeg.wasm 0.11
-        // itself runs the heavy FFmpeg command inside its own worker. We do NOT
-        // create a second Blob Worker and we do NOT call importScripts().
-        ffmpeg=await this._loadVideoShortsFfmpeg(false);
-        if(!ffmpeg || !ffmpeg.isLoaded?.()) throw new Error('MP4 encoder is not loaded.');
+        if(status) status.textContent='Loading native media engine…';
+        await this._ensureMediabunnySupport();
+        const MB=await import('https://unpkg.com/mediabunny@1.49.0/dist/bundles/mediabunny.min.mjs');
         if(this.videoShortsExportCancelRequested) throw new Error('CANCELLED');
 
-        const token=`${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-        const ext=(String(source.name||'mp4').split('.').pop()||'mp4').toLowerCase().replace(/[^a-z0-9]/g,'');
-        inName=`sonvex_source_${token}.${ext||'mp4'}`;
-        outName=`sonvex_clip_${token}.mp4`;
+        const {
+          Input, BlobSource, ALL_FORMATS,
+          Output, Mp4OutputFormat, BufferTarget, Conversion
+        }=MB;
 
-        if(status) status.textContent='Reading source file…';
-        if(fill) fill.style.width='3%';
+        input=new Input({
+          source:new BlobSource(source),
+          formats:ALL_FORMATS
+        });
 
-        // Do not use the old two-pass WebM -> MP4 path. The selected range is
-        // rendered directly to MP4 in ONE FFmpeg command.
-        const sourceBytes=await window.FFmpeg.fetchFile(source);
-        if(this.videoShortsExportCancelRequested) throw new Error('CANCELLED');
+        output=new Output({
+          format:new Mp4OutputFormat({fastStart:'in-memory'}),
+          target:new BufferTarget()
+        });
 
-        ffmpeg.FS('writeFile',inName,sourceBytes);
-        if(fill) fill.style.width='5%';
+        const isShort=this.videoShortsAspect!=='original';
+        let videoOptions=undefined;
+
+        if(isShort){
+          const track=input.getPrimaryVideoTrack();
+          if(!track) throw new Error('The selected file has no video track.');
+
+          const vw=await track.getDisplayWidth();
+          const vh=await track.getDisplayHeight();
+          if(!vw || !vh) throw new Error('Could not read the source video dimensions.');
+
+          // Keep the source height and derive the 9:16 crop width.
+          // H.264 generally prefers even dimensions, so clamp to an even width.
+          const cropH=vh;
+          const cropW=Math.max(2,Math.floor((cropH*9/16)/2)*2);
+          const maxLeft=Math.max(0,vw-cropW);
+          const pos=Math.max(-1,Math.min(1,Number(this.videoShortsPosX)||0));
+          const left=Math.max(0,Math.min(maxLeft,
+            Math.round((maxLeft/2)+(pos*(maxLeft/2)))
+          ));
+
+          videoOptions={
+            crop:{left,top:0,width:cropW,height:cropH},
+            hardwareAcceleration:'prefer-hardware'
+          };
+        }
+
+        conversion=await Conversion.init({
+          input,
+          output,
+          tracks:'primary',
+          trim:{start,end},
+          video:videoOptions,
+          // No audio options on purpose: let Mediabunny copy the source audio
+          // whenever the MP4 output supports passthrough. We never decode,
+          // resample, change volume, or re-encode audio ourselves.
+          showWarnings:true
+        });
+
+        if(!conversion.isValid){
+          const reasons=(conversion.discardedTracks||[]).map(x=>x.reason).join(', ');
+          throw new Error(`This file cannot be exported as MP4 with the selected settings.${reasons?` ${reasons}`:''}`);
+        }
+
+        this.videoShortsMediabunnyConversion=conversion;
+        conversion.onProgress=(progress)=>{
+          if(!this.videoShortsExporting || this.videoShortsExportCancelRequested) return;
+          const pct=Math.max(0,Math.min(1,Number(progress)||0));
+          this.videoShortsRealProgressSeen=true;
+          if(fill) fill.style.width=`${(5+pct*92).toFixed(1)}%`;
+          if(status) status.textContent=`Rendering selected clip… ${Math.round(pct*100)}%`;
+        };
+
         if(status) status.textContent='Rendering selected clip… 0%';
-
-        const ratio=this._videoShortsAspectRatio(settings.aspect);
-        const res=Math.max(144,Number(settings.resolution)||1080);
-
-        let outW=res, outH=Math.round(res/ratio);
-        if(settings.aspect==='9:16'){outW=res;outH=Math.round(res*16/9);}
-        else if(settings.aspect==='16:9'){outW=res;outH=Math.round(res*9/16);}
-        else if(settings.aspect==='1:1'){outW=res;outH=res;}
-        else if(settings.aspect==='4:5'){outW=Math.round(res*4/5);outH=res;}
-
-        let vf=`scale=${outW}:${outH}:force_original_aspect_ratio=increase,crop=${outW}:${outH}`;
-
-        const zoom=Math.max(1,Number(settings.zoom)||1);
-        if(Math.abs(zoom-1)>0.001){
-          const zw=Math.max(outW,Math.round(outW*zoom));
-          const zh=Math.max(outH,Math.round(outH*zoom));
-          vf=`scale=${zw}:${zh}:force_original_aspect_ratio=increase,crop=${outW}:${outH}`;
-        }
-
-        const brightness=Number(settings.brightness);
-        if(Number.isFinite(brightness) && Math.abs(brightness-1)>0.001){
-          vf+=`,eq=brightness=${brightness-1}`;
-        }
-
-        const blur=Math.max(0,Number(settings.blur)||0);
-        if(blur>0){
-          vf+=`,boxblur=${Math.max(1,Math.round(blur))}:1`;
-        }
-
-        // Keep progress tied to the actual FFmpeg command. No fake timer.
-        ffmpeg.setProgress?.(({ratio})=>{
-          if(!this.videoShortsExporting || this.videoShortsMp4Phase!=='render') return;
-          const pct=Math.max(0,Math.min(1,Number(ratio)||0));
-          this.videoShortsRealProgressSeen=true;
-          const overall=5+pct*90;
-          if(fill) fill.style.width=`${overall.toFixed(1)}%`;
-          if(status) status.textContent=`Rendering selected clip… ${Math.round(pct*100)}%`;
-        });
-
-        ffmpeg.setLogger?.(({message})=>{
-          if(!this.videoShortsExporting || !message) return;
-          const m=String(message).match(/time=(\d+):(\d+):(\d+(?:\.\d+)?)/);
-          if(!m) return;
-          const elapsed=(Number(m[1])*3600)+(Number(m[2])*60)+Number(m[3]);
-          const pct=Math.max(0,Math.min(1,elapsed/Math.max(.001,duration)));
-          this.videoShortsRealProgressSeen=true;
-          const overall=5+pct*90;
-          if(fill) fill.style.width=`${overall.toFixed(1)}%`;
-          if(status) status.textContent=`Rendering selected clip… ${Math.round(pct*100)}%`;
-        });
-
-        const isImage=String(source.type||'').toLowerCase().startsWith('image/');
-        const inputArgs=isImage
-          ? ['-loop','1','-i',inName]
-          : ['-ss',String(start),'-i',inName];
-
-        // ONE command:
-        // - renders ONLY IN -> OUT
-        // - encodes video because resize/crop/effects require it
-        // - copies the original audio bit-for-bit (no AAC re-encode)
-        // - muxes directly to a normal ISO MP4
-        // - no intermediate WebM, MKA or M4A files
-        const args=[
-          ...inputArgs,
-          '-t',String(duration),
-          '-map','0:v:0',
-          '-map','0:a:0?',
-          '-vf',vf,
-          '-c:v','libx264',
-          '-preset','ultrafast',
-          '-crf',String(Math.max(18,Math.min(28,
-            Number(settings.bitrate)
-              ? Math.round(28-Number(settings.bitrate)/2)
-              : 23
-          ))),
-          '-pix_fmt','yuv420p',
-          '-tag:v','avc1',
-          '-c:a','copy',
-          '-avoid_negative_ts','make_zero',
-          '-movflags','+faststart',
-          '-shortest',
-          '-f','mp4',
-          outName
-        ];
-
-        let ffmpegError=null;
-        try{
-          await ffmpeg.run(...args);
-        }catch(e){
-          ffmpegError=e;
-        }
+        await conversion.execute();
 
         if(this.videoShortsExportCancelRequested) throw new Error('CANCELLED');
-
-        // ffmpeg.wasm 0.11 can occasionally reject with exit(0) even though
-        // the output was successfully written. Accept it only when the file
-        // really exists and is non-empty.
-        let outSize=0;
-        try{outSize=Number(ffmpeg.FS('stat',outName)?.size||0);}catch(e){}
-
-        if(ffmpegError && !(Number(ffmpegError?.status)===0 && outSize>1024)){
-          throw ffmpegError;
-        }
-        if(outSize<=1024) throw new Error('FFmpeg did not produce a valid MP4 file.');
 
         if(status) status.textContent='Finalizing MP4… 100%';
         if(fill) fill.style.width='100%';
 
-        const bytes=ffmpeg.FS('readFile',outName);
-        if(!bytes || bytes.length<1024) throw new Error('MP4 output is empty.');
+        const buffer=output.target.buffer;
+        if(!buffer || buffer.byteLength<1024) throw new Error('MP4 output is empty.');
 
-        // Validate ISO-BMFF signature: ftyp must appear at offset 4.
-        if(bytes.length<12 ||
-           bytes[4]!==0x66 || bytes[5]!==0x74 ||
+        const bytes=new Uint8Array(buffer);
+        if(bytes.length<12 || bytes[4]!==0x66 || bytes[5]!==0x74 ||
            bytes[6]!==0x79 || bytes[7]!==0x70){
-          throw new Error('FFmpeg produced a file that is not a valid MP4 container.');
+          throw new Error('The encoder did not produce a valid MP4 container.');
         }
 
-        const blob=new Blob([bytes],{type:'video/mp4'});
+        const blob=new Blob([buffer],{type:'video/mp4'});
         const url=URL.createObjectURL(blob);
         const a=document.createElement('a');
         a.href=url;
-        a.download=`sonvex-clip-${String(idx+1).padStart(2,'0')}.mp4`;
+        a.download=`sonvex-clip-${String(this.videoShortsActiveClipIndex+1).padStart(2,'0')}.mp4`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -7686,7 +7509,7 @@
         this.showToast('MP4 exported successfully.','success');
 
       }catch(e){
-        if(e && e.message==='CANCELLED'){
+        if(e && (e.message==='CANCELLED' || e.name==='ConversionCanceledError')){
           if(status) status.textContent='Export cancelled';
           if(fill) fill.style.width='0%';
         }else{
@@ -7744,26 +7567,17 @@
       this._stopVideoShortsPreviewLoop();this._updateVideoShortsPlayIcon(false);this._renderVideoShortsClipList();this._renderVideoShortsTimeline();this._updateVideoShortsTimeDisplay();this.videoShortsRenderFrame();this._updateVideoShortsExportButtons();this.showToast('All saved clips cleared.', 'info');
     }
 
-    cancelVideoShortExport() {
+    async cancelVideoShortExport() {
       if(!this.videoShortsExporting) return;
-
       this.videoShortsExportCancelRequested=true;
-
-      // The FFmpeg 0.11 instance owns the real encoding worker.
-      // Terminating it is the reliable cancellation mechanism.
-      const ffmpeg=this.videoShortsFfmpeg;
-      this.videoShortsFfmpeg=null;
-      if(ffmpeg){
-        try{ffmpeg.terminate();}catch(e){}
+      const conversion=this.videoShortsMediabunnyConversion;
+      if(conversion){
+        try{ await conversion.cancel(); }catch(e){}
       }
-
-      this.videoShortsExportWorker=null;
-      this.videoShortsExporting=false;
-      this.videoShortsMp4Phase=null;
-      this.videoShortsMp4CurrentDuration=0;
-      this._hideVideoExportOverlay();
-      this._updateVideoShortsExportButtons();
-      this.showToast('Video export cancelled.','info');
+      if(!this.videoShortsExporting){
+        this._hideVideoExportOverlay();
+        this._updateVideoShortsExportButtons();
+      }
     }
 
     openStemStudio() {
