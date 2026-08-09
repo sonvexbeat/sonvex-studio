@@ -7408,7 +7408,8 @@ this.videoShortsActiveClipIndex = -1;
 
         const {
           Input, BlobSource, ALL_FORMATS,
-          Output, Mp4OutputFormat, BufferTarget, Conversion
+          Output, Mp4OutputFormat, BufferTarget, Conversion,
+          canEncodeVideo, QUALITY_HIGH
         }=MB;
 
         input=new Input({
@@ -7432,8 +7433,8 @@ this.videoShortsActiveClipIndex = -1;
           const vh=await track.getDisplayHeight();
           if(!vw || !vh) throw new Error('Could not read the source video dimensions.');
 
-          // Keep the source height and derive the 9:16 crop width.
-          // H.264 generally prefers even dimensions, so clamp to an even width.
+          // Crop the landscape source to 9:16 while keeping its source height
+          // whenever the browser can actually encode that output size.
           const cropH=vh;
           const cropW=Math.max(2,Math.floor((cropH*9/16)/2)*2);
           const maxLeft=Math.max(0,vw-cropW);
@@ -7442,8 +7443,55 @@ this.videoShortsActiveClipIndex = -1;
             Math.round((maxLeft/2)+(pos*(maxLeft/2)))
           ));
 
+          let outW=cropW;
+          let outH=cropH;
+
+          // H.264/AVC is the safest MP4 choice for end users. Check the exact
+          // requested dimensions first; some browser/GPU combinations reject
+          // very tall 4K encodes even though ordinary H.264 is supported.
+          let canEncodeExact=false;
+          try {
+            canEncodeExact=await canEncodeVideo('avc',{
+              width:outW,
+              height:outH,
+              bitrate:Math.max(8_000_000, Math.min(24_000_000, Math.round(outW*outH*3.5))),
+              hardwareAcceleration:'prefer-hardware'
+            });
+          }catch(_){}
+
+          if(!canEncodeExact){
+            // Compatibility fallback: keep the 9:16 crop and cap the encoded
+            // height at 1920. This is automatic; there is no user resolution
+            // selector and normal 1080p sources are not changed.
+            outH=Math.min(outH,1920);
+            outW=Math.max(2,Math.floor((outH*9/16)/2)*2);
+
+            const canEncodeFallback=await canEncodeVideo('avc',{
+              width:outW,
+              height:outH,
+              bitrate:Math.max(6_000_000, Math.min(16_000_000, Math.round(outW*outH*3.5))),
+              hardwareAcceleration:'prefer-hardware'
+            });
+            if(!canEncodeFallback){
+              throw new Error('This browser/device cannot encode the selected MP4 video size. Please use a current Chrome or Edge browser.');
+            }
+
+            if(status) status.textContent=`Using compatible MP4 size ${outW}×${outH}…`;
+          }
+
+          const bitrate=Math.max(
+            6_000_000,
+            Math.min(24_000_000, Math.round(outW*outH*3.5))
+          );
+
           videoOptions={
             crop:{left,top:0,width:cropW,height:cropH},
+            width:outW,
+            height:outH,
+            fit:'fill',
+            codec:'avc',
+            bitrate,
+            forceTranscode:true,
             hardwareAcceleration:'prefer-hardware'
           };
         }
@@ -7466,16 +7514,22 @@ this.videoShortsActiveClipIndex = -1;
         }
 
         this.videoShortsMediabunnyConversion=conversion;
-        conversion.onProgress=(progress)=>{
+        conversion.onProgress=(progress,processedTime)=>{
           if(!this.videoShortsExporting || this.videoShortsExportCancelRequested) return;
           const pct=Math.max(0,Math.min(1,Number(progress)||0));
           this.videoShortsRealProgressSeen=true;
-           if(fill) fill.classList.remove('video-export-preparing');
+          if(fill) fill.classList.remove('video-export-preparing');
           if(fill) fill.style.width=`${(5+pct*92).toFixed(1)}%`;
-          if(status) status.textContent=`Rendering selected clip… ${Math.round(pct*100)}%`;
+          const processed=Number(processedTime);
+          if(Number.isFinite(processed) && duration>0){
+            const sec=Math.max(0,Math.min(duration,processed-start));
+            if(status) status.textContent=`Rendering selected clip… ${Math.round(pct*100)}% (${sec.toFixed(1)} / ${duration.toFixed(1)}s)`;
+          }else if(status){
+            status.textContent=`Rendering selected clip… ${Math.round(pct*100)}%`;
+          }
         };
 
-        if(status) status.textContent='Encoding selected clip… 0% — preparing video frames';
+        if(status) status.textContent='Encoding selected clip… preparing video frames';
          const progressStartedAt=performance.now();
          let progressHeartbeat=null;
          progressHeartbeat=setInterval(()=>{
