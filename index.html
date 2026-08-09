@@ -6071,7 +6071,9 @@
           if (!content) return;
           const rect = content.getBoundingClientRect();
           if (!rect.width) return;
-          const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+          const scrollEl = document.getElementById('videoTimelineScroll');
+           const scrollLeft = scrollEl ? scrollEl.scrollLeft : 0;
+           const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left + scrollLeft));
           const sec = (x / rect.width) * this.videoShortsDuration;
           this.videoShortsLastTimelineClickSec = sec;
            this.videoShortsActiveClipIndex = -1;
@@ -6116,7 +6118,9 @@
         const content = document.getElementById('videoTimelineContent');
         if (!content) return;
         const rect = content.getBoundingClientRect();
-        const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+        const scrollEl = document.getElementById('videoTimelineScroll');
+           const scrollLeft = scrollEl ? scrollEl.scrollLeft : 0;
+           const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left + scrollLeft));
         const sec = Math.max(0, Math.min(this.videoShortsDuration, (x / rect.width) * this.videoShortsDuration));
         this.videoShortsActiveClipIndex = -1;
         if (this.videoShortsDraggingHandle === 'in') {
@@ -6441,25 +6445,35 @@
     videoShortsSetIn() {
       if (!this.videoShortsDuration || !this.videoShortsVideo) return;
       this.videoShortsActiveClipIndex = -1;
+
       const clicked = Number(this.videoShortsLastTimelineClickSec);
-
-      const current = Number.isFinite(clicked)
-
+      const hasClick = Number.isFinite(clicked);
+      const current = hasClick
         ? Math.max(0, Math.min(this.videoShortsDuration, clicked))
-
         : Math.max(0, Math.min(this.videoShortsDuration, this.videoShortsVideo.currentTime));
-
-      this.videoShortsLastTimelineClickSec = null;
-
       const defaultLen = Math.min(30, this.videoShortsDuration);
-      if (!this.videoShortsSelectionActive) {
+
+      if (hasClick) {
+        const oldStart = Number(this.videoShortsStart) || 0;
+        const oldEnd = Number(this.videoShortsEnd) || 0;
+        const outside = !this.videoShortsSelectionActive || current < oldStart || current > oldEnd;
+        if (outside) {
+          this.videoShortsStart = current;
+          this.videoShortsEnd = Math.min(this.videoShortsDuration, current + defaultLen);
+        } else {
+          this.videoShortsStart = Math.max(0, Math.min(current, this.videoShortsEnd - 0.05));
+        }
+      } else if (!this.videoShortsSelectionActive) {
         this.videoShortsStart = current;
         this.videoShortsEnd = Math.min(this.videoShortsDuration, current + defaultLen);
       } else {
         this.videoShortsStart = Math.max(0, Math.min(current, this.videoShortsEnd - 0.05));
       }
+
+      this.videoShortsLastTimelineClickSec = null;
       this.videoShortsSelectionActive = true;
-      if (this.videoShortsVideo.currentTime < this.videoShortsStart) this.videoShortsVideo.currentTime = this.videoShortsStart;
+      this.videoShortsVideo.currentTime = this.videoShortsStart;
+      this.videoShortsPlaybackStopAt = this.videoShortsEnd;
       this._renderVideoShortsTimeline();
       this._updateVideoShortsTimeDisplay();
       this.videoShortsRenderFrame();
@@ -6469,25 +6483,35 @@
     videoShortsSetOut() {
       if (!this.videoShortsDuration || !this.videoShortsVideo) return;
       this.videoShortsActiveClipIndex = -1;
+
       const clicked = Number(this.videoShortsLastTimelineClickSec);
-
-      const current = Number.isFinite(clicked)
-
+      const hasClick = Number.isFinite(clicked);
+      const current = hasClick
         ? Math.max(0, Math.min(this.videoShortsDuration, clicked))
-
         : Math.max(0, Math.min(this.videoShortsDuration, this.videoShortsVideo.currentTime));
-
-      this.videoShortsLastTimelineClickSec = null;
-
       const defaultLen = Math.min(30, this.videoShortsDuration);
-      if (!this.videoShortsSelectionActive) {
+
+      if (hasClick) {
+        const oldStart = Number(this.videoShortsStart) || 0;
+        const oldEnd = Number(this.videoShortsEnd) || 0;
+        const outside = !this.videoShortsSelectionActive || current < oldStart || current > oldEnd;
+        if (outside) {
+          this.videoShortsEnd = current;
+          this.videoShortsStart = Math.max(0, current - defaultLen);
+        } else {
+          this.videoShortsEnd = Math.min(this.videoShortsDuration, Math.max(current, this.videoShortsStart + 0.05));
+        }
+      } else if (!this.videoShortsSelectionActive) {
         this.videoShortsEnd = current;
         this.videoShortsStart = Math.max(0, current - defaultLen);
       } else {
         this.videoShortsEnd = Math.min(this.videoShortsDuration, Math.max(current, this.videoShortsStart + 0.05));
       }
+
+      this.videoShortsLastTimelineClickSec = null;
       this.videoShortsSelectionActive = true;
-      if (this.videoShortsVideo.currentTime > this.videoShortsEnd) this.videoShortsVideo.currentTime = this.videoShortsEnd;
+      this.videoShortsVideo.currentTime = this.videoShortsEnd;
+      this.videoShortsPlaybackStopAt = this.videoShortsEnd;
       this._renderVideoShortsTimeline();
       this._updateVideoShortsTimeDisplay();
       this.videoShortsRenderFrame();
@@ -7164,22 +7188,21 @@
     }
 
     async _runFfmpegExclusive(ffmpeg, args) {
-      // ffmpeg.wasm 0.11.x allows only ONE run() at a time.
-      // Queue commands, but the queued command must call ffmpeg.run()
-      // directly. The previous version accidentally called this mutex
-      // method recursively, so the command could never actually start.
-      if (!ffmpeg.__sonvexRunQueue) ffmpeg.__sonvexRunQueue = Promise.resolve();
+      if (ffmpeg.__sonvexRunQueue) {
+        await ffmpeg.__sonvexRunQueue.catch(()=>{});
+      }
 
-      const previous = ffmpeg.__sonvexRunQueue;
       let release;
-      const current = new Promise(resolve => { release = resolve; });
-      ffmpeg.__sonvexRunQueue = previous.then(() => current);
+      const queuePromise = new Promise(resolve => { release = resolve; });
+      ffmpeg.__sonvexRunQueue = queuePromise;
 
-      await previous;
       try {
         return await ffmpeg.run(...args);
       } finally {
         release();
+        if (ffmpeg.__sonvexRunQueue === queuePromise) {
+          ffmpeg.__sonvexRunQueue = null;
+        }
       }
     }
 
@@ -7283,7 +7306,7 @@
     }
 
     async _encodeVideoShortsWebmToMp4(webmBlob, label='clip', clip=null) {
-      const ffmpeg=await this._loadVideoShortsFfmpeg(true);
+      const ffmpeg=await this._loadVideoShortsFfmpeg(false);
       if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
 
       const sourceFile=this.videoShortsSourceFile;
@@ -7449,6 +7472,13 @@
 
     async exportVideoShortMp4() {
       if(this.videoShortsExporting || !this.videoShortsVideo || this.videoShortsActiveClipIndex<0) return;
+       // Always start with a clean FFmpeg.wasm instance. A previous canceled
+       // export can leave its internal "running" flag set.
+       if(this.videoShortsFfmpeg){
+         try{ this.videoShortsFfmpeg.terminate(); }catch(e){}
+         this.videoShortsFfmpeg=null;
+       }
+       this.videoShortsFfmpegLoading=null;
       this.videoShortsExporting=true;
       this.videoShortsExportCancelRequested=false;
       this.videoShortsRealProgressSeen=false;
