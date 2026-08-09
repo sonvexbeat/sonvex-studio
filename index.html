@@ -7142,6 +7142,20 @@
       this.videoShortsExporting=false;this.videoShortsExportRecorder=null;this.videoShortsExportStream=null;this.videoShortsExportQueue=[];if(cancel)cancel.disabled=true;this._updateVideoShortsExportButtons();
     }
 
+    async _runFfmpegExclusive(ffmpeg, args) {
+      if (!ffmpeg.__sonvexRunQueue) ffmpeg.__sonvexRunQueue = Promise.resolve();
+      const previous = ffmpeg.__sonvexRunQueue;
+      let release;
+      const current = new Promise(resolve => { release = resolve; });
+      ffmpeg.__sonvexRunQueue = previous.then(() => current);
+      await previous;
+      try {
+        return await this._runFfmpegExclusive(ffmpeg,args);
+      } finally {
+        release();
+      }
+    }
+
     async _loadVideoShortsFfmpeg(forceFresh=false) {
       if (forceFresh && this.videoShortsFfmpeg && !this.videoShortsExporting) {
         try { this.videoShortsFfmpeg.terminate(); } catch(e) {}
@@ -7265,7 +7279,7 @@
 
       const runStrict=async(args,expected)=>{
         try{
-          await ffmpeg.run(...args);
+          await this._runFfmpegExclusive(ffmpeg,args);
         }catch(err){
           const status=Number(err?.status);
           const size=getSize(expected);
@@ -7408,7 +7422,6 @@
       if(this.videoShortsExporting || !this.videoShortsVideo || this.videoShortsActiveClipIndex<0) return;
       this.videoShortsExporting=true;
       this.videoShortsExportCancelRequested=false;
-      this.videoShortsFfmpegCommandLock=null;
 
       const status=document.getElementById('videoExportStatus');
       const fill=document.getElementById('videoExportProgressFill');
@@ -7458,27 +7471,14 @@
         // promise mutex here so even an accidental second export callback cannot
         // call ffmpeg.run while another command is still inside the core.
         const run=async(args,expected)=>{
-          const previous=this.videoShortsFfmpegCommandLock||Promise.resolve();
-          let release;
-          const current=new Promise(resolve=>{release=resolve;});
-          this.videoShortsFfmpegCommandLock=current;
-
-          await previous;
+          if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
           try{
-            if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
-            try{
-              await ffmpeg.run(...args);
-            }catch(err){
-              const statusCode=Number(err?.status);
-              if(!(statusCode===0 && getSize(expected)>0))throw err;
-            }
-            if(getSize(expected)<=0)throw new Error(`FFmpeg did not produce ${expected}.`);
-          }finally{
-            release();
-            if(this.videoShortsFfmpegCommandLock===current){
-              this.videoShortsFfmpegCommandLock=null;
-            }
+            await this._runFfmpegExclusive(ffmpeg,args);
+          }catch(err){
+            const statusCode=Number(err?.status);
+            if(!(statusCode===0 && getSize(expected)>0))throw err;
           }
+          if(getSize(expected)<=0)throw new Error(`FFmpeg did not produce ${expected}.`);
         };
 
         try{
@@ -7633,8 +7633,7 @@
       }finally{
         this.videoShortsMp4Phase=null;
         this.videoShortsMp4CurrentDuration=0;
-        this.videoShortsFfmpegCommandLock=null;
-        this.videoShortsExporting=false;
+          this.videoShortsExporting=false;
         this.videoShortsExportRecorder=null;
         this.videoShortsExportStream=null;
         if(cancel)cancel.disabled=true;
