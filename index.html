@@ -3701,6 +3701,7 @@
       this.videoShortsClips = [];
       this.videoShortsActiveClipIndex = -1;
       this.videoShortsSelectionActive = false;
+      this.videoShortsLastTimelineClickSec = null;
       this.videoShortsDraggingHandle = null;
       this.videoShortsAudioContext = null;
       this.videoShortsMediaSource = null;
@@ -6072,7 +6073,8 @@
           if (!rect.width) return;
           const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
           const sec = (x / rect.width) * this.videoShortsDuration;
-          this.videoShortsActiveClipIndex = -1;
+          this.videoShortsLastTimelineClickSec = sec;
+           this.videoShortsActiveClipIndex = -1;
           const wasPlaying = this.videoShortsVideo && !this.videoShortsVideo.paused;
           if (this.videoShortsVideo) {
             // A manual timeline seek must never inherit the previous playback stop point.
@@ -6202,7 +6204,8 @@
             const rect = content.getBoundingClientRect();
             const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
             const sec = (x / rect.width) * this.videoShortsDuration;
-            this.videoShortsPlaybackStopAt = this.videoShortsDuration;
+            this.videoShortsLastTimelineClickSec = sec;
+             this.videoShortsPlaybackStopAt = this.videoShortsDuration;
             try { this.videoShortsVideo.currentTime = sec; } catch (_) {}
             this._updateVideoShortsTimeDisplay();
             this.videoShortsRenderFrame();
@@ -6438,7 +6441,16 @@
     videoShortsSetIn() {
       if (!this.videoShortsDuration || !this.videoShortsVideo) return;
       this.videoShortsActiveClipIndex = -1;
-      const current = Math.max(0, Math.min(this.videoShortsDuration, this.videoShortsVideo.currentTime));
+      const clicked = Number(this.videoShortsLastTimelineClickSec);
+
+      const current = Number.isFinite(clicked)
+
+        ? Math.max(0, Math.min(this.videoShortsDuration, clicked))
+
+        : Math.max(0, Math.min(this.videoShortsDuration, this.videoShortsVideo.currentTime));
+
+      this.videoShortsLastTimelineClickSec = null;
+
       const defaultLen = Math.min(30, this.videoShortsDuration);
       if (!this.videoShortsSelectionActive) {
         this.videoShortsStart = current;
@@ -6457,7 +6469,16 @@
     videoShortsSetOut() {
       if (!this.videoShortsDuration || !this.videoShortsVideo) return;
       this.videoShortsActiveClipIndex = -1;
-      const current = Math.max(0, Math.min(this.videoShortsDuration, this.videoShortsVideo.currentTime));
+      const clicked = Number(this.videoShortsLastTimelineClickSec);
+
+      const current = Number.isFinite(clicked)
+
+        ? Math.max(0, Math.min(this.videoShortsDuration, clicked))
+
+        : Math.max(0, Math.min(this.videoShortsDuration, this.videoShortsVideo.currentTime));
+
+      this.videoShortsLastTimelineClickSec = null;
+
       const defaultLen = Math.min(30, this.videoShortsDuration);
       if (!this.videoShortsSelectionActive) {
         this.videoShortsEnd = current;
@@ -7143,14 +7164,20 @@
     }
 
     async _runFfmpegExclusive(ffmpeg, args) {
+      // ffmpeg.wasm 0.11.x allows only ONE run() at a time.
+      // Queue commands, but the queued command must call ffmpeg.run()
+      // directly. The previous version accidentally called this mutex
+      // method recursively, so the command could never actually start.
       if (!ffmpeg.__sonvexRunQueue) ffmpeg.__sonvexRunQueue = Promise.resolve();
+
       const previous = ffmpeg.__sonvexRunQueue;
       let release;
       const current = new Promise(resolve => { release = resolve; });
       ffmpeg.__sonvexRunQueue = previous.then(() => current);
+
       await previous;
       try {
-        return await this._runFfmpegExclusive(ffmpeg,args);
+        return await ffmpeg.run(...args);
       } finally {
         release();
       }
@@ -7213,6 +7240,7 @@
             const m = message.match(/time=(\d+):(\d+):(\d+(?:\.\d+)?)/);
             if (!m) return;
 
+            this.videoShortsRealProgressSeen=true;
             const elapsed =
               (Number(m[1]) * 3600) +
               (Number(m[2]) * 60) +
@@ -7220,6 +7248,7 @@
 
             const total = Math.max(0.001, Number(this.videoShortsMp4CurrentDuration || 0));
             const pct = Math.max(0, Math.min(1, elapsed / total));
+            this.videoShortsRealProgressSeen=true;
             const phase = this.videoShortsMp4Phase;
 
             let overall = 0;
@@ -7422,6 +7451,8 @@
       if(this.videoShortsExporting || !this.videoShortsVideo || this.videoShortsActiveClipIndex<0) return;
       this.videoShortsExporting=true;
       this.videoShortsExportCancelRequested=false;
+      this.videoShortsRealProgressSeen=false;
+      this.videoShortsExportProgressTimer=null;
 
       const status=document.getElementById('videoExportStatus');
       const fill=document.getElementById('videoExportProgressFill');
@@ -7528,6 +7559,18 @@
           if(status)status.textContent=`Rendering selected clip… 0%`;
           if(fill)fill.style.width='5%';
 
+          if(this.videoShortsExportProgressTimer) clearInterval(this.videoShortsExportProgressTimer);
+          let pulse=5, pulseDir=1;
+          this.videoShortsExportProgressTimer=setInterval(()=>{
+            if(!this.videoShortsExporting || this.videoShortsMp4Phase!=='render') return;
+            if(this.videoShortsRealProgressSeen) return;
+            pulse += pulseDir * 1.5;
+            if(pulse>=65){pulse=65;pulseDir=-1;}
+            if(pulse<=5){pulse=5;pulseDir=1;}
+            if(fill)fill.style.width=pulse.toFixed(1)+'%';
+            if(status)status.textContent='Rendering selected clip… Encoding';
+          },350);
+
           const videoArgs=[
             '-ss',String(start),
             '-i',inName,
@@ -7631,6 +7674,10 @@
         if(fill&&e.message==='CANCELLED')fill.style.width='0%';
         if(e.message!=='CANCELLED')this.showToast(e.message||'MP4 export failed.','error');
       }finally{
+        if(this.videoShortsExportProgressTimer){
+          clearInterval(this.videoShortsExportProgressTimer);
+          this.videoShortsExportProgressTimer=null;
+        }
         this.videoShortsMp4Phase=null;
         this.videoShortsMp4CurrentDuration=0;
           this.videoShortsExporting=false;
@@ -7689,44 +7736,60 @@
 
     cancelVideoShortExport() {
       if(!this.videoShortsExporting) return;
+
       this.videoShortsExportCancelRequested=true;
       this.videoShortsCloudCancelRequested=true;
-      if(this.videoShortsFfmpeg){
-        try { this.videoShortsFfmpeg.terminate(); } catch(e) {}
-        this.videoShortsFfmpeg=null;
-        this.videoShortsFfmpegLoading=null;
+
+      if(this.videoShortsExportProgressTimer){
+        clearInterval(this.videoShortsExportProgressTimer);
+        this.videoShortsExportProgressTimer=null;
       }
-      if (this.videoShortsTusUpload) {
-        try { this.videoShortsTusUpload.abort(true); } catch(e) {}
-        this.videoShortsTusUpload = null;
-      }
-      if (this.videoShortsFfmpeg) {
-        try { this.videoShortsFfmpeg.terminate(); } catch(e) {}
-        this.videoShortsFfmpeg = null;
-        this.videoShortsFfmpegLoading = null;
-      }
-      this.videoShortsExportQueue=[];
-      if(this.videoShortsExportTimer){clearInterval(this.videoShortsExportTimer);this.videoShortsExportTimer=null;}
+
       try { if(this.videoShortsVideo) this.videoShortsVideo.pause(); } catch(e) {}
-      const recorder=this.videoShortsExportRecorder;
-      if(recorder && recorder.state!=='inactive') {
-        try { recorder.stop(); } catch(e) { this.videoShortsExporting=false; }
-      } else {
-        this.videoShortsExporting=false;
-        if(this.videoShortsRenderRAF){cancelAnimationFrame(this.videoShortsRenderRAF);this.videoShortsRenderRAF=null;}
-        const status=document.getElementById('videoExportStatus');
-        const fill=document.getElementById('videoExportProgressFill');
-        const btn=document.getElementById('videoExportBtn');
-        const cancelBtn=document.getElementById('videoExportCancelBtn');
-        if(status)status.textContent='Export cancelled';
-        if(fill)fill.style.width='0%';
-        if(btn)btn.disabled=false;
-        if(cancelBtn)cancelBtn.disabled=true;
-        const overlayCancel=document.getElementById('videoExportOverlayCancel'); if(overlayCancel)overlayCancel.disabled=true;
-        if(this.videoShortsExportStream){this.videoShortsExportStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});this.videoShortsExportStream=null;}
-        this._updateVideoShortsExportButtons();
-        this.showToast('Video export cancelled.', 'info');
+      if(this.videoShortsRenderRAF){
+        cancelAnimationFrame(this.videoShortsRenderRAF);
+        this.videoShortsRenderRAF=null;
       }
+
+      // Return to the editor immediately; do not wait for the wasm promise.
+      this._hideVideoExportOverlay();
+
+      const status=document.getElementById('videoExportStatus');
+      const fill=document.getElementById('videoExportProgressFill');
+      const btn=document.getElementById('videoExportBtn');
+      const cancelBtn=document.getElementById('videoExportCancelBtn');
+      if(status)status.textContent='Export cancelled';
+      if(fill)fill.style.width='0%';
+      if(btn)btn.disabled=true;
+      if(cancelBtn)cancelBtn.disabled=true;
+
+      if(this.videoShortsExportStream){
+        this.videoShortsExportStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});
+        this.videoShortsExportStream=null;
+      }
+
+      const recorder=this.videoShortsExportRecorder;
+      if(recorder && recorder.state!=='inactive'){
+        try{recorder.stop();}catch(e){}
+      }
+
+      const ffmpeg=this.videoShortsFfmpeg;
+      if(ffmpeg){
+        try{ffmpeg.terminate();}catch(e){}
+        if(this.videoShortsFfmpeg===ffmpeg){
+          this.videoShortsFfmpeg=null;
+          this.videoShortsFfmpegLoading=null;
+        }
+      }
+
+      this.videoShortsExportQueue=[];
+      if(this.videoShortsExportTimer){
+        clearInterval(this.videoShortsExportTimer);
+        this.videoShortsExportTimer=null;
+      }
+
+      this._updateVideoShortsExportButtons();
+      this.showToast('Video export cancelled.', 'info');
     }
 
     openStemStudio() {
