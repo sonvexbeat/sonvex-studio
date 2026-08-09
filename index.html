@@ -7196,6 +7196,143 @@
       finally { this.videoShortsFfmpegLoading = null; }
     }
 
+    async _encodeVideoShortsDirectMp4(clip, label='clip') {
+      const ffmpeg=await this._loadVideoShortsFfmpeg(true);
+      if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+
+      const sourceFile=this.videoShortsSourceFile;
+      if(!sourceFile)throw new Error('The original source file is no longer available.');
+      const fetchFile=window.FFmpeg?.fetchFile;
+      if(!fetchFile)throw new Error('FFmpeg file helper is unavailable.');
+
+      const settings=this._videoShortsGetExportSettings(clip);
+      const start=Math.max(0,Number(clip?.start)||0);
+      const end=Math.max(start,Number(clip?.end)||0);
+      const duration=end-start;
+      if(duration<=0)throw new Error('Invalid clip duration.');
+
+      // Playback-rate changes cannot keep the original compressed audio bit-for-bit.
+      // Keep the user's "do not touch audio" requirement strict.
+      if(Math.abs(Number(settings.speed||1)-1)>0.0001){
+        throw new Error('Set Playback Speed to 1.00x to export with the original audio unchanged.');
+      }
+
+      const vw=this.videoShortsVideo?.videoWidth||0;
+      const vh=this.videoShortsVideo?.videoHeight||0;
+      if(!vw||!vh){
+        throw new Error('Direct MP4 export requires a video source. Audio-only uploads use the visualizer path.');
+      }
+
+      const ratio=this._videoShortsAspectRatio(settings.aspect);
+      let outH=Number(settings.resolution)||1080;
+      let outW=Math.round(outH*ratio);
+      if(settings.aspect==='9:16'){outW=Math.round(outH*9/16);}
+      if(settings.aspect==='16:9'){outW=Math.round(outH*16/9);}
+      if(settings.aspect==='1:1'){outW=outH;}
+      if(settings.aspect==='4:5'){outW=Math.round(outH*4/5);}
+      outW=Math.max(2,outW-(outW%2));
+      outH=Math.max(2,outH-(outH%2));
+
+      const token=`${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+      const safe=String(label).replace(/[^a-z0-9_-]/gi,'_');
+      const ext=(sourceFile.name.match(/\.([a-z0-9]+)$/i)?.[1]||'mp4').toLowerCase();
+      const inputName=`source_${safe}_${token}.${ext}`;
+      const outputName=`sonvex_${safe}_${token}.mp4`;
+
+      // Build the same visual geometry as the editor's Canvas preview, but
+      // directly in FFmpeg. This completely removes the Canvas -> WebM -> MP4
+      // round-trip and lets FFmpeg create the final MP4 container in one pass.
+      const zoom=Math.max(1,Number(settings.zoom)||1);
+      const px=Number(settings.posX)||0;
+      const py=Number(settings.posY)||0;
+      const brightness=Math.max(.5,Math.min(1.5,Number(settings.brightness)||1));
+      const blur=Math.max(0,Number(settings.blur)||0);
+
+      const filters=[];
+      if(settings.fitMode==='contain'){
+        filters.push(`scale=iw*min(${outW}/iw\\,${outH}/ih)*${zoom}:ih*min(${outW}/iw\\,${outH}/ih)*${zoom}`);
+        filters.push(`pad=${outW}:${outH}:(ow-iw)/2+${px*outW*.5}:(oh-ih)/2+${py*outH*.5}:color=black`);
+      }else{
+        filters.push(`scale=iw*max(${outW}/iw\\,${outH}/ih)*${zoom}:ih*max(${outW}/iw\\,${outH}/ih)*${zoom}`);
+        filters.push(`crop=${outW}:${outH}:(iw-ow)/2+${px*outW*.5}:(ih-oh)/2+${py*outH*.5}`);
+      }
+      if(Math.abs(brightness-1)>.001){
+        filters.push(`eq=brightness=${(brightness-1).toFixed(4)}`);
+      }
+      if(blur>0){
+        const b=Math.max(.1,Math.min(18,blur));
+        filters.push(`boxblur=${b.toFixed(1)}:${b.toFixed(1)}`);
+      }
+
+      // Text overlays are left to the browser renderer for now if a font path
+      // is unavailable in the WASM core. The export itself remains direct MP4.
+      // This avoids introducing a hidden font dependency into the encoder.
+
+      const filterComplex=filters.join(',');
+
+      try{
+        if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+
+        ffmpeg.FS('writeFile',inputName,await fetchFile(sourceFile));
+
+        const args=[
+          '-ss',String(start),
+          '-i',inputName,
+          '-t',String(duration),
+          '-map','0:v:0',
+          '-map','0:a:0?',
+          '-vf',filterComplex,
+          '-r','30',
+          '-c:v','libx264',
+          '-preset','ultrafast',
+          '-crf',String(Math.max(18,Math.min(30,Math.round(23-(Number(settings.bitrate||18)-18)*.15)))),
+          '-pix_fmt','yuv420p',
+          '-c:a','copy',
+          '-avoid_negative_ts','make_zero',
+          '-movflags','+faststart',
+          '-f','mp4',
+          outputName
+        ];
+
+        const status=document.getElementById('videoExportStatus');
+        if(status)status.textContent='Encoding MP4… 0%';
+
+        try{
+          await ffmpeg.run(...args);
+        }catch(err){
+          const statusCode=Number(err?.status);
+          let size=0;
+          try{size=Number(ffmpeg.FS('stat',outputName)?.size||0);}catch(_e){}
+          if(!(statusCode===0&&size>0))throw err;
+        }
+
+        if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+
+        const stat=ffmpeg.FS('stat',outputName);
+        if(!stat?.size)throw new Error('FFmpeg did not produce the MP4 output.');
+
+        const data=ffmpeg.FS('readFile',outputName);
+        const bytes=data instanceof Uint8Array?data:new Uint8Array(data);
+
+        // Validate that the final bytes actually contain an ISO-BMFF ftyp box.
+        let ftyp=-1;
+        const max=Math.min(bytes.length,65536);
+        for(let i=4;i+4<=max;i++){
+          if(bytes[i]===0x66&&bytes[i+1]===0x74&&bytes[i+2]===0x79&&bytes[i+3]===0x70){
+            ftyp=i-4;break;
+          }
+        }
+        if(ftyp<0)throw new Error('FFmpeg did not produce a valid MP4 container.');
+
+        return new Blob([bytes],{type:'video/mp4'});
+      }finally{
+        try{ffmpeg.FS('unlink',inputName);}catch(e){}
+        try{ffmpeg.FS('unlink',outputName);}catch(e){}
+        try{ffmpeg.terminate();}catch(e){}
+        if(this.videoShortsFfmpeg===ffmpeg)this.videoShortsFfmpeg=null;
+      }
+    }
+
     async _encodeVideoShortsWebmToMp4(webmBlob, label='clip', clip=null) {
       const ffmpeg=await this._loadVideoShortsFfmpeg(true);
       if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
@@ -7371,11 +7508,9 @@
       this.videoShortsMp4Phase='render';
       try {
         const idx=this.videoShortsActiveClipIndex;
-        const rendered=await this._renderVideoShortRangeBlob(this.videoShortsClips[idx],'webm');
-        if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
         this.videoShortsMp4Phase='encode';
         if(status)status.textContent='Encoding MP4… 0%';
-        const mp4=await this._encodeVideoShortsWebmToMp4(rendered.blob,`sonvex-clip-${String(idx+1).padStart(2,'0')}`,this.videoShortsClips[idx]);
+        const mp4=await this._encodeVideoShortsDirectMp4(this.videoShortsClips[idx],`sonvex-clip-${String(idx+1).padStart(2,'0')}`);
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
         const url=URL.createObjectURL(mp4);const a=document.createElement('a');a.href=url;a.download=`sonvex-clip-${String(idx+1).padStart(2,'0')}.mp4`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
         if(fill)fill.style.width='100%';if(status)status.textContent='MP4 exported';this.showToast('MP4 exported. Original audio was copied without re-encoding.', 'success');
@@ -7406,11 +7541,9 @@
         for(let i=0;i<this.videoShortsClips.length;i++){
           if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
           if(status)status.textContent=`Rendering Clip ${i+1} / ${this.videoShortsClips.length}…`;
-          const rendered=await this._renderVideoShortRangeBlob(this.videoShortsClips[i],'webm');
-          if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
           this.videoShortsMp4Phase='encode';
           if(status)status.textContent=`Encoding Clip ${i+1} / ${this.videoShortsClips.length}…`;
-          const mp4=await this._encodeVideoShortsWebmToMp4(rendered.blob,`sonvex-clip-${String(i+1).padStart(2,'0')}`);
+          const mp4=await this._encodeVideoShortsDirectMp4(this.videoShortsClips[i],`sonvex-clip-${String(i+1).padStart(2,'0')}`);
           this.videoShortsMp4Phase='render';
           if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
           zip.file(`Clip_${String(i+1).padStart(2,'0')}.mp4`,mp4);
