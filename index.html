@@ -6722,6 +6722,29 @@
       if(posPanel) posPanel.style.display=aspect==='original'?'none':'';
     }
 
+    _updateVideoShortsExportButtons() {
+      const btn = document.getElementById('videoExportBtn');
+      const cancel = document.getElementById('videoExportCancelBtn');
+      const hasSource = !!this.videoShortsSourceFile;
+      const hasVideo = !!this.videoShortsVideo;
+      const idx = Number(this.videoShortsActiveClipIndex);
+      const clip = (idx >= 0 && idx < this.videoShortsClips.length)
+        ? this.videoShortsClips[idx]
+        : null;
+      const validRange = !!clip &&
+        Number.isFinite(Number(clip.start)) &&
+        Number.isFinite(Number(clip.end)) &&
+        Number(clip.end) > Number(clip.start);
+
+      if (btn) {
+        btn.disabled = !(hasSource && hasVideo && validRange) || !!this.videoShortsExporting;
+        btn.title = btn.disabled
+          ? 'Set IN / OUT and save a clip first'
+          : 'Export the selected clip as MP4';
+      }
+      if (cancel) cancel.disabled = !this.videoShortsExporting;
+    }
+
     _renderVideoShortsClipList() {
       const list=document.getElementById('videoClipList');
       const count=document.getElementById('videoClipCount');
@@ -6753,10 +6776,9 @@
         exp.innerHTML='<i class="fa-solid fa-download"></i>';
         exp.onclick=(e)=>{
           e.stopPropagation();
-          this._loadVideoShortsClip(index,true,false);
-          // The export controls are the source of truth for the single clip.
-          // Do not restore an old resolution/bitrate from the clip when downloading.
-          setTimeout(()=>this.exportVideoShortMp4(),0);
+          if(this.videoShortsExporting) return;
+          this._loadVideoShortsClip(index,true,true);
+          this.exportVideoShortMp4();
         };
         const del=document.createElement('button');
         del.type='button';
