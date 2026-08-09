@@ -6915,10 +6915,9 @@
     }
 
     async _renderVideoShortRangeBlob(clip, format='webm') {
-      // Stable continuous renderer:
-      // seek once to the exact IN point, then PLAY and draw only frames that
-      // the decoder actually presents. This avoids repeated seek timeouts and
-      // avoids the frozen-canvas problem caused by drawing stale frames.
+      // Render exactly the selected range. Crucially, the recorder is not
+      // started until the first decoded frame at/after IN is drawn. This
+      // prevents leading black frames when a seek lands on an earlier keyframe.
       const sourceFile=this.videoShortsSourceFile;
       if(!sourceFile) throw new Error('Original source file is unavailable.');
       const settings=this._videoShortsGetExportSettings(clip);
@@ -6945,6 +6944,7 @@
       canvas.dataset.exportWidth=String(w);
       canvas.dataset.exportHeight=String(h);
       canvas.width=w;canvas.height=h;
+
       const stream=canvas.captureStream(24);
       const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
         .find(x=>MediaRecorder.isTypeSupported(x))||'';
@@ -6961,9 +6961,7 @@
       this.videoShortsExportRecorder=recorder;
       this.videoShortsExportStream=stream;
 
-      let ended=false;
-      let frameCallbackId=null;
-      let stopTimer=null;
+      let ended=false,frameCallbackId=null,stopTimer=null,started=false,lastFrameTime=-1;
 
       const cleanup=()=>{
         try{if(frameCallbackId!=null && v.cancelVideoFrameCallback)v.cancelVideoFrameCallback(frameCallbackId);}catch(e){}
@@ -7028,12 +7026,6 @@
           await waitMetadata();
           await seekExact();
 
-          this._videoShortsApplyExportSettings(settings);
-          this.videoShortsRenderFrame(canvas,v);
-          await new Promise(r=>setTimeout(r,30));
-
-          recorder.start(250);
-
           const renderFrame=(now,metadata)=>{
             if(ended)return;
 
@@ -7044,12 +7036,28 @@
               return;
             }
 
-            const current=Number(v.currentTime)||startTime;
+            const current=Number(v.currentTime)||0;
 
-            // Only draw decoded/presented frames inside IN/OUT.
+            // Do not record anything until a real decoded frame has reached
+            // the selected IN. This eliminates the leading black section.
             if(current>=startTime-0.02 && current<endTime){
-              this._videoShortsApplyExportSettings(settings);
-              this.videoShortsRenderFrame(canvas,v);
+              if(current!==lastFrameTime){
+                this._videoShortsApplyExportSettings(settings);
+                this.videoShortsRenderFrame(canvas,v);
+                lastFrameTime=current;
+              }
+
+              if(!started){
+                started=true;
+                recorder.start(250);
+                stopTimer=setTimeout(()=>{
+                  if(!ended){
+                    try{v.pause();}catch(e){}
+                    if(recorder.state!=='inactive')try{recorder.stop();}catch(e){}
+                    finish(new Error('Video playback stopped responding during rendering.'));
+                  }
+                },Math.max(30000,duration*1000+30000));
+              }
 
               const pct=Math.max(0,Math.min(1,(current-startTime)/duration));
               const fill=document.getElementById('videoExportProgressFill');
@@ -7060,7 +7068,7 @@
               }
             }
 
-            if(current>=endTime-0.02){
+            if(started && current>=endTime-0.02){
               try{v.pause();}catch(e){}
               if(recorder.state!=='inactive')recorder.stop();
               return;
@@ -7080,16 +7088,6 @@
           }
 
           await v.play();
-
-          // Safety timeout: if the media decoder stops progressing, fail with
-          // a useful message instead of hanging the page indefinitely.
-          stopTimer=setTimeout(()=>{
-            if(!ended){
-              try{v.pause();}catch(e){}
-              if(recorder.state!=='inactive')try{recorder.stop();}catch(e){}
-              finish(new Error('Video playback stopped responding during rendering.'));
-            }
-          },Math.max(30000,(duration*1000)+30000));
 
         }catch(err){
           if(recorder.state!=='inactive')try{recorder.stop();}catch(e){}
@@ -7204,7 +7202,6 @@
 
       const sourceFile=this.videoShortsSourceFile;
       if(!sourceFile)throw new Error('The original source file is no longer available.');
-
       const fetchFile=window.FFmpeg?.fetchFile;
       if(!fetchFile)throw new Error('FFmpeg file helper is unavailable.');
 
@@ -7212,6 +7209,7 @@
       const safe=label.replace(/[^a-z0-9_-]/gi,'_');
       const inputVideoName=`render_${safe}_${token}.webm`;
       const sourceName=`source_${safe}_${token}.${(sourceFile.name.match(/\.([a-z0-9]+)$/i)?.[1]||'bin').toLowerCase()}`;
+      const audioName=`audio_${safe}_${token}.mka`;
       const outputName=`out_${safe}_${token}.mp4`;
 
       const startTime=Math.max(0,Number(clip?.start)||0);
@@ -7219,11 +7217,8 @@
       if(!duration)throw new Error('Invalid clip duration.');
 
       try{
-        const renderedData=await fetchFile(webmBlob);
-        const sourceData=await fetchFile(sourceFile);
-
-        ffmpeg.FS('writeFile',inputVideoName,renderedData);
-        ffmpeg.FS('writeFile',sourceName,sourceData);
+        ffmpeg.FS('writeFile',inputVideoName,await fetchFile(webmBlob));
+        ffmpeg.FS('writeFile',sourceName,await fetchFile(sourceFile));
 
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
 
@@ -7232,14 +7227,26 @@
           throw new Error('Set Playback Speed to 1.00x to preserve the original audio exactly.');
         }
 
-        // The original audio stream is copied as packets. It is NOT sent
-        // through WebAudio, MediaRecorder, Opus, AAC, gain, or resampling.
-        // We intentionally fail if MP4 cannot contain that exact codec.
+        // Step 1: extract ONLY the requested audio interval using stream copy.
+        // -ss is deliberately AFTER -i so FFmpeg can discard packets until the
+        // requested timestamp instead of doing coarse input seeking.
         await ffmpeg.run(
-          '-i',inputVideoName,
+          '-i',sourceName,
           '-ss',String(startTime),
           '-t',String(duration),
-          '-i',sourceName,
+          '-map','0:a:0?',
+          '-c:a','copy',
+          '-avoid_negative_ts','make_zero',
+          audioName
+        );
+
+        if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+
+        // Step 2: mux the already-trimmed audio with the rendered video.
+        // The audio itself is never decoded/re-encoded.
+        await ffmpeg.run(
+          '-i',inputVideoName,
+          '-i',audioName,
           '-map','0:v:0',
           '-map','1:a:0?',
           '-c:v','libx264',
@@ -7264,16 +7271,14 @@
       }catch(e){
         if(e?.message==='CANCELLED')throw e;
         console.error('Sonvex MP4 encoding/muxing failed:',e);
-        const detail = ffmpeg.__lastLog?.() || '';
-        throw new Error((e?.message||'MP4 export failed.') + (detail ? ` [FFmpeg: ${detail}]` : ''));
+        const detail=ffmpeg.__lastLog?.()||'';
+        throw new Error((e?.message||'MP4 export failed.')+(detail?` [FFmpeg: ${detail}]`:''));
       }finally{
-        try{ffmpeg.FS('unlink',inputVideoName);}catch(e){}
-        try{ffmpeg.FS('unlink',sourceName);}catch(e){}
-        try{ffmpeg.FS('unlink',outputName);}catch(e){}
-        // Do not reuse this FFmpeg worker for the next export. A fresh worker
-        // makes export #2 independent from export #1 and avoids stale WASM state.
+        for(const name of [inputVideoName,sourceName,audioName,outputName]){
+          try{ffmpeg.FS('unlink',name);}catch(e){}
+        }
         try{ffmpeg.terminate();}catch(e){}
-        if(this.videoShortsFfmpeg===ffmpeg) this.videoShortsFfmpeg=null;
+        if(this.videoShortsFfmpeg===ffmpeg)this.videoShortsFfmpeg=null;
       }
     }
 
