@@ -7232,6 +7232,10 @@
           '-crf','23',
           '-pix_fmt','yuv420p',
           '-c:a','copy',
+          '-copyts',
+          '-start_at_zero',
+          '-avoid_negative_ts','make_zero',
+          '-vsync','cfr',
           '-movflags','+faststart',
           '-shortest',
           outputName
