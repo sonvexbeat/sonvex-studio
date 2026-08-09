@@ -1914,11 +1914,11 @@
               <input id="metaEditYear" class="w-full rounded-lg border border-indigo-500/15 bg-black/20 px-3 py-2 text-xs" placeholder="Year">
               <input id="metaEditComment" class="w-full rounded-lg border border-indigo-500/15 bg-black/20 px-3 py-2 text-xs" placeholder="Comment">
             </div>
-            <div class="flex flex-wrap gap-2 mt-3">
-              <button id="metadataEditBtn" type="button" onclick="app.editMetadataFile()" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-indigo-600 hover:bg-indigo-700 text-white">Edit Metadata</button>
-              <button id="metadataDownloadBtn" type="button" onclick="app.downloadEditedMetadataFile()" class="px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-emerald-600 hover:bg-emerald-700 text-white">Download Updated File</button>
+            <div class="mt-3">
+              <div id="metadataEditorStatus" class="text-[10px] text-indigo-300/70 light:text-indigo-700/70">
+                Metadata will be included automatically when you export the processed master WAV.
+              </div>
             </div>
-            <div id="metadataEditorStatus" class="text-[10px] text-indigo-300/70 light:text-indigo-700/70 mt-2"></div>
           </div>
     <!-- ================= 6. PITCH & TEMPO TRANSPOSER ================= -->
     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
@@ -4101,7 +4101,6 @@
         this.inspectorOriginalBuffer = this.audioBuffer;
         this.inspectorProcessedBuffer = null;
       this.metadataEditorState = { supported: false, bytes: null, type: "", name: "" };
-      this.metadataEditedBytes = null;
         document.getElementById('inspectorPlaceholder').classList.add('hidden');
         document.getElementById('inspectorContent').classList.remove('hidden');
         document.getElementById('inspectorFileNameDisplay').textContent = file.name;
@@ -4147,7 +4146,6 @@
       this.inspectorOriginalBuffer = null;
       this.inspectorProcessedBuffer = null;
       this.metadataEditorState = { supported: false, bytes: null, type: "", name: "" };
-      this.metadataEditedBytes = null;
       const metadataEditor = document.getElementById('metadataEditor');
       if (metadataEditor) metadataEditor.classList.add('hidden');
       if (this.isPlaying && this.audioSourceNode) {
@@ -4337,31 +4335,85 @@
       const editor=document.getElementById('metadataEditor');if(!editor)return;const ext=(file.name.split('.').pop()||'').toLowerCase();if(ext!=='mp3'&&ext!=='wav'){editor.classList.add('hidden');return;}
       try{const bytes=new Uint8Array(await file.arrayBuffer());this.metadataEditorState={supported:true,bytes,type:ext,name:file.name};this.metadataEditedBytes=null;this._metadataSetInputs(ext==='mp3'?this._metadataReadId3v2(bytes):this._metadataReadWav(bytes));const badge=document.getElementById('metadataFormatBadge');if(badge)badge.textContent=ext.toUpperCase();const status=document.getElementById('metadataEditorStatus');if(status)status.textContent='';editor.classList.remove('hidden');}catch(e){console.error('Metadata editor load failed:',e);editor.classList.add('hidden');}
     }
-    editMetadataFile(){
-      const s=this.metadataEditorState;if(!s?.supported||!s.bytes)return this.showToast('Metadata editing is available for MP3 and WAV files.','warning');
-      try{const meta=this._metadataGetInputs();this.metadataEditedBytes=s.type==='mp3'?this._metadataBuildMp3(s.bytes,meta):this._metadataWriteWav(s.bytes,meta);const status=document.getElementById('metadataEditorStatus');if(status)status.textContent='Metadata updated. Click Download Updated File.';this.showToast('Metadata updated. The original file is unchanged.','success');}catch(e){console.error('Metadata edit failed:',e);this.showToast('Could not update metadata: '+e.message,'error');}
-    }
-    downloadEditedMetadataFile(){
-      const s=this.metadataEditorState;if(!s?.supported||!this.metadataEditedBytes)return this.showToast('Edit the metadata first.','warning');const base=s.name.replace(/\.[^/.]+$/,''),blob=new Blob([this.metadataEditedBytes],{type:s.type==='mp3'?'audio/mpeg':'audio/wav'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=base+'_metadata-edited.'+s.type;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);this.showToast('Updated metadata file is ready to download.','success');
+    getMetadataForExport() {
+      return {
+        title: document.getElementById('metaEditTitle')?.value || '',
+        artist: document.getElementById('metaEditArtist')?.value || '',
+        album: document.getElementById('metaEditAlbum')?.value || '',
+        genre: document.getElementById('metaEditGenre')?.value || '',
+        year: document.getElementById('metaEditYear')?.value || '',
+        comment: document.getElementById('metaEditComment')?.value || ''
+      };
     }
 
-    exportInspectorMasterWav() {
+    hasMetadataForExport(meta) {
+      return Object.values(meta).some(v => String(v || '').trim().length > 0);
+    }
+
+    updateMetadataExportStatus(meta) {
+      const el = document.getElementById('metadataEditorStatus');
+      if (!el) return;
+      el.textContent = this.hasMetadataForExport(meta)
+        ? 'Metadata is ready and will be embedded automatically in the exported master WAV.'
+        : 'No metadata entered. The master WAV will be exported normally.';
+    }
+
+    async exportInspectorMasterWav() {
       const bufToExport = this.inspectorProcessedBuffer || this.inspectorOriginalBuffer || this.audioBuffer;
       if (!bufToExport) {
         this.showToast('No active audio buffer to export', 'error');
         return;
       }
-      const wavBlob = this.audioBufferToWavBlob(bufToExport);
-      const filename = (this.selectedFile ? this.selectedFile.name.replace(/\.[^/.]+$/, "") : "track") + `_processed_master.wav`;
-      const url = URL.createObjectURL(wavBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      this.showToast(`💾 Downloaded processed master: ${filename}`, 'success');
+
+      const btn = document.getElementById('exportMasterWavBtn');
+      const meta = this.getMetadataForExport();
+      this.updateMetadataExportStatus(meta);
+
+      try {
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>EXPORTING MASTER WAV...</span>';
+        }
+
+        // The audio processing/mastering is still exactly the existing pipeline.
+        // Metadata is added only to the final WAV bytes, so there is no second
+        // render, no second download, and no separate metadata file.
+        const baseWavBlob = this.audioBufferToWavBlob(bufToExport);
+        let wavBytes = new Uint8Array(await baseWavBlob.arrayBuffer());
+
+        if (this.hasMetadataForExport(meta)) {
+          wavBytes = this._metadataWriteWav(wavBytes, meta);
+        }
+
+        const wavBlob = new Blob([wavBytes], { type: 'audio/wav' });
+        const filename = (this.selectedFile
+          ? this.selectedFile.name.replace(/\.[^/.]+$/, '')
+          : 'track') + '_processed_master.wav';
+
+        const url = URL.createObjectURL(wavBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        this.showToast(
+          this.hasMetadataForExport(meta)
+            ? 'Master WAV exported with metadata.'
+            : 'Master WAV exported successfully.',
+          'success'
+        );
+      } catch (e) {
+        console.error('Metadata/master WAV export failed:', e);
+        this.showToast('Export failed: ' + (e.message || e), 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> <span>EXPORT MASTER WAV</span>';
+        }
+      }
     }
 
     // ============================================================
