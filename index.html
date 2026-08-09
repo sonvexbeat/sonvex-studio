@@ -7143,7 +7143,7 @@
     }
 
     async _loadVideoShortsFfmpeg(forceFresh=false) {
-      if (forceFresh && this.videoShortsFfmpeg) {
+      if (forceFresh && this.videoShortsFfmpeg && !this.videoShortsExporting) {
         try { this.videoShortsFfmpeg.terminate(); } catch(e) {}
         this.videoShortsFfmpeg = null;
         this.videoShortsFfmpegLoading = null;
@@ -7166,21 +7166,64 @@
             corePath,
             mainName: 'main',
             progress: ({ ratio }) => {
-              if (this.videoShortsExporting && fill) {
-                const pct = Math.max(0, Math.min(1, Number(ratio) || 0));
-                const overall = this.videoShortsMp4Phase === 'encode' ? 55 + pct * 45 : pct * 100;
-                fill.style.width = Math.max(5, overall).toFixed(1) + '%';
-                if (status) status.textContent = `Encoding MP4… ${(pct * 100).toFixed(0)}%`;
+              if (!this.videoShortsExporting || !fill) return;
+              const pct = Math.max(0, Math.min(1, Number(ratio) || 0));
+              const phase = this.videoShortsMp4Phase || 'prepare';
+              let overall = 0;
+              let label = 'Preparing MP4…';
+              if (phase === 'render') {
+                overall = 5 + pct * 70;
+                label = `Rendering selected clip… ${(pct * 100).toFixed(0)}%`;
+              } else if (phase === 'audio') {
+                overall = 75 + pct * 12;
+                label = `Preparing original audio… ${(pct * 100).toFixed(0)}%`;
+              } else if (phase === 'mux') {
+                overall = 87 + pct * 12;
+                label = `Finalizing MP4… ${(pct * 100).toFixed(0)}%`;
+              } else {
+                overall = 2 + pct * 3;
               }
+              fill.style.width = Math.max(2, Math.min(99, overall)).toFixed(1) + '%';
+              if (status) status.textContent = label;
             }
           });
           await ffmpeg.load();
           ffmpeg.__lastLog = () => '';
           ffmpeg.setLogger?.(({ message }) => {
-            if (message) {
-              ffmpeg.__lastLog = () => message;
-              console.debug('[Sonvex FFmpeg]', message);
+            if (!message) return;
+            ffmpeg.__lastLog = () => message;
+            console.debug('[Sonvex FFmpeg]', message);
+
+            if (!this.videoShortsExporting) return;
+
+            const m = message.match(/time=(\d+):(\d+):(\d+(?:\.\d+)?)/);
+            if (!m) return;
+
+            const elapsed =
+              (Number(m[1]) * 3600) +
+              (Number(m[2]) * 60) +
+              Number(m[3]);
+
+            const total = Math.max(0.001, Number(this.videoShortsMp4CurrentDuration || 0));
+            const pct = Math.max(0, Math.min(1, elapsed / total));
+            const phase = this.videoShortsMp4Phase;
+
+            let overall = 0;
+            let label = 'Preparing MP4…';
+
+            if (phase === 'render') {
+              overall = 5 + pct * 70;
+              label = `Rendering selected clip… ${Math.round(pct * 100)}%`;
+            } else if (phase === 'audio') {
+              overall = 75 + pct * 12;
+              label = `Preparing original audio… ${Math.round(pct * 100)}%`;
+            } else if (phase === 'mux') {
+              overall = 87 + pct * 12;
+              label = `Finalizing MP4… ${Math.round(pct * 100)}%`;
             }
+
+            if (fill) fill.style.width = `${Math.max(2, Math.min(99, overall)).toFixed(1)}%`;
+            if (status) status.textContent = label;
           });
           this.videoShortsFfmpeg = ffmpeg;
           if (status) status.textContent = 'MP4 encoder ready';
@@ -7365,6 +7408,7 @@
       if(this.videoShortsExporting || !this.videoShortsVideo || this.videoShortsActiveClipIndex<0) return;
       this.videoShortsExporting=true;
       this.videoShortsExportCancelRequested=false;
+      this.videoShortsFfmpegCommandLock=null;
 
       const status=document.getElementById('videoExportStatus');
       const fill=document.getElementById('videoExportProgressFill');
@@ -7397,6 +7441,7 @@
         const end=Math.max(start,Number(clip.end)||0);
         const duration=end-start;
         if(duration<=0)throw new Error('Invalid clip duration.');
+        this.videoShortsMp4CurrentDuration=duration;
 
         const token=`${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
         const ext=(source.name.match(/\.([a-z0-9]+)$/i)?.[1]||'mp4').toLowerCase();
@@ -7409,14 +7454,31 @@
           try{return Number(ffmpeg.FS('stat',name)?.size||0);}catch(e){return 0;}
         };
 
+        // ffmpeg.wasm 0.11.6 has a hard single-command lock. Keep an explicit
+        // promise mutex here so even an accidental second export callback cannot
+        // call ffmpeg.run while another command is still inside the core.
         const run=async(args,expected)=>{
+          const previous=this.videoShortsFfmpegCommandLock||Promise.resolve();
+          let release;
+          const current=new Promise(resolve=>{release=resolve;});
+          this.videoShortsFfmpegCommandLock=current;
+
+          await previous;
           try{
-            await ffmpeg.run(...args);
-          }catch(err){
-            const statusCode=Number(err?.status);
-            if(!(statusCode===0 && getSize(expected)>0))throw err;
+            if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+            try{
+              await ffmpeg.run(...args);
+            }catch(err){
+              const statusCode=Number(err?.status);
+              if(!(statusCode===0 && getSize(expected)>0))throw err;
+            }
+            if(getSize(expected)<=0)throw new Error(`FFmpeg did not produce ${expected}.`);
+          }finally{
+            release();
+            if(this.videoShortsFfmpegCommandLock===current){
+              this.videoShortsFfmpegCommandLock=null;
+            }
           }
-          if(getSize(expected)<=0)throw new Error(`FFmpeg did not produce ${expected}.`);
         };
 
         try{
@@ -7570,6 +7632,8 @@
         if(e.message!=='CANCELLED')this.showToast(e.message||'MP4 export failed.','error');
       }finally{
         this.videoShortsMp4Phase=null;
+        this.videoShortsMp4CurrentDuration=0;
+        this.videoShortsFfmpegCommandLock=null;
         this.videoShortsExporting=false;
         this.videoShortsExportRecorder=null;
         this.videoShortsExportStream=null;
