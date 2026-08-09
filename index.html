@@ -7209,12 +7209,41 @@
       const safe=label.replace(/[^a-z0-9_-]/gi,'_');
       const inputVideoName=`render_${safe}_${token}.webm`;
       const sourceName=`source_${safe}_${token}.${(sourceFile.name.match(/\.([a-z0-9]+)$/i)?.[1]||'bin').toLowerCase()}`;
-      const audioName=`audio_${safe}_${token}.mka`;
+      const audioName=`audio_${safe}_${token}.m4a`;
       const outputName=`out_${safe}_${token}.mp4`;
 
       const startTime=Math.max(0,Number(clip?.start)||0);
       const duration=Math.max(0,(Number(clip?.end)||0)-startTime);
       if(!duration)throw new Error('Invalid clip duration.');
+
+      const getSize=(name)=>{
+        try{return Number(ffmpeg.FS('stat',name)?.size||0);}catch(e){return 0;}
+      };
+
+      const runVerified=async(args,expectedFile)=>{
+        try{
+          await ffmpeg.run(...args);
+        }catch(err){
+          const status=Number(err?.status);
+          const size=getSize(expectedFile);
+          // ffmpeg.wasm 0.11.6 can throw ExitStatus(0) after a successful
+          // command. Accept it only when the expected output is actually
+          // present and non-empty.
+          if(!(status===0 && size>0))throw err;
+        }
+        const size=getSize(expectedFile);
+        if(size<=0)throw new Error(`FFmpeg did not produce ${expectedFile}.`);
+      };
+
+      const isValidMp4=(bytes)=>{
+        // ISO-BMFF/MP4 must contain an ftyp box. Search the first few KB
+        // because some muxers can place a small leading box before ftyp.
+        const max=Math.min(bytes.byteLength,8192);
+        for(let i=0;i+8<=max;i++){
+          if(bytes[i]===0x66&&bytes[i+1]===0x74&&bytes[i+2]===0x79&&bytes[i+3]===0x70)return true;
+        }
+        return false;
+      };
 
       try{
         ffmpeg.FS('writeFile',inputVideoName,await fetchFile(webmBlob));
@@ -7227,31 +7256,8 @@
           throw new Error('Set Playback Speed to 1.00x to preserve the original audio exactly.');
         }
 
-        // Step 1: extract ONLY the requested audio interval using stream copy.
-        // -ss is deliberately AFTER -i so FFmpeg can discard packets until the
-        // requested timestamp instead of doing coarse input seeking.
-        const runVerified=async(args,expectedFile)=>{
-          try{
-            await ffmpeg.run(...args);
-          }catch(err){
-            const status=Number(err?.status);
-            let exists=false;
-            try{
-              const st=ffmpeg.FS('stat',expectedFile);
-              exists=!!st?.size;
-            }catch(_e){}
-            // ffmpeg.wasm 0.11.6 may throw ExitStatus even with exit(0).
-            // If the expected file was actually written, treat it as success.
-            if(!(status===0 && exists))throw err;
-          }
-          try{
-            const st=ffmpeg.FS('stat',expectedFile);
-            if(!st?.size)throw new Error(`FFmpeg produced an empty file: ${expectedFile}`);
-          }catch(err){
-            throw new Error(`FFmpeg did not produce ${expectedFile}: ${err?.message||err}`);
-          }
-        };
-
+        // Create an M4A containing the ORIGINAL AAC packets only.
+        // AAC is copied, never decoded or re-encoded.
         await runVerified([
           '-i',sourceName,
           '-ss',String(startTime),
@@ -7259,13 +7265,14 @@
           '-map','0:a:0?',
           '-c:a','copy',
           '-avoid_negative_ts','make_zero',
+          '-movflags','+faststart',
           audioName
         ],audioName);
 
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
 
-        // Step 2: mux the already-trimmed audio with the rendered video.
-        // The audio itself is never decoded/re-encoded.
+        // Mux rendered H.264 video + copied AAC into a normal ISO MP4.
+        // No audio codec conversion occurs here either.
         await runVerified([
           '-i',inputVideoName,
           '-i',audioName,
@@ -7275,10 +7282,10 @@
           '-preset','ultrafast',
           '-crf','23',
           '-pix_fmt','yuv420p',
+          '-tag:v','avc1',
           '-c:a','copy',
-          '-avoid_negative_ts','make_zero',
+          '-t',String(duration),
           '-movflags','+faststart',
-          '-shortest',
           outputName
         ],outputName);
 
@@ -7288,18 +7295,12 @@
         const bytes=data instanceof Uint8Array?data:new Uint8Array(data);
         if(!bytes.byteLength)throw new Error('MP4 encoder returned an empty file.');
 
-        // Do not reject a valid ffmpeg.wasm output using a fragile byte-string
-        // check. Read the first ISO-BMFF box safely; if it is not "ftyp", still
-        // allow ffmpeg's own successful output to be returned so the browser can
-        // validate the container. This is especially important with ffmpeg.wasm
-        // 0.11.6 where FS.readFile may expose the data differently.
-        let isIsoBmff=false;
-        if(bytes.byteLength>=8){
-          isIsoBmff=bytes[4]===0x66 && bytes[5]===0x74 && bytes[6]===0x79 && bytes[7]===0x70;
+        if(!isValidMp4(bytes)){
+          // Never download a corrupt/unknown container just because a file
+          // happened to exist in MEMFS.
+          throw new Error('FFmpeg created a file, but it is not a valid MP4 container.');
         }
-        if(!isIsoBmff){
-          console.warn('MP4 output did not expose an ftyp signature at offset 4; returning ffmpeg output because the file exists and ffmpeg completed.');
-        }
+
         return new Blob([bytes],{type:'video/mp4'});
       }catch(e){
         if(e?.message==='CANCELLED')throw e;
