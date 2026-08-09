@@ -7230,7 +7230,29 @@
         // Step 1: extract ONLY the requested audio interval using stream copy.
         // -ss is deliberately AFTER -i so FFmpeg can discard packets until the
         // requested timestamp instead of doing coarse input seeking.
-        await ffmpeg.run(
+        const runVerified=async(args,expectedFile)=>{
+          try{
+            await ffmpeg.run(...args);
+          }catch(err){
+            const status=Number(err?.status);
+            let exists=false;
+            try{
+              const st=ffmpeg.FS('stat',expectedFile);
+              exists=!!st?.size;
+            }catch(_e){}
+            // ffmpeg.wasm 0.11.6 may throw ExitStatus even with exit(0).
+            // If the expected file was actually written, treat it as success.
+            if(!(status===0 && exists))throw err;
+          }
+          try{
+            const st=ffmpeg.FS('stat',expectedFile);
+            if(!st?.size)throw new Error(`FFmpeg produced an empty file: ${expectedFile}`);
+          }catch(err){
+            throw new Error(`FFmpeg did not produce ${expectedFile}: ${err?.message||err}`);
+          }
+        };
+
+        await runVerified([
           '-i',sourceName,
           '-ss',String(startTime),
           '-t',String(duration),
@@ -7238,13 +7260,13 @@
           '-c:a','copy',
           '-avoid_negative_ts','make_zero',
           audioName
-        );
+        ],audioName);
 
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
 
         // Step 2: mux the already-trimmed audio with the rendered video.
         // The audio itself is never decoded/re-encoded.
-        await ffmpeg.run(
+        await runVerified([
           '-i',inputVideoName,
           '-i',audioName,
           '-map','0:v:0',
@@ -7258,7 +7280,7 @@
           '-movflags','+faststart',
           '-shortest',
           outputName
-        );
+        ],outputName);
 
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
 
