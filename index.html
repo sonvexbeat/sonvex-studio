@@ -822,7 +822,7 @@
     }
     .stem-global-playhead {
       position: absolute;
-      top: 0;
+      top: 28px; /* keep the cursor below the dedicated timeline ruler */
       bottom: 0;
       width: 2px;
       background: #00FFCC;
@@ -831,7 +831,8 @@
       pointer-events: none;
       display: none;
       left: 0;
-      will-change: transform;
+      transform: none;
+      will-change: left;
     }
 
 
@@ -1011,6 +1012,11 @@
       overflow: hidden;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
+    .stem-track-card {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
     .stem-track-card.selected-track {
       border-color: rgba(0, 255, 204, 0.5) !important;
       box-shadow: 0 0 14px rgba(0, 255, 204, 0.15), inset 0 0 10px rgba(0, 255, 204, 0.05) !important;
@@ -1035,12 +1041,15 @@
     }
 
   .stem-track-waveform-wrap {
-      flex: 1;
+      flex: 1 1 0%;
+      min-width: 0;
+      width: 0;
       height: 75px;
       background: rgba(6, 8, 24, 0.9);
       border-left: 1px solid rgba(99, 102, 241, 0.15);
       position: relative;
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: hidden;
       cursor: pointer;
     }
 
@@ -1062,6 +1071,7 @@
     }
     .stem-track-canvas {
       width: 100%;
+      min-width: 100%;
       height: 100%;
       display: block;
     }
@@ -1378,6 +1388,36 @@
     .stem-track-zoom-controls .stem-track-zoom-reset {
       font-size: 9px;
       color: #94a3b8;
+    }
+
+    /* Vertical track reordering */
+    .stem-track-drag-handle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      flex: 0 0 22px;
+      border: 1px solid rgba(99,102,241,.22);
+      border-radius: 5px;
+      color: #64748b;
+      background: rgba(99,102,241,.06);
+      cursor: grab;
+      user-select: none;
+      transition: .15s ease;
+    }
+    .stem-track-drag-handle:hover {
+      color: #00FFCC;
+      border-color: rgba(0,255,204,.35);
+      background: rgba(0,255,204,.08);
+    }
+    .stem-track-drag-handle:active { cursor: grabbing; }
+    .stem-track-card.stem-dragging { opacity: .48; }
+    .stem-track-card.stem-drop-before {
+      box-shadow: inset 0 3px 0 #00FFCC, 0 -3px 14px rgba(0,255,204,.12);
+    }
+    .stem-track-card.stem-drop-after {
+      box-shadow: inset 0 -3px 0 #00FFCC, 0 3px 14px rgba(0,255,204,.12);
     }
     .light .stem-track-zoom-controls {
       background: rgba(255,255,255,0.9);
@@ -1740,6 +1780,183 @@
 .stem-fx-panel {
   position: relative;
   z-index: 121;
+}
+
+/* ===== STEM TRACK PLAYHEAD + ZOOM CONTROL FIX ===== */
+.stem-track-waveform-wrap {
+  position: relative;
+  isolation: auto !important;
+}
+.stem-local-playhead {
+  z-index: 8 !important;
+  pointer-events: none !important;
+}
+.stem-track-zoom-controls {
+  z-index: 100 !important;
+  pointer-events: auto !important;
+  background: rgba(6, 8, 24, 0.96) !important;
+  box-shadow: 0 3px 14px rgba(0,0,0,.38) !important;
+}
+.stem-track-zoom-controls button,
+.stem-track-zoom-controls .stem-track-zoom-value {
+  position: relative;
+  z-index: 101;
+}
+.light .stem-track-zoom-controls {
+  background: rgba(255,255,255,.96) !important;
+}
+
+
+/* ===== STEM V29 — ZOOM SCROLLBAR + PLAYHEAD LAYERING ===== */
+.stem-track-card {
+  position: relative;
+}
+.stem-track-waveform-wrap {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,255,204,.55) rgba(10,14,38,.82);
+}
+.stem-track-waveform-wrap::-webkit-scrollbar {
+  width: 0;
+  height: 8px !important;
+}
+.stem-track-waveform-wrap::-webkit-scrollbar-track {
+  background: rgba(10,14,38,.82);
+  border-radius: 5px;
+}
+.stem-track-waveform-wrap::-webkit-scrollbar-thumb {
+  background: rgba(0,255,204,.55);
+  border-radius: 5px;
+  border: 1px solid rgba(0,255,204,.18);
+}
+.stem-track-waveform-wrap::-webkit-scrollbar-thumb:hover {
+  background: #00FFCC;
+  box-shadow: 0 0 8px rgba(0,255,204,.45);
+}
+
+/* The playhead stays visible in the waveform, but never draws over the
+   zoom-control box. */
+.stem-global-playhead {
+  z-index: 20 !important;
+}
+.stem-track-zoom-controls {
+  z-index: 999999 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  will-change: left, top;
+  margin: 0 !important;
+}
+.stem-track-zoom-controls * {
+  pointer-events: auto;
+}
+
+/* The waveform itself remains the scrollable layer. */
+.stem-track-canvas,
+.stem-clips-layer,
+.stem-local-playhead {
+  pointer-events: none;
+}
+
+
+/* ===== SLICE ALL TOOL ===== */
+#stemSliceAllBtn {
+  border-color: rgba(0, 220, 255, .28);
+}
+#stemSliceAllBtn:hover {
+  border-color: rgba(0, 220, 255, .55);
+}
+
+.stem-track-zoom-controls {
+      position: fixed !important;
+      z-index: 2147483000 !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: auto !important;
+      bottom: auto !important;
+      transform: none !important;
+      margin: 0 !important;
+      pointer-events: auto !important;
+      will-change: left, top;
+    }
+    
+/* ===== SONVEX STEM ZOOM V38 — WAVEFORM CORNER =====
+   Anchor each zoom control to the non-scrolling track card, at the
+   top-right corner of the waveform viewport. */
+.stem-track-card {
+  position: relative !important;
+}
+.stem-track-zoom-controls {
+  position: absolute !important;
+  top: 44px !important;
+  right: 18px !important;
+  left: auto !important;
+  bottom: auto !important;
+  z-index: 2147483000 !important;
+  transform: none !important;
+  margin: 0 !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  padding: 3px !important;
+  border-radius: 7px !important;
+  background: rgba(6,8,24,.96) !important;
+  border: 1px solid rgba(99,102,241,.35) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,.42) !important;
+  user-select: none !important;
+  visibility: visible !important;
+}
+.stem-track-zoom-controls button,
+.stem-track-zoom-controls .stem-track-zoom-value {
+  position: relative !important;
+  z-index: 2147483001 !important;
+  pointer-events: auto !important;
+}
+.light .stem-track-zoom-controls {
+  background: rgba(255,255,255,.96) !important;
+}
+
+/* ===== SONVEX STEM ZOOM V38 FINAL — RED BOX POSITION ===== */
+.stem-track-card { position: relative !important; }
+.stem-track-zoom-controls {
+  position: absolute !important;
+  top: 44px !important;
+  right: 18px !important;
+  left: auto !important;
+  bottom: auto !important;
+  z-index: 2147483000 !important;
+  transform: none !important;
+  margin: 0 !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  padding: 3px !important;
+  border-radius: 7px !important;
+  background: rgba(6,8,24,.96) !important;
+  border: 1px solid rgba(99,102,241,.35) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,.42) !important;
+  visibility: visible !important;
+}
+.stem-track-zoom-controls button,
+.stem-track-zoom-controls .stem-track-zoom-value {
+  pointer-events: auto !important;
+}
+.light .stem-track-zoom-controls {
+  background: rgba(255,255,255,.96) !important;
+}
+
+/* ===== SONVEX STEM V42 — SINGLE PLAYHEAD =====
+   Keep only the main green playhead. The old per-track marker is hidden so
+   there cannot be two competing cursors. */
+.stem-local-playhead {
+  display: none !important;
 }
 </style>
 </head>
@@ -2731,9 +2948,13 @@
           <i class="fa-solid fa-rotate-right text-blue-300"></i>
           <span>Redo</span>
         </button>
-        <button id="stemSliceBtn" class="studio-btn purple" onclick="app.sliceTracksAtPlayhead()" title="Slice / Split Clips at Playhead (Cut)">
+        <button id="stemSliceBtn" class="studio-btn purple" onclick="app.sliceTracksAtPlayhead()" title="Slice / Split Selected Clip at Playhead (Cut)">
           <i class="fa-solid fa-scissors text-purple-300"></i>
           <span>Slice</span>
+        </button>
+        <button id="stemSliceAllBtn" class="studio-btn purple" onclick="app.sliceAllTracksAtPlayhead()" title="Slice / Split All Tracks at Playhead">
+          <i class="fa-solid fa-scissors text-cyan-300"></i>
+          <span>Slice All</span>
         </button>
         <button id="stemDeleteBtn" class="studio-btn red" onclick="app.deleteSelectedClip()" title="Delete Selected Clip (Delete Key)">
           <i class="fa-solid fa-trash-can text-red-300"></i>
@@ -3658,10 +3879,17 @@
       this.stemStartTime = 0;
       this.stemPauseTime = 0;
       this.stemDuration = 0;
+      // Visual timeline scale is anchored to the original project duration.
+      // Adding a longer track extends the scrollable timeline instead of
+      // compressing tracks that were already present.
+      this.stemTimelineBaseDuration = 0;
       this.stemAnimFrame = null;
       this.stemTrackColors = ['#94a3b8', '#06b6d4', '#c084fc', '#34d399', '#fbbf24'];
       this.stemTrackZoom = [1, 1, 1, 1, 1];
       this.stemTrackScrollLeft = [0, 0, 0, 0, 0];
+      this.stemTrackOrder = [0, 1, 2, 3, 4];
+      this._stemDraggingTrack = null;
+      this._stemAutoScrollGuard = false;
       this.projectName = 'Untitled Project';
 
       this.supportedFormats = [
@@ -5155,6 +5383,9 @@
       }
 
       setPlaybackSpeed(val) {
+        if (document.getElementById('stemStudioView')?.style.display === 'flex') {
+          this._pushUndoGesture('playbackSpeed', 'Change Playback Speed');
+        }
         val = Math.max(0.5, Math.min(2.0, parseFloat(val) || 1.0));
         const oldTransposerSpeed = this.transposerSpeed || 1.0;
         const oldStemSpeed = this.stemSpeed || 1.0;
@@ -6083,6 +6314,18 @@
       if (stem) {
         stem.style.display = 'flex';
         window.scrollTo(0, 0);
+
+        // The Stem Studio is display:none before this point. Any zoom-control
+        // measurement made while hidden returns invalid/zero geometry. Re-run
+        // after the fullscreen view is actually laid out.
+        const placeZoomControls = () => {
+          if (typeof this._positionAllStemZoomControls === 'function') {
+            this._positionAllStemZoomControls();
+          }
+        };
+        requestAnimationFrame(placeZoomControls);
+        requestAnimationFrame(() => requestAnimationFrame(placeZoomControls));
+        setTimeout(placeZoomControls, 80);
       }
     }
 
@@ -6131,6 +6374,7 @@
         // from the previous song cannot leak into the new project.
         this._resetStemStateForNewSong();
         this.stemDuration = fullBuffer.duration;
+        this.stemTimelineBaseDuration = fullBuffer.duration;
         const timeDur = document.getElementById('stemDurationTime');
         if (timeDur) timeDur.textContent = this._secToTimeStr(this.stemDuration);
         setProgress('Extracting vocal frequencies (High/Mid Center band)…', 50);
@@ -6497,10 +6741,16 @@
         this._pushUndoState('Import Audio Track');
         if (!this.stemDuration || this.stemDuration <= 0) {
           this.stemDuration = audioBuffer.duration;
+          this.stemTimelineBaseDuration = audioBuffer.duration;
           const timeDur = document.getElementById('stemDurationTime');
           if (timeDur) timeDur.textContent = this._secToTimeStr(this.stemDuration);
           this._renderTimelineRuler();
         } else if (audioBuffer.duration > this.stemDuration) {
+          // Extend the real project duration, but DO NOT change the visual
+          // pixels-per-second scale of tracks that are already on screen.
+          if (!this.stemTimelineBaseDuration || this.stemTimelineBaseDuration <= 0) {
+            this.stemTimelineBaseDuration = this.stemDuration;
+          }
           this.stemDuration = Math.max(this.stemDuration, audioBuffer.duration);
           const timeDur = document.getElementById('stemDurationTime');
           if (timeDur) timeDur.textContent = this._secToTimeStr(this.stemDuration);
@@ -6563,9 +6813,15 @@
         });
         this.selectedClipId = customClip.id;
         this.selectedTrackIdx = newTrackIdx;
-        this._renderAllStemCanvases();
+        this._renderAllStemCanvases({ preserveScroll: false });
         this._renderClipDOMElements();
         this._updateStemNodes();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            this._renderAllStemCanvases({ preserveScroll: true });
+            this._updateStemTrackPlayheadVisuals();
+          });
+        });
         this.showToast(`🎵 Added "${trackName}" track to Stem Studio timeline!`, 'success');
       } catch(e) {
         console.error('Failed to import audio track file:', e);
@@ -6620,7 +6876,7 @@
       `;
 
       const addSlot = document.getElementById('stemAddTrackSlot');
-      if (addSlot) {
+      if (addSlot && addSlot.parentElement === consoleEl) {
         consoleEl.insertBefore(card, addSlot);
       } else {
         consoleEl.appendChild(card);
@@ -6958,6 +7214,8 @@
       const defaultColors = ['#94a3b8', '#06b6d4', '#c084fc', '#34d399', '#fbbf24', '#f43f5e', '#f97316', '#ec4899', '#8b5cf6', '#10b981'];
       const numTracks = this.tracks ? this.tracks.length : 5;
       this._ensureStemTrackViewControls();
+      this._ensureStemTrackReorderControls();
+      requestAnimationFrame(() => this._positionAllStemZoomControls());
 
       for (let i = 0; i < numTracks; i++) {
         const canvas = document.getElementById(`stemCanvas_${i}`);
@@ -7266,6 +7524,18 @@
         fx: JSON.parse(JSON.stringify(this.stemFx || [])),
         tracks: this.tracks ? JSON.parse(JSON.stringify(this.tracks)) : [],
         buffers: [...(this.stemBuffers || [])]
+     ,
+        masterGain: this.stemMasterGainVal ?? 1,
+        masterFadeIn: this.masterFadeIn ?? 0,
+        masterFadeOut: this.masterFadeOut ?? 0,
+        speed: this.stemSpeed ?? 1,
+        trackZoom: [...(this.stemTrackZoom || [])],
+        trackScrollLeft: [...(this.stemTrackScrollLeft || [])],
+        trackOrder: [...(this.stemTrackOrder || [])],
+        selectedTrackIdx: this.selectedTrackIdx ?? 0,
+        selectedClipId: this.selectedClipId ?? null,
+        pauseTime: this.stemPauseTime ?? 0,
+        projectName: this.projectName || ''
       };
       this.undoStack.push(stateSnapshot);
       if (this.undoStack.length > 50) this.undoStack.shift();
@@ -7274,6 +7544,66 @@
       if (undoBtn) undoBtn.disabled = false;
       const redoBtn = document.getElementById('stemRedoBtn');
       if (redoBtn) redoBtn.disabled = true;
+    }
+
+    _pushUndoGesture(key, actionName = 'Adjust Setting', delay = 500) {
+      if (!this._undoGestures) this._undoGestures = {};
+      if (!this._undoGestureTimers) this._undoGestureTimers = {};
+      if (!this._undoGestures[key]) {
+        this._pushUndoState(actionName);
+        this._undoGestures[key] = true;
+      }
+      clearTimeout(this._undoGestureTimers[key]);
+      this._undoGestureTimers[key] = setTimeout(() => {
+        delete this._undoGestures[key];
+        delete this._undoGestureTimers[key];
+      }, delay);
+    }
+
+    _restoreHistoryUI() {
+      const nameInput=document.getElementById('stemProjectName');
+      if(nameInput && this.projectName!==undefined) nameInput.value=this.projectName||'';
+      const mg=document.getElementById('stemMasterGainSlider');
+      if(mg) mg.value=this.stemMasterGainVal??1;
+      const mgt=document.getElementById('stemMasterGainValue');
+      if(mgt) mgt.textContent=Math.round((this.stemMasterGainVal??1)*100)+'%';
+      const sp=document.getElementById('stemSpeedSlider');
+      if(sp) sp.value=this.stemSpeed??1;
+      const spt=document.getElementById('stemSpeedVal');
+      if(spt) spt.textContent=Number(this.stemSpeed??1).toFixed(2)+'x';
+      const fi=document.querySelector('[oninput*="setMasterFadeIn"]');
+      const fo=document.querySelector('[oninput*="setMasterFadeOut"]');
+      if(fi) fi.value=this.masterFadeIn??0;
+      if(fo) fo.value=this.masterFadeOut??0;
+      const fit=document.getElementById('masterFadeInVal');
+      const fot=document.getElementById('masterFadeOutVal');
+      if(fit) fit.textContent=Number(this.masterFadeIn??0).toFixed(1)+'s';
+      if(fot) fot.textContent=Number(this.masterFadeOut??0).toFixed(1)+'s';
+      const count=Math.max(this.tracks?.length||0,5);
+      for(let i=0;i<count;i++){
+        const card=document.querySelector(`.stem-track-card[data-track="${i}"]`);
+        if(!card) continue;
+        const r=card.querySelectorAll('input[type="range"]');
+        if(r[0]) r[0].value=this.stemGains?.[i]??1;
+        if(r[1]) r[1].value=this.stemPans?.[i]??0;
+        if(r[2]) r[2].value=this.stemFadeIn?.[i]??0;
+        if(r[3]) r[3].value=this.stemFadeOut?.[i]??0;
+        const vol=document.getElementById(`volVal_${i}`);
+        if(vol) vol.textContent=Math.round((this.stemGains?.[i]??1)*100)+'%';
+        const pan=document.getElementById(`panVal_${i}`);
+        const pv=this.stemPans?.[i]??0;
+        if(pan) pan.textContent=pv===0?'C':(pv<0?`L${Math.round(Math.abs(pv)*100)}`:`R${Math.round(pv*100)}`);
+        const a=document.getElementById(`fadeInVal_${i}`);
+        const b=document.getElementById(`fadeOutVal_${i}`);
+        if(a) a.textContent=Number(this.stemFadeIn?.[i]??0).toFixed(1)+'s';
+        if(b) b.textContent=Number(this.stemFadeOut?.[i]??0).toFixed(1)+'s';
+        const mute=document.getElementById(`mute_${i}`);
+        const solo=document.getElementById(`solo_${i}`);
+        if(mute) mute.classList.toggle('active',!!this.stemMuted?.[i]);
+        if(solo) solo.classList.toggle('active',!!this.stemSoloed?.[i]);
+        const zv=card.querySelector('.stem-track-zoom-value');
+        if(zv) zv.textContent=Math.round((this.stemTrackZoom?.[i]||1)*100)+'%';
+      }
     }
 
     undoStemAction() {
@@ -7331,8 +7661,18 @@
       this.stemFx = JSON.parse(JSON.stringify(lastState.fx || this.stemFx || []));
       if (lastState.tracks) this.tracks = JSON.parse(JSON.stringify(lastState.tracks));
       if (lastState.buffers) this.stemBuffers = [...lastState.buffers];
-
-      this.selectedClipId = null;
+      this.stemMasterGainVal = lastState.masterGain ?? this.stemMasterGainVal ?? 1;
+      this.masterFadeIn = lastState.masterFadeIn ?? this.masterFadeIn ?? 0;
+      this.masterFadeOut = lastState.masterFadeOut ?? this.masterFadeOut ?? 0;
+      this.stemSpeed = lastState.speed ?? this.stemSpeed ?? 1;
+      this.transposerSpeed = this.stemSpeed;
+      this.stemTrackZoom = [...(lastState.trackZoom || this.stemTrackZoom || [])];
+      this.stemTrackScrollLeft = [...(lastState.trackScrollLeft || this.stemTrackScrollLeft || [])];
+      this.stemTrackOrder = [...(lastState.trackOrder || this.stemTrackOrder || [])];
+      this.selectedTrackIdx = lastState.selectedTrackIdx ?? 0;
+      this.selectedClipId = lastState.selectedClipId ?? null;
+      this.stemPauseTime = lastState.pauseTime ?? 0;
+      this.projectName = lastState.projectName ?? this.projectName ?? '';
 
       const consoleEl = document.getElementById('stemMultitrackConsole');
       if (consoleEl) {
@@ -7359,6 +7699,7 @@
 
       this._renderAllStemCanvases();
       this._renderClipDOMElements();
+      this._restoreHistoryUI();
       if (typeof this._updateStemNodes === 'function') this._updateStemNodes();
       this.showToast(`⎌ Undid action: ${lastState.actionName || ''}`, 'success');
     }
@@ -7401,7 +7742,18 @@
         fadeIn: [...(this.stemFadeIn || [])],
         fadeOut: [...(this.stemFadeOut || [])],
         tracks: this.tracks ? JSON.parse(JSON.stringify(this.tracks)) : [],
-        buffers: [...(this.stemBuffers || [])]
+        buffers: [...(this.stemBuffers || [])],
+        masterGain: this.stemMasterGainVal ?? 1,
+        masterFadeIn: this.masterFadeIn ?? 0,
+        masterFadeOut: this.masterFadeOut ?? 0,
+        speed: this.stemSpeed ?? 1,
+        trackZoom: [...(this.stemTrackZoom || [])],
+        trackScrollLeft: [...(this.stemTrackScrollLeft || [])],
+        trackOrder: [...(this.stemTrackOrder || [])],
+        selectedTrackIdx: this.selectedTrackIdx ?? 0,
+        selectedClipId: this.selectedClipId ?? null,
+        pauseTime: this.stemPauseTime ?? 0,
+        projectName: this.projectName || ''
       });
 
       const nextState = this.redoStack.pop();
@@ -7416,8 +7768,18 @@
       this.stemFx = JSON.parse(JSON.stringify(nextState.fx || this.stemFx || []));
       if (nextState.tracks) this.tracks = JSON.parse(JSON.stringify(nextState.tracks));
       if (nextState.buffers) this.stemBuffers = [...nextState.buffers];
-
-      this.selectedClipId = null;
+      this.stemMasterGainVal = nextState.masterGain ?? this.stemMasterGainVal ?? 1;
+      this.masterFadeIn = nextState.masterFadeIn ?? this.masterFadeIn ?? 0;
+      this.masterFadeOut = nextState.masterFadeOut ?? this.masterFadeOut ?? 0;
+      this.stemSpeed = nextState.speed ?? this.stemSpeed ?? 1;
+      this.transposerSpeed = this.stemSpeed;
+      this.stemTrackZoom = [...(nextState.trackZoom || this.stemTrackZoom || [])];
+      this.stemTrackScrollLeft = [...(nextState.trackScrollLeft || this.stemTrackScrollLeft || [])];
+      this.stemTrackOrder = [...(nextState.trackOrder || this.stemTrackOrder || [])];
+      this.selectedTrackIdx = nextState.selectedTrackIdx ?? 0;
+      this.selectedClipId = nextState.selectedClipId ?? null;
+      this.stemPauseTime = nextState.pauseTime ?? 0;
+      this.projectName = nextState.projectName ?? this.projectName ?? '';
 
       const consoleEl = document.getElementById('stemMultitrackConsole');
       if (consoleEl) {
@@ -7444,6 +7806,7 @@
 
       this._renderAllStemCanvases();
       this._renderClipDOMElements();
+      this._restoreHistoryUI();
       if (typeof this._updateStemNodes === 'function') this._updateStemNodes();
 
       this.showToast('↷ Redid action', 'success');
@@ -7468,6 +7831,7 @@
           const clickSec = pct * this.stemDuration;
 
           this.selectedTrackIdx = i;
+          this._stemPlayheadAnchorTrack = i;
           const clickedClip = (this.stemClips[i] || []).find(c => clickSec >= c.startTime && clickSec <= c.startTime + c.duration);
           if (clickedClip) {
             if (typeof this._pushUndoState === 'function') {
@@ -7590,6 +7954,108 @@
       this._updateStemNodes();
       this.showToast(`✂️ Sliced selected clip into Clip A & Clip B at ${this._secToTimeStr(playheadTime)}!`, 'success');
     }
+
+    sliceAllTracksAtPlayhead() {
+      if (!this.stemDuration || !this.stemAudioCtx) {
+        this.showToast('Please upload an audio file first', 'info');
+        return;
+      }
+
+      let playheadTime = 0;
+      if (this.stemIsPlaying) {
+        const now = this.stemAudioCtx.currentTime;
+        playheadTime = Math.min(
+          this.stemDuration,
+          Math.max(0, (now - this.stemStartTime) * (this.stemSpeed || 1.0))
+        );
+      } else {
+        playheadTime = this.stemPauseTime || 0;
+      }
+
+      if (playheadTime <= 0.05 || playheadTime >= this.stemDuration - 0.05) {
+        this.showToast('Place the playhead inside the audio before using Slice All', 'info');
+        return;
+      }
+
+      // Save the whole project once so Undo restores the state before the
+      // multi-track operation, rather than requiring one Undo per track.
+      this._pushUndoState('Slice All Tracks');
+
+      let slicedCount = 0;
+      const nowId = Date.now();
+
+      // Slice every clip that crosses the global playhead. Tracks that have
+      // no audio at this exact time are left untouched.
+      for (let trackIdx = 0; trackIdx < this.stemClips.length; trackIdx++) {
+        const clips = this.stemClips[trackIdx];
+        if (!Array.isArray(clips) || !clips.length) continue;
+
+        // There should normally be one active clip at the playhead, but using
+        // a snapshot lets us safely handle multiple overlapping clips too.
+        const crossing = clips.filter(clip =>
+          clip &&
+          playheadTime > clip.startTime + 0.05 &&
+          playheadTime < clip.startTime + clip.duration - 0.05
+        );
+
+        for (const targetClip of crossing) {
+          const localSplitSec = playheadTime - targetClip.startTime;
+          if (!targetClip.audioBuffer || localSplitSec <= 0.05 ||
+              localSplitSec >= targetClip.duration - 0.05) continue;
+
+          const [buf1, buf2] = this._sliceAudioBuffer(
+            this.stemAudioCtx,
+            targetClip.audioBuffer,
+            localSplitSec
+          );
+
+          const clip1 = new AudioClip(
+            `clip_${nowId}_${trackIdx}_${slicedCount}_a`,
+            trackIdx,
+            targetClip.startTime,
+            localSplitSec,
+            buf1,
+            targetClip.isSilenced
+          );
+
+          const clip2 = new AudioClip(
+            `clip_${nowId}_${trackIdx}_${slicedCount}_b`,
+            trackIdx,
+            playheadTime,
+            targetClip.duration - localSplitSec,
+            buf2,
+            targetClip.isSilenced
+          );
+
+          const idx = clips.indexOf(targetClip);
+          if (idx >= 0) {
+            clips.splice(idx, 1, clip1, clip2);
+            slicedCount++;
+          }
+        }
+      }
+
+      if (!slicedCount) {
+        // Remove the undo snapshot we just created when there was nothing
+        // eligible to slice, so an empty operation does not pollute Undo.
+        if (Array.isArray(this.undoStack) && this.undoStack.length) {
+          this.undoStack.pop();
+        }
+        this.showToast('No audio clips cross the playhead on any track', 'info');
+        return;
+      }
+
+      this.selectedClipId = null;
+      this._renderAllStemCanvases();
+      this._renderClipDOMElements();
+      this._updateStemNodes();
+
+      this.showToast(
+        `✂️ Slice All split ${slicedCount} track${slicedCount === 1 ? '' : 's'} at ${this._secToTimeStr(playheadTime)}`,
+        'success'
+      );
+    }
+
 
     deleteSelectedClip() {
       if (!this.stemDuration) {
@@ -7748,11 +8214,12 @@
       const projectName=(nameInput?.value || this.projectName || 'Untitled Project').trim() || 'Untitled Project';
       this.projectName=projectName;
       const projectData = {
-        version: '2.1',
+        version: '2.2',
         appName: 'Sonvex Studio',
         projectName,
         date: new Date().toISOString(),
         duration: this.stemDuration,
+        timelineBaseDuration: this.stemTimelineBaseDuration || this.stemDuration || 0,
         masterGain: this.stemMasterGainVal,
         masterFadeIn: this.masterFadeIn,
         masterFadeOut: this.masterFadeOut,
@@ -7794,6 +8261,23 @@
         if (data.masterFadeIn !== undefined) this.setMasterFadeIn(data.masterFadeIn);
         if (data.masterFadeOut !== undefined) this.setMasterFadeOut(data.masterFadeOut);
         if (data.speed !== undefined) this.setStemSpeed(data.speed);
+
+        // V40 stores the original visual timeline scale. Older projects do
+        // not have it, so derive it from the original master clip when
+        // possible; otherwise fall back to the saved project duration.
+        const savedBaseDuration = Number(data.timelineBaseDuration) || 0;
+        let derivedBaseDuration = savedBaseDuration;
+        if (derivedBaseDuration <= 0) {
+          const masterData = data.tracks.find(x => Number(x.index) === 0);
+          const masterClips = Array.isArray(masterData?.clips) ? masterData.clips : [];
+          const masterEnd = masterClips.reduce((max, clip) => {
+            const end = (Number(clip?.startTime) || 0) + (Number(clip?.duration) || 0);
+            return Math.max(max, end);
+          }, 0);
+          derivedBaseDuration = masterEnd > 0 ? masterEnd : (Number(data.duration) || 0);
+        }
+        this.stemTimelineBaseDuration = derivedBaseDuration;
+
         data.tracks.forEach(t => {
           const i = t.index;
           if (i >= 0 && i < 5) {
@@ -7825,6 +8309,15 @@
           }
         });
 
+        if (Number(data.duration) > 0) {
+          this.stemDuration = Number(data.duration);
+        } else if (!this.stemDuration) {
+          this.stemDuration = this.stemTimelineBaseDuration || 0;
+        }
+        const loadedDurationEl = document.getElementById('stemDurationTime');
+        if (loadedDurationEl) loadedDurationEl.textContent = this._secToTimeStr(this.stemDuration);
+
+        this._renderTimelineRuler();
         this._renderAllStemCanvases();
         this._updateStemNodes();
         this.showToast('Loaded Sonvex Studio project state!', 'success');
@@ -7904,9 +8397,10 @@
       if (!this.stemDuration) return;
       const rect = e.currentTarget.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
-      const pct = Math.max(0, Math.min(1, clickX / rect.width));
+      const pct = Math.max(0, Math.min(1, clickX / Math.max(1, rect.width)));
       const newTime = pct * this.stemDuration;
       this.selectedClipId = null;
+      this._stemPlayheadAnchorTrack = null;
       const wasPlaying = this.stemIsPlaying;
       if (wasPlaying) this.stemPause();
       this.stemPauseTime = newTime;
@@ -7918,12 +8412,28 @@
 
     seekStemFromWaveform(e, trackIdx = 0) {
       if (!this.stemDuration) return;
-      const rect = e.currentTarget.getBoundingClientRect();
+      const wrap = e.currentTarget;
+      const rect = wrap.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
-      const pct = Math.max(0, Math.min(1, clickX / rect.width));
+      // IMPORTANT: when a waveform is zoomed, the visible viewport is only
+      // part of the full timeline. Include horizontal scrollLeft so clicking
+      // at the visible position seeks to that actual timeline position.
+      const contentWidth = this._getStemTrackContentWidth(trackIdx, wrap);
+      const absoluteX = Math.max(0, Math.min(
+        contentWidth,
+        clickX + (wrap.scrollLeft || 0)
+      ));
+      const pct = Math.max(0, Math.min(1, absoluteX / Math.max(1, contentWidth)));
       const newTime = pct * this.stemDuration;
       this.selectedTrackIdx = trackIdx;
       this.selectedClipId = null;
+
+      // The clicked track is the authoritative visual reference for the
+      // main playhead. This keeps the big green cursor exactly under the
+      // user's click even when the project timeline is extended or this
+      // track has its own horizontal scroll/zoom.
+      this._stemPlayheadAnchorTrack = trackIdx;
+
       const wasPlaying = this.stemIsPlaying;
       if (wasPlaying) this.stemPause();
       this.stemPauseTime = newTime;
@@ -7952,23 +8462,68 @@
 
     _updateGlobalPlayhead(currentSec) {
       if (!this.stemDuration) return;
-      const waveformWrap = document.querySelector('.stem-track-waveform-wrap');
-      const multitrackConsole = document.getElementById('stemMultitrackConsole');
-      if (!waveformWrap || !multitrackConsole) return;
 
-      const wrapRect = waveformWrap.getBoundingClientRect();
+      const multitrackConsole = document.getElementById('stemMultitrackConsole');
+      if (!multitrackConsole) return;
+
       const consoleRect = multitrackConsole.getBoundingClientRect();
       const pct = Math.max(0, Math.min(1, currentSec / this.stemDuration));
-      const contentWidth = this._getStemTrackContentWidth(0, waveformWrap);
-      const visibleX = (pct * contentWidth) - waveformWrap.scrollLeft;
-      const globalLeftPos = (wrapRect.left - consoleRect.left) + visibleX;
+      let globalLeftPos = null;
+
+      // If the user clicked a waveform, use THAT waveform's real content
+      // geometry. This makes the large green cursor land exactly where the
+      // click occurred, including per-track horizontal scrolling and zoom.
+      const anchorIdx = Number.isInteger(this._stemPlayheadAnchorTrack)
+        ? this._stemPlayheadAnchorTrack
+        : null;
+
+      if (anchorIdx !== null) {
+        const card = document.querySelector(
+          `.stem-track-card[data-track="${anchorIdx}"]`
+        );
+        const wrap = card
+          ? card.querySelector('.stem-track-waveform-wrap')
+          : null;
+
+        if (wrap) {
+          const wrapRect = wrap.getBoundingClientRect();
+          const contentWidth = this._getStemTrackContentWidth(anchorIdx, wrap);
+          const absoluteX = pct * contentWidth;
+          const visibleX = absoluteX - (wrap.scrollLeft || 0);
+          globalLeftPos = (wrapRect.left - consoleRect.left) + visibleX;
+
+          // Never allow the global cursor to enter the track-control column.
+          // The ruler's timeline begins exactly where the waveform begins.
+          const minWaveformLeft = wrapRect.left - consoleRect.left;
+          globalLeftPos = Math.max(minWaveformLeft, globalLeftPos);
+        }
+      }
+
+      // Fallback: clicks on the dedicated timeline ruler still use the ruler
+      // itself, exactly as before.
+      if (globalLeftPos === null) {
+        const ruler = document.getElementById('stemTimelineRuler');
+        const rulerRect = ruler ? ruler.getBoundingClientRect() : null;
+        const waveformWrap = document.querySelector('.stem-track-waveform-wrap');
+        const rulerWidth = rulerRect
+          ? Math.max(1, rulerRect.width)
+          : Math.max(1, waveformWrap ? waveformWrap.clientWidth : 1);
+        const rulerLeft = rulerRect
+          ? rulerRect.left
+          : (waveformWrap ? waveformWrap.getBoundingClientRect().left : consoleRect.left);
+        globalLeftPos = (rulerLeft - consoleRect.left) + (pct * rulerWidth);
+        globalLeftPos = Math.max(0, globalLeftPos);
+      }
+
       const playhead = document.getElementById('stemGlobalPlayhead');
       if (playhead) {
         playhead.style.display = 'block';
-        playhead.style.transform = `translate3d(${globalLeftPos}px, 0, 0)`;
-        playhead.style.willChange = 'transform';
+        playhead.style.left = Math.round(globalLeftPos) + 'px';
+        playhead.style.transform = 'none';
+        playhead.style.willChange = 'left';
       }
 
+      // Do not render a second per-track cursor.
       this._updateStemTrackPlayheadVisuals(currentSec);
     }
 
@@ -8079,15 +8634,44 @@
       });
     }
 
-    deleteTrack(index) {
+    async deleteTrack(index) {
       const idx = Number(index);
       if (!Number.isInteger(idx) || idx < 0 || idx >= (this.tracks?.length || 0)) {
         this.showToast('Track not found', 'error');
         return;
       }
 
-      // Stop playback before changing the track graph.
-      try { this.stemStop(); } catch (e) {}
+      const trackName = this.tracks?.[idx]?.name || `Track ${idx + 1}`;
+      const isFixedTrack = idx < 5;
+      const confirmed = await this.showConfirmDialog(
+        isFixedTrack ? 'Clear Track?' : 'Delete Track?',
+        isFixedTrack
+          ? `"${trackName}" will be cleared. The track itself will remain in the project.`
+          : `Are you sure you want to remove "${trackName}" from this project?`,
+        {
+          danger: true,
+          confirmText: isFixedTrack ? 'Yes, Clear' : 'Yes, Delete',
+          icon: 'fa-solid fa-trash-can'
+        }
+      );
+      if (!confirmed) return;
+
+      this._pushUndoState(idx < 5 ? 'Clear Track' : 'Delete Track');
+
+      // Stop playback before changing the track graph, but DO NOT reset the
+      // playhead. stemStop() intentionally rewinds to 00:00; deleting a track
+      // must not affect the user's current listening position.
+      let preservedPlayhead = Number(this.stemPauseTime) || 0;
+      try {
+        if (this.stemIsPlaying && this.stemAudioCtx) {
+          const now = this.stemAudioCtx.currentTime;
+          preservedPlayhead = Math.min(
+            this.stemDuration || 0,
+            Math.max(0, (now - (this.stemStartTime || now)) * (this.stemSpeed || 1.0))
+          );
+        }
+        this.stemPause();
+      } catch (e) {}
 
       // Base five tracks stay as fixed slots in the DAW. Deleting one clears
       // its audio/clip content instead of breaking the fixed track layout.
@@ -8138,6 +8722,16 @@
         this._renderAllStemCanvases();
         this._renderClipDOMElements();
         this._renderTimelineRuler();
+
+        // Keep the user's last listening position after clearing a fixed track.
+        this.stemPauseTime = Math.min(
+          this.stemDuration || 0,
+          Math.max(0, preservedPlayhead)
+        );
+        const fixedTimeEl = document.getElementById('stemCurrentTime');
+        if (fixedTimeEl) fixedTimeEl.textContent = this._secToTimeStr(this.stemPauseTime);
+        this._updateGlobalPlayhead(this.stemPauseTime);
+
         this.showToast(`${this.tracks[idx].name} cleared`, 'success');
         return;
       }
@@ -8176,6 +8770,18 @@
       this._renderAllStemCanvases();
       this._renderClipDOMElements();
       this._renderTimelineRuler();
+
+      // Removing a dynamic track must not rewind the global playhead either.
+      // If the removed track was the only item defining the previous duration,
+      // clamp the preserved position to the new project duration.
+      this.stemPauseTime = Math.min(
+        this.stemDuration || 0,
+        Math.max(0, preservedPlayhead)
+      );
+      const removedTimeEl = document.getElementById('stemCurrentTime');
+      if (removedTimeEl) removedTimeEl.textContent = this._secToTimeStr(this.stemPauseTime);
+      this._updateGlobalPlayhead(this.stemPauseTime);
+
       this.showToast(`Removed "${removedTrack?.name || 'Track'}"`, 'success');
     }
 
@@ -8231,6 +8837,12 @@
         }
 
         if (!Array.isArray(this.tracks)) this.tracks = [];
+        if (newName === currentName) {
+          cleanup();
+          close();
+          return;
+        }
+        this._pushUndoState('Rename Track');
         if (!this.tracks[idx]) this.tracks[idx] = { index: idx, name: currentName };
         this.tracks[idx].name = newName;
         this.tracks[idx].index = idx;
@@ -8273,6 +8885,7 @@
     }
 
     setStemGain(idx, val) {
+      this._pushUndoGesture(`gain_${idx}`, 'Change Track Volume');
       val = parseFloat(val) || 0;
       this.stemGains[idx] = val;
       const txt = document.getElementById(`volVal_${idx}`);
@@ -8281,6 +8894,7 @@
     }
 
     setStemPan(idx, val) {
+      this._pushUndoGesture(`pan_${idx}`, 'Change Track Pan');
       val = parseFloat(val) || 0;
       this.stemPans[idx] = val;
       const txt = document.getElementById(`panVal_${idx}`);
@@ -8296,6 +8910,7 @@
     }
 
     setStemFadeIn(idx, val) {
+      this._pushUndoGesture(`fadeIn_${idx}`, 'Change Track Fade In');
       val = parseFloat(val) || 0;
       this.stemFadeIn[idx] = val;
       const txt = document.getElementById(`fadeInVal_${idx}`);
@@ -8304,6 +8919,7 @@
     }
 
     setStemFadeOut(idx, val) {
+      this._pushUndoGesture(`fadeOut_${idx}`, 'Change Track Fade Out');
       val = parseFloat(val) || 0;
       this.stemFadeOut[idx] = val;
       const txt = document.getElementById(`fadeOutVal_${idx}`);
@@ -8312,6 +8928,7 @@
     }
 
     setMasterFadeIn(val) {
+      this._pushUndoGesture('masterFadeIn', 'Change Master Fade In');
       val = parseFloat(val) || 0;
       this.masterFadeIn = val;
       const txt = document.getElementById('masterFadeInVal');
@@ -8320,6 +8937,7 @@
     }
 
     setMasterFadeOut(val) {
+      this._pushUndoGesture('masterFadeOut', 'Change Master Fade Out');
       val = parseFloat(val) || 0;
       this.masterFadeOut = val;
       const txt = document.getElementById('masterFadeOutVal');
@@ -8328,6 +8946,7 @@
     }
 
     toggleStemMute(idx) {
+      this._pushUndoState('Toggle Mute');
       this.stemMuted[idx] = !this.stemMuted[idx];
       const b = document.getElementById(`mute_${idx}`);
       if (b) {
@@ -8350,6 +8969,7 @@
     }
 
     toggleStemSolo(idx) {
+      this._pushUndoState('Toggle Solo');
       this.stemSoloed[idx] = !this.stemSoloed[idx];
       const b = document.getElementById(`solo_${idx}`);
       if (b) b.classList.toggle('active', this.stemSoloed[idx]);
@@ -8357,6 +8977,7 @@
     }
 
     setStemMasterGain(val) {
+      this._pushUndoGesture('masterGain', 'Change Master Volume');
       val = parseFloat(val) || 1;
       this.stemMasterGainVal = val;
       const txt = document.getElementById('stemMasterGainValue');
@@ -8578,22 +9199,142 @@
       return this.stemFx[idx];
     }
 
-    _ensureStemTrackViewControls() {
-      const wraps = document.querySelectorAll('.stem-track-waveform-wrap');
-      wraps.forEach((wrap) => {
-        const card = wrap.closest('.stem-track-card');
-        const idx = card ? parseInt(card.getAttribute('data-track'), 10) : NaN;
+    _ensureStemTrackReorderControls() {
+      const consoleEl = document.getElementById('stemMultitrackConsole');
+      if (!consoleEl) return;
+      const cards = Array.from(consoleEl.querySelectorAll('.stem-track-card'));
+      if (!Array.isArray(this.stemTrackOrder)) this.stemTrackOrder = cards.map(card => parseInt(card.dataset.track, 10)).filter(Number.isFinite);
+
+      cards.forEach(card => {
+        const idx = parseInt(card.dataset.track, 10);
         if (!Number.isFinite(idx)) return;
+        card.classList.remove('stem-drop-before', 'stem-drop-after');
+
+        let handle = card.querySelector('.stem-track-drag-handle');
+        if (!handle) {
+          handle = document.createElement('span');
+          handle.className = 'stem-track-drag-handle';
+          handle.draggable = true;
+          handle.title = 'Drag to move this track up or down';
+          handle.setAttribute('aria-label', 'Drag to reorder track');
+          handle.innerHTML = '<i class="fa-solid fa-grip-vertical"></i>';
+
+          const controls = card.querySelector('.stem-track-controls');
+          const titleRow = controls ? controls.firstElementChild : null;
+          if (titleRow) {
+            titleRow.insertBefore(handle, titleRow.firstChild);
+          } else if (controls) {
+            controls.insertBefore(handle, controls.firstChild);
+          }
+
+          handle.addEventListener('mousedown', (ev) => ev.stopPropagation());
+          handle.addEventListener('click', (ev) => ev.stopPropagation());
+          handle.addEventListener('dragstart', (ev) => {
+            ev.stopPropagation();
+            this._stemDraggingTrack = idx;
+            card.classList.add('stem-dragging');
+            if (ev.dataTransfer) {
+              ev.dataTransfer.effectAllowed = 'move';
+              ev.dataTransfer.setData('text/plain', String(idx));
+            }
+          });
+          handle.addEventListener('dragend', () => {
+            this._stemDraggingTrack = null;
+            consoleEl.querySelectorAll('.stem-track-card').forEach(c => c.classList.remove('stem-dragging', 'stem-drop-before', 'stem-drop-after'));
+          });
+        }
+
+        if (!card.dataset.reorderBound) {
+          card.dataset.reorderBound = '1';
+          card.addEventListener('dragover', (ev) => {
+            const sourceIdx = Number(this._stemDraggingTrack);
+            const targetIdx = Number(card.dataset.track);
+            if (!Number.isFinite(sourceIdx) || sourceIdx === targetIdx) return;
+            ev.preventDefault();
+            if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move';
+            const rect = card.getBoundingClientRect();
+            const before = ev.clientY < rect.top + rect.height / 2;
+            consoleEl.querySelectorAll('.stem-track-card').forEach(c => c.classList.remove('stem-drop-before', 'stem-drop-after'));
+            card.classList.add(before ? 'stem-drop-before' : 'stem-drop-after');
+          });
+          card.addEventListener('dragleave', (ev) => {
+            if (!card.contains(ev.relatedTarget)) card.classList.remove('stem-drop-before', 'stem-drop-after');
+          });
+          card.addEventListener('drop', (ev) => {
+            ev.preventDefault();
+            const sourceIdx = Number(this._stemDraggingTrack ?? ev.dataTransfer?.getData('text/plain'));
+            const targetIdx = Number(card.dataset.track);
+            if (!Number.isFinite(sourceIdx) || !Number.isFinite(targetIdx) || sourceIdx === targetIdx) return;
+            const rect = card.getBoundingClientRect();
+            const before = ev.clientY < rect.top + rect.height / 2;
+            this._moveStemTrackCard(sourceIdx, targetIdx, before);
+            this._stemDraggingTrack = null;
+            consoleEl.querySelectorAll('.stem-track-card').forEach(c => c.classList.remove('stem-dragging', 'stem-drop-before', 'stem-drop-after'));
+          });
+        }
+      });
+
+      // Keep the Add Track slot at the bottom.
+      const addSlot = document.getElementById('stemAddTrackSlot');
+      if (addSlot && addSlot.parentElement === consoleEl) consoleEl.appendChild(addSlot);
+    }
+
+    _moveStemTrackCard(sourceIdx, targetIdx, before = true) {
+      const consoleEl = document.getElementById('stemMultitrackConsole');
+      if (!consoleEl || sourceIdx === targetIdx) return;
+      const sourceCard = consoleEl.querySelector(`.stem-track-card[data-track="${sourceIdx}"]`);
+      const targetCard = consoleEl.querySelector(`.stem-track-card[data-track="${targetIdx}"]`);
+      if (!sourceCard || !targetCard) return;
+
+      const cards = Array.from(consoleEl.querySelectorAll('.stem-track-card'));
+      const order = cards.map(c => Number(c.dataset.track)).filter(Number.isFinite);
+      const from = order.indexOf(sourceIdx);
+      let to = order.indexOf(targetIdx);
+      if (from < 0 || to < 0) return;
+      order.splice(from, 1);
+      to = order.indexOf(targetIdx);
+      if (!before) to += 1;
+      order.splice(to, 0, sourceIdx);
+      this.stemTrackOrder = order;
+
+      if (before) consoleEl.insertBefore(sourceCard, targetCard);
+      else consoleEl.insertBefore(sourceCard, targetCard.nextSibling);
+
+      this._updateStemTrackPlayheadVisuals();
+      const movedName = this.tracks?.[sourceIdx]?.name || `Track ${sourceIdx + 1}`;
+      this.showToast(`↕️ Moved "${movedName}" ${before ? 'above' : 'below'} "${this.tracks?.[targetIdx]?.name || `Track ${targetIdx + 1}`}"`, 'success');
+    }
+
+    _ensureStemTrackViewControls() {
+      const cards = document.querySelectorAll('.stem-track-card');
+      const activeTrackIndexes = new Set();
+
+      cards.forEach((card) => {
+        const idx = parseInt(card.getAttribute('data-track'), 10);
+        if (!Number.isFinite(idx)) return;
+        activeTrackIndexes.add(String(idx));
+
         if (!Array.isArray(this.stemTrackZoom)) this.stemTrackZoom = [];
         if (!Array.isArray(this.stemTrackScrollLeft)) this.stemTrackScrollLeft = [];
         if (!Number.isFinite(this.stemTrackZoom[idx])) this.stemTrackZoom[idx] = 1;
         if (!Number.isFinite(this.stemTrackScrollLeft[idx])) this.stemTrackScrollLeft[idx] = 0;
 
-        let controls = wrap.querySelector('.stem-track-zoom-controls');
+        let controls = card.querySelector('.stem-track-zoom-controls');
+
+        // Clean up any old V24–V37 body-level control for this track.
+        const oldControls = document.querySelectorAll(
+          `.stem-track-zoom-controls[data-track="${idx}"]`
+        );
+        oldControls.forEach((candidate) => {
+          if (candidate !== controls) candidate.remove();
+        });
+
         if (!controls) {
           controls = document.createElement('div');
           controls.className = 'stem-track-zoom-controls';
+          controls.dataset.track = String(idx);
           controls.title = 'Per-track waveform zoom';
+          controls.setAttribute('aria-label', 'Track waveform zoom controls');
 
           const minus = document.createElement('button');
           minus.type = 'button';
@@ -8616,45 +9357,130 @@
           reset.textContent = '1:1';
           reset.title = 'Reset track zoom to 100%';
 
-          controls.appendChild(minus);
-          controls.appendChild(value);
-          controls.appendChild(plus);
-          controls.appendChild(reset);
-          wrap.insertBefore(controls, wrap.firstChild);
+          controls.append(minus, value, plus, reset);
 
-          [minus, plus, reset, controls].forEach(el => {
+          // IMPORTANT:
+          // Append to the non-scrolling track card. NEVER append to body and
+          // NEVER append inside .stem-track-waveform-wrap.
+          card.appendChild(controls);
+
+          [minus, plus, reset, controls].forEach((el) => {
             el.addEventListener('click', (ev) => {
               ev.preventDefault();
               ev.stopPropagation();
             });
-            el.addEventListener('mousedown', (ev) => {
-              ev.stopPropagation();
-            });
+            el.addEventListener('mousedown', (ev) => ev.stopPropagation());
           });
 
-          minus.addEventListener('click', () => this.setStemTrackZoom(idx, this.stemTrackZoom[idx] - 0.25));
-          plus.addEventListener('click', () => this.setStemTrackZoom(idx, this.stemTrackZoom[idx] + 0.25));
-          reset.addEventListener('click', () => this.setStemTrackZoom(idx, 1));
+          minus.addEventListener('click', () =>
+            this.setStemTrackZoom(idx, this.stemTrackZoom[idx] - 0.25)
+          );
+          plus.addEventListener('click', () =>
+            this.setStemTrackZoom(idx, this.stemTrackZoom[idx] + 0.25)
+          );
+          reset.addEventListener('click', () =>
+            this.setStemTrackZoom(idx, 1)
+          );
 
-          wrap.addEventListener('scroll', () => {
-            this.stemTrackScrollLeft[idx] = wrap.scrollLeft;
-            controls.style.transform = `translate3d(${wrap.scrollLeft}px, 0, 0)`;
-            this._updateStemTrackPlayheadVisuals();
-          }, { passive: true });
+          const wrap = card.querySelector('.stem-track-waveform-wrap');
+          if (wrap) {
+            wrap.addEventListener('scroll', () => {
+              this.stemTrackScrollLeft[idx] = wrap.scrollLeft;
+              // Do not move the controls with horizontal waveform scrolling.
+              this._positionStemZoomControl(idx, controls);
+              this._updateStemTrackPlayheadVisuals();
+            }, { passive: true });
+          }
         }
 
         const value = controls.querySelector('.stem-track-zoom-value');
-        if (value) value.textContent = Math.round(this.stemTrackZoom[idx] * 100) + '%';
-        controls.style.transform = `translate3d(${wrap.scrollLeft || 0}px, 0, 0)`;
+        if (value) {
+          value.textContent = Math.round(this.stemTrackZoom[idx] * 100) + '%';
+        }
+
+        this._positionStemZoomControl(idx, controls);
       });
+
+      // Remove all controls that do not belong to a current track card.
+      document.querySelectorAll('.stem-track-zoom-controls').forEach((controls) => {
+        const card = controls.closest('.stem-track-card');
+        const idx = card ? card.getAttribute('data-track') : null;
+        if (!card || !activeTrackIndexes.has(idx)) controls.remove();
+      });
+
+      this._positionAllStemZoomControls();
+    }
+
+    _positionStemZoomControl(idx, controls = null) {
+      const card = document.querySelector(`.stem-track-card[data-track="${idx}"]`);
+      if (!controls && card) {
+        controls = card.querySelector('.stem-track-zoom-controls');
+      }
+      if (!controls) return;
+
+      // The card itself does not horizontally scroll. The waveform wrapper
+      // inside it does, so this keeps the controls exactly at the waveform's
+      // top-right corner without following waveform scroll/zoom.
+      controls.style.position = 'absolute';
+      controls.style.top = '44px';
+      controls.style.right = '18px';
+      controls.style.left = 'auto';
+      controls.style.bottom = 'auto';
+      controls.style.transform = 'none';
+      controls.style.visibility = 'visible';
+    }
+
+    _positionAllStemZoomControls() {
+      document.querySelectorAll('.stem-track-zoom-controls[data-track]').forEach((controls) => {
+        const idx = Number(controls.dataset.track);
+        if (Number.isFinite(idx)) this._positionStemZoomControl(idx, controls);
+      });
+    }
+
+    _bindStemZoomViewportPositioning() {
+      // Intentionally no window/viewport positioning: zoom controls are
+      // card-anchored and therefore independent of waveform scrolling.
+      this._positionAllStemZoomControls();
     }
 
     _getStemTrackContentWidth(idx, wrap = null) {
       wrap = wrap || document.querySelector(`.stem-track-card[data-track="${idx}"] .stem-track-waveform-wrap`);
       if (!wrap) return 800;
-      const viewportWidth = Math.max(1, wrap.clientWidth || 800);
+
+      // The viewport width is the width of ONE screen of the original
+      // timeline.  It is intentionally NOT divided by the current project
+      // duration.  If a new track makes the project longer, the timeline
+      // becomes wider and horizontally scrollable instead of shrinking the
+      // tracks that were already there.
+      const card = wrap.closest('.stem-track-card');
+      const controls = card ? card.querySelector('.stem-track-controls') : null;
+      const cardWidth = card ? card.clientWidth : 0;
+      const controlsWidth = controls ? controls.offsetWidth : 0;
+      const measuredViewport = Math.max(1, wrap.clientWidth || 0);
+      const geometryViewport = Math.max(1, cardWidth - controlsWidth);
+      const viewportWidth = Math.max(measuredViewport, geometryViewport, 800);
+
       const zoom = Math.max(1, Math.min(8, Number(this.stemTrackZoom?.[idx]) || 1));
-      return Math.max(viewportWidth, Math.round(viewportWidth * zoom));
+
+      // Anchor the visual scale to the duration that existed when the first
+      // timeline/song was created. Example: 5-minute base + 60-minute track
+      // => 12 viewport-widths of timeline, so the 5-minute track keeps its
+      // original width and the 60-minute track simply continues off-screen.
+      let baseDuration = Number(this.stemTimelineBaseDuration) || 0;
+      const projectDuration = Number(this.stemDuration) || 0;
+      if (baseDuration <= 0 && projectDuration > 0) {
+        baseDuration = projectDuration;
+        this.stemTimelineBaseDuration = baseDuration;
+      }
+
+      const durationScale = baseDuration > 0
+        ? Math.max(1, projectDuration / baseDuration)
+        : 1;
+
+      return Math.max(
+        viewportWidth,
+        Math.round(viewportWidth * durationScale * zoom)
+      );
     }
 
     _makeImpulseResponse(ctx, duration, decay) {
@@ -8723,6 +9549,9 @@
       this.stemClips = [[], [], [], [], []];
       this.stemTrackZoom = [1, 1, 1, 1, 1];
       this.stemTrackScrollLeft = [0, 0, 0, 0, 0];
+      this.stemTrackOrder = [0, 1, 2, 3, 4];
+      this._stemDraggingTrack = null;
+      this._stemAutoScrollGuard = false;
       this.selectedTrackIdx = 0;
       this.selectedClipId = null;
       this.undoStack = [];
@@ -8730,6 +9559,7 @@
       this.stemPauseTime = 0;
       this.stemStartTime = 0;
       this.stemDuration = 0;
+      this.stemTimelineBaseDuration = 0;
       this.stemIsPlaying = false;
       this.stemSpeed = 1;
       this.stemMasterGainVal = 1;
@@ -8817,9 +9647,40 @@
         if (localLine && wrap) {
           if (isSelected) {
             const contentWidth = this._getStemTrackContentWidth(i, wrap);
-            const x = (pct * contentWidth) - wrap.scrollLeft;
-            localLine.style.display = 'block';
-            localLine.style.left = x + 'px';
+            const viewportWidth = Math.max(1, wrap.clientWidth || 1);
+            const absoluteX = pct * contentWidth;
+
+            // When a track is zoomed, keep its playhead in the visible viewport
+            // during playback instead of letting the line disappear off-screen.
+            const zoom = Math.max(1, Number(this.stemTrackZoom?.[i]) || 1);
+            if (this.stemIsPlaying && zoom > 1 && !this._stemAutoScrollGuard) {
+              const margin = Math.max(32, viewportWidth * 0.18);
+              const currentScroll = wrap.scrollLeft || 0;
+              if (absoluteX < currentScroll + margin || absoluteX > currentScroll + viewportWidth - margin) {
+                const desiredScroll = Math.max(0, Math.min(
+                  Math.max(0, contentWidth - viewportWidth),
+                  Math.round(absoluteX - viewportWidth * 0.32)
+                ));
+                if (Math.abs(desiredScroll - currentScroll) > 1) {
+                  this._stemAutoScrollGuard = true;
+                  wrap.scrollLeft = desiredScroll;
+                  this.stemTrackScrollLeft[i] = wrap.scrollLeft;
+                  const zoomControls = document.querySelector(`.stem-track-zoom-controls[data-track="${i}"]`);
+                  if (zoomControls) this._positionStemZoomControl(i, zoomControls);
+                  this._stemAutoScrollGuard = false;
+                }
+              }
+            }
+
+            const x = absoluteX - (wrap.scrollLeft || 0);
+            // The line belongs to the zoomed track itself. Keep it exact and
+            // visible whenever the current position is inside the viewport.
+            if (x >= -2 && x <= viewportWidth + 2) {
+              localLine.style.display = 'block';
+              localLine.style.left = Math.round(x) + 'px';
+            } else {
+              localLine.style.display = 'none';
+            }
           } else {
             localLine.style.display = 'none';
           }
@@ -8881,6 +9742,7 @@
 
     async setStemFxEnabled(type, enabled) {
       const idx = this.selectedTrackIdx || 0;
+      this._pushUndoState('Toggle FX');
       this._ensureStemFxState(idx)[type].enabled = !!enabled;
 
       if (!enabled && !this.stemIsPlaying) {
@@ -8893,6 +9755,7 @@
 
     setStemFxParam(type, key, value) {
       const idx = this.selectedTrackIdx || 0;
+      this._pushUndoGesture(`fx_${idx}_${type}`, 'Adjust FX');
       const fx = this._ensureStemFxState(idx);
       if (!fx[type]) return;
       fx[type][key] = parseFloat(value);
@@ -8901,6 +9764,8 @@
     }
 
     setStemTrackZoom(idx, value) {
+      this._pushUndoGesture(`zoom_${parseInt(idx, 10)}`, 'Change Track Zoom');
+      // Zoom is display-only: it changes waveform canvas width/viewport only; clip timing is untouched.
       idx = parseInt(idx, 10);
       if (!Number.isFinite(idx)) return;
       value = Math.max(1, Math.min(8, parseFloat(value) || 1));
@@ -8940,6 +9805,8 @@
         if (currentWrap) {
           currentWrap.scrollLeft = targetScroll;
           this.stemTrackScrollLeft[idx] = currentWrap.scrollLeft;
+          const zoomControls = document.querySelector(`.stem-track-zoom-controls[data-track="${idx}"]`);
+          if (zoomControls) this._positionStemZoomControl(idx, zoomControls);
           this._updateStemTrackPlayheadVisuals();
         }
       });
