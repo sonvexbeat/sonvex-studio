@@ -3716,6 +3716,7 @@
       this.videoShortsExportRecorder = null;
       this.videoShortsExportStream = null;
       this.videoShortsExporting = false;
+      this.videoShortsExportWorker = null;
       this.videoShortsExportCancelRequested = false;
       this.videoShortsExportQueue = [];
       this.videoShortsExportQueueIndex = 0;
@@ -7472,26 +7473,44 @@
 
     async exportVideoShortMp4() {
       if(this.videoShortsExporting || !this.videoShortsVideo || this.videoShortsActiveClipIndex<0) return;
-       // Always start with a clean FFmpeg.wasm instance. A previous canceled
-       // export can leave its internal "running" flag set.
-       if(this.videoShortsFfmpeg){
-         try{ this.videoShortsFfmpeg.terminate(); }catch(e){}
-         this.videoShortsFfmpeg=null;
-       }
-       this.videoShortsFfmpegLoading=null;
+
       this.videoShortsExporting=true;
       this.videoShortsExportCancelRequested=false;
+      this.videoShortsMp4Phase='prepare';
       this.videoShortsRealProgressSeen=false;
-      this.videoShortsExportProgressTimer=null;
 
       const status=document.getElementById('videoExportStatus');
       const fill=document.getElementById('videoExportProgressFill');
       const cancel=document.getElementById('videoExportCancelBtn');
       if(cancel)cancel.disabled=false;
-      if(fill)fill.style.width='0%';
+      if(fill)fill.style.width='1%';
       if(status)status.textContent='Preparing MP4…';
       this._showVideoExportOverlay();
       this._updateVideoShortsExportButtons();
+
+      let worker=null;
+      let workerUrl=null;
+      let settled=false;
+
+      const finishCleanup=()=>{
+        if(worker){
+          try{worker.terminate();}catch(e){}
+          worker=null;
+        }
+        if(workerUrl){
+          try{URL.revokeObjectURL(workerUrl);}catch(e){}
+          workerUrl=null;
+        }
+        this.videoShortsExportWorker=null;
+        this.videoShortsMp4Phase=null;
+        this.videoShortsMp4CurrentDuration=0;
+        this.videoShortsExporting=false;
+        this.videoShortsExportRecorder=null;
+        this.videoShortsExportStream=null;
+        if(cancel)cancel.disabled=true;
+        this._hideVideoExportOverlay();
+        this._updateVideoShortsExportButtons();
+      };
 
       try{
         const idx=this.videoShortsActiveClipIndex;
@@ -7499,15 +7518,6 @@
         if(!clip)throw new Error('No clip is selected.');
 
         const settings=this._videoShortsGetExportSettings(clip);
-        const ffmpeg=await this._loadVideoShortsFfmpeg(true);
-        const fetchFile=window.FFmpeg?.fetchFile;
-        if(!fetchFile)throw new Error('FFmpeg file helper is unavailable.');
-        if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
-
-        if(Math.abs(Number(settings.speed||1)-1)>0.0001){
-          throw new Error('Playback speed must be 1.00x for direct MP4 export.');
-        }
-
         const source=this.videoShortsSourceFile;
         if(!source)throw new Error('Original source file is unavailable.');
 
@@ -7515,207 +7525,106 @@
         const end=Math.max(start,Number(clip.end)||0);
         const duration=end-start;
         if(duration<=0)throw new Error('Invalid clip duration.');
+
         this.videoShortsMp4CurrentDuration=duration;
 
-        const token=`${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-        const ext=(source.name.match(/\.([a-z0-9]+)$/i)?.[1]||'mp4').toLowerCase();
-        const inName=`direct_${token}.${ext}`;
-        const videoName=`video_${token}.mp4`;
-        const audioName=`audio_${token}.m4a`;
-        const outName=`direct_${token}.mp4`;
+        const blob=new Blob(["\nimportScripts('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js');\n\nlet ffmpeg = null;\nlet currentJob = null;\n\nconst CORE_PATH = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js';\nconst FFMPEG_WORKER_PATH = 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/046d0074eee1d99a674a.js';\n\nfunction post(type, data) {\n  self.postMessage(Object.assign({type}, data || {}));\n}\n\nfunction secondsFromTimeLog(message) {\n  const m = String(message || '').match(/time=(\\d+):(\\d+):(\\d+(?:\\.\\d+)?)/);\n  if (!m) return null;\n  return Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3]);\n}\n\nfunction makeProgressLogger(total, phase, base, span) {\n  return ({message}) => {\n    const elapsed = secondsFromTimeLog(message);\n    if (elapsed == null || !currentJob) return;\n    const pct = Math.max(0, Math.min(1, elapsed / Math.max(0.001, total)));\n    post('progress', {\n      phase,\n      percent: base + pct * span,\n      phasePercent: pct,\n      elapsed,\n      total,\n      message: String(message)\n    });\n  };\n}\n\nasync function ensureFfmpeg() {\n  if (ffmpeg && ffmpeg.isLoaded && ffmpeg.isLoaded()) return ffmpeg;\n\n  post('status', {message:'Loading MP4 encoder\u2026'});\n  ffmpeg = FFmpeg.createFFmpeg({\n    log: true,\n    corePath: CORE_PATH,\n    workerPath: FFMPEG_WORKER_PATH,\n    mainName: 'main'\n  });\n  await ffmpeg.load();\n  post('progress', {phase:'prepare', percent:5, phasePercent:1});\n  return ffmpeg;\n}\n\nfunction unlinkSafe(name) {\n  if (!ffmpeg || !name) return;\n  try { ffmpeg.FS('unlink', name); } catch(e) {}\n}\n\nasync function run(args, expected, phase, total, base, span) {\n  if (!currentJob) throw new Error('CANCELLED');\n\n  ffmpeg.setLogger(makeProgressLogger(total, phase, base, span));\n\n  let status = 0;\n  try {\n    status = await ffmpeg.run(...args);\n  } catch (err) {\n    // ffmpeg.wasm 0.11 may reject with exit(0) even when a file was written.\n    let size = 0;\n    try { size = Number(ffmpeg.FS('stat', expected).size || 0); } catch(e) {}\n    if (!(Number(err && err.status) === 0 && size > 0)) throw err;\n  }\n\n  if (!currentJob) throw new Error('CANCELLED');\n\n  let size = 0;\n  try { size = Number(ffmpeg.FS('stat', expected).size || 0); } catch(e) {}\n  if (!size) throw new Error(`FFmpeg did not produce ${expected}.`);\n\n  post('progress', {phase, percent:base + span, phasePercent:1, elapsed:total, total});\n  return status;\n}\n\nself.onmessage = async (event) => {\n  const data = event.data || {};\n\n  if (data.type === 'cancel') {\n    currentJob = null;\n    // Termination is controlled by the main thread. Clearing the job makes\n    // the current command fail its next cooperative checkpoint.\n    return;\n  }\n\n  if (data.type !== 'export') return;\n\n  currentJob = {id:data.id};\n  const {file, start, duration, settings} = data;\n\n  const token = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;\n  const inName = `source_${token}.${String(file.name || 'mp4').split('.').pop().toLowerCase()}`;\n  const videoName = `video_${token}.mp4`;\n  const audioName = `audio_${token}.m4a`;\n  const outName = `sonvex_${token}.mp4`;\n\n  try {\n    const engine = await ensureFfmpeg();\n    if (!currentJob) throw new Error('CANCELLED');\n\n    post('status', {message:'Reading source file\u2026'});\n    const dataBytes = await FFmpeg.fetchFile(file);\n    if (!currentJob) throw new Error('CANCELLED');\n\n    engine.FS('writeFile', inName, dataBytes);\n    post('progress', {phase:'prepare', percent:8, phasePercent:1});\n\n    const ratio = Number(settings.ratio || 9/16);\n    const res = Number(settings.resolution) || 1080;\n    let outW = res, outH = Math.round(res / ratio);\n    if(settings.aspect === '9:16'){outW=res;outH=Math.round(res*16/9);}\n    else if(settings.aspect === '16:9'){outW=res;outH=Math.round(res*9/16);}\n    else if(settings.aspect === '1:1'){outW=outH=res;}\n    else if(settings.aspect === '4:5'){outW=Math.round(res*4/5);outH=res;}\n\n    let vf = `scale=${outW}:${outH}:force_original_aspect_ratio=increase,crop=${outW}:${outH}`;\n    if(Number(settings.zoom || 1) !== 1){\n      const z=Math.max(1,Number(settings.zoom));\n      const zw=Math.max(outW,Math.round(outW*z));\n      const zh=Math.max(outH,Math.round(outH*z));\n      vf=`scale=${zw}:${zh}:force_original_aspect_ratio=increase,crop=${outW}:${outH}`;\n    }\n    if(Number(settings.brightness || 1) !== 1){\n      vf += `,eq=brightness=${Number(settings.brightness)-1}`;\n    }\n    if(Number(settings.blur || 0) > 0){\n      vf += `,boxblur=${Math.max(1,Math.round(Number(settings.blur)))}:1`;\n    }\n\n    // Stage 1: render ONLY the selected range. The input-side -ss avoids\n    // rendering the whole source before reaching IN.\n    post('status',{message:'Rendering selected clip\u2026 0%'});\n    await run([\n      '-ss', String(start),\n      '-i', inName,\n      '-t', String(duration),\n      '-map','0:v:0',\n      '-vf',vf,\n      '-an',\n      '-c:v','libx264',\n      '-preset','ultrafast',\n      '-crf',String(Math.max(18,Math.min(28,Number(settings.bitrate) ? Math.round(28-Number(settings.bitrate)/2) : 23))),\n      '-pix_fmt','yuv420p',\n      '-tag:v','avc1',\n      '-movflags','+faststart',\n      '-f','mp4',\n      videoName\n    ], videoName, 'render', duration, 8, 68);\n\n    if (!currentJob) throw new Error('CANCELLED');\n\n    // Stage 2: stream-copy original audio. No audio decoding, filtering,\n    // resampling, or re-encoding.\n    post('status',{message:'Preparing original audio\u2026'});\n    await run([\n      '-ss', String(start),\n      '-i', inName,\n      '-t', String(duration),\n      '-map','0:a:0?',\n      '-c:a','copy',\n      '-avoid_negative_ts','make_zero',\n      '-movflags','+faststart',\n      '-f','mp4',\n      audioName\n    ], audioName, 'audio', duration, 76, 12);\n\n    if (!currentJob) throw new Error('CANCELLED');\n\n    // Stage 3: mux the already-trimmed video and untouched audio.\n    post('status',{message:'Finalizing MP4\u2026'});\n    await run([\n      '-i', videoName,\n      '-i', audioName,\n      '-map','0:v:0',\n      '-map','1:a:0?',\n      '-c:v','copy',\n      '-c:a','copy',\n      '-movflags','+faststart',\n      '-shortest',\n      '-f','mp4',\n      outName\n    ], outName, 'mux', 0.001, 88, 11);\n\n    if (!currentJob) throw new Error('CANCELLED');\n\n    const output = engine.FS('readFile', outName);\n    // Transfer the underlying ArrayBuffer instead of cloning it.\n    post('result', {\n      name:`sonvex-clip-${new Date().toISOString().replace(/[:.]/g,'-')}.mp4`,\n      buffer:output.buffer,\n      byteOffset:output.byteOffset,\n      byteLength:output.byteLength\n    });\n    currentJob = null;\n  } catch (err) {\n    const message = err && err.message ? err.message : String(err);\n    post('error',{message});\n    currentJob = null;\n  } finally {\n    unlinkSafe(inName);\n    unlinkSafe(videoName);\n    unlinkSafe(audioName);\n    unlinkSafe(outName);\n  }\n};\n"],{type:'application/javascript'});
+        workerUrl=URL.createObjectURL(blob);
+        worker=new Worker(workerUrl);
+        this.videoShortsExportWorker=worker;
 
-        const getSize=(name)=>{
-          try{return Number(ffmpeg.FS('stat',name)?.size||0);}catch(e){return 0;}
-        };
+        const result=await new Promise((resolve,reject)=>{
+          const id=`${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
 
-        // ffmpeg.wasm 0.11.6 has a hard single-command lock. Keep an explicit
-        // promise mutex here so even an accidental second export callback cannot
-        // call ffmpeg.run while another command is still inside the core.
-        const run=async(args,expected)=>{
-          if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
-          try{
-            await this._runFfmpegExclusive(ffmpeg,args);
-          }catch(err){
-            const statusCode=Number(err?.status);
-            if(!(statusCode===0 && getSize(expected)>0))throw err;
-          }
-          if(getSize(expected)<=0)throw new Error(`FFmpeg did not produce ${expected}.`);
-        };
-
-        try{
-          ffmpeg.FS('writeFile',inName,await fetchFile(source));
-
-          const ratio=this._videoShortsAspectRatio(settings.aspect);
-          const res=Number(settings.resolution)||1080;
-          let outW=res,outH=Math.round(res/ratio);
-          if(settings.aspect==='9:16'){outW=res;outH=Math.round(res*16/9);}
-          else if(settings.aspect==='16:9'){outW=res;outH=Math.round(res*9/16);}
-          else if(settings.aspect==='1:1'){outW=outH=res;}
-          else if(settings.aspect==='4:5'){outW=Math.round(res*4/5);outH=res;}
-
-          let vf=`scale=${outW}:${outH}:force_original_aspect_ratio=increase,crop=${outW}:${outH}`;
-          if(Number(settings.zoom||1)!==1){
-            const z=Math.max(1,Number(settings.zoom));
-            const zw=Math.max(outW,Math.round(outW*z));
-            const zh=Math.max(outH,Math.round(outH*z));
-            vf=`scale=${zw}:${zh}:force_original_aspect_ratio=increase,crop=${outW}:${outH}`;
-          }
-          if(Number(settings.brightness||1)!==1){
-            vf+=`,eq=brightness=${Number(settings.brightness)-1}`;
-          }
-          if(Number(settings.blur||0)>0){
-            vf+=`,boxblur=${Math.max(1,Math.round(Number(settings.blur)))}:1`;
-          }
-
-          /*
-           * IMPORTANT:
-           * The previous V10 command used:
-           *   -i source -ss IN -t duration ...
-           * which can leave FFmpeg decoding from the beginning while seeking
-           * on the output side. More importantly, the final mux combined
-           * streams whose timestamps still belonged to the full source.
-           *
-           * V11 deliberately makes THREE small stages:
-           *   1) decode/render ONLY the selected video range
-           *   2) stream-copy ONLY the selected audio range
-           *   3) mux those two already-trimmed streams
-           *
-           * The source is never rendered from 0 to the end. The audio is never
-           * re-encoded.
-           */
-
-          // Stage 1: render only IN -> OUT, with no audio in this intermediate.
-          this.videoShortsMp4Phase='render';
-          if(status)status.textContent=`Rendering selected clip… 0%`;
-          if(fill)fill.style.width='5%';
-
-          if(this.videoShortsExportProgressTimer) clearInterval(this.videoShortsExportProgressTimer);
-          let pulse=5, pulseDir=1;
-          this.videoShortsExportProgressTimer=setInterval(()=>{
-            if(!this.videoShortsExporting || this.videoShortsMp4Phase!=='render') return;
-            if(this.videoShortsRealProgressSeen) return;
-            pulse += pulseDir * 1.5;
-            if(pulse>=65){pulse=65;pulseDir=-1;}
-            if(pulse<=5){pulse=5;pulseDir=1;}
-            if(fill)fill.style.width=pulse.toFixed(1)+'%';
-            if(status)status.textContent='Rendering selected clip… Encoding';
-          },350);
-
-          const videoArgs=[
-            '-ss',String(start),
-            '-i',inName,
-            '-t',String(duration),
-            '-map','0:v:0',
-            '-vf',vf,
-            '-an',
-            '-c:v','libx264',
-            '-preset','ultrafast',
-            '-crf',String(Math.max(18,Math.min(28,Number(settings.bitrate)?Math.round(28-Number(settings.bitrate)/2):23))),
-            '-pix_fmt','yuv420p',
-            '-tag:v','avc1',
-            '-movflags','+faststart',
-            '-f','mp4',
-            videoName
-          ];
-          await run(videoArgs,videoName);
-
-          if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
-
-          // Stage 2: cut the original audio to exactly the same requested
-          // duration. AAC packets are copied; no decoding/re-encoding occurs.
-          this.videoShortsMp4Phase='audio';
-          if(status)status.textContent='Preparing original audio…';
-          if(fill)fill.style.width='65%';
-
-          const audioArgs=[
-            '-i',inName,
-            '-ss',String(start),
-            '-t',String(duration),
-            '-map','0:a:0?',
-            '-c:a','copy',
-            '-avoid_negative_ts','make_zero',
-            '-movflags','+faststart',
-            '-f','mp4',
-            audioName
-          ];
-          await run(audioArgs,audioName);
-
-          if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
-
-          // Stage 3: mux only the two short intermediates. No video or audio
-          // re-encoding here.
-          this.videoShortsMp4Phase='mux';
-          if(status)status.textContent='Finalizing MP4…';
-          if(fill)fill.style.width='90%';
-
-          await run([
-            '-i',videoName,
-            '-i',audioName,
-            '-map','0:v:0',
-            '-map','1:a:0?',
-            '-c:v','copy',
-            '-c:a','copy',
-            '-shortest',
-            '-avoid_negative_ts','make_zero',
-            '-movflags','+faststart',
-            '-f','mp4',
-            outName
-          ],outName);
-
-          if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
-
-          const data=ffmpeg.FS('readFile',outName);
-          const bytes=data instanceof Uint8Array?data:new Uint8Array(data);
-          if(!bytes.byteLength)throw new Error('FFmpeg returned an empty MP4.');
-
-          let ftyp=false;
-          for(let i=4;i+4<Math.min(bytes.length,65536);i++){
-            if(bytes[i]===102&&bytes[i+1]===116&&bytes[i+2]===121&&bytes[i+3]===112){
-              ftyp=true;break;
+          worker.onmessage=(ev)=>{
+            const d=ev.data||{};
+            if(d.type==='status'){
+              if(status)status.textContent=d.message||'Preparing MP4…';
+              return;
             }
-          }
-          if(!ftyp)throw new Error('FFmpeg did not produce a valid MP4 container.');
 
-          const blob=new Blob([bytes],{type:'video/mp4'});
-          const url=URL.createObjectURL(blob);
-          const a=document.createElement('a');
-          a.href=url;
-          a.download=`sonvex-clip-${String(idx+1).padStart(2,'0')}.mp4`;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(()=>URL.revokeObjectURL(url),10000);
+            if(d.type==='progress'){
+              const pct=Math.max(0,Math.min(100,Number(d.percent)||0));
+              const phase=d.phase||'prepare';
+              this.videoShortsMp4Phase=phase;
+              if(fill)fill.style.width=`${pct.toFixed(1)}%`;
 
-          if(fill)fill.style.width='100%';
-          if(status)status.textContent='MP4 exported';
-          this.showToast('MP4 exported — only the selected IN/OUT range was rendered.','success');
+              if(status){
+                if(phase==='render'){
+                  status.textContent=`Rendering selected clip… ${Math.round(Number(d.phasePercent||0)*100)}%`;
+                }else if(phase==='audio'){
+                  status.textContent=`Preparing original audio… ${Math.round(Number(d.phasePercent||0)*100)}%`;
+                }else if(phase==='mux'){
+                  status.textContent=`Finalizing MP4… ${Math.round(Number(d.phasePercent||0)*100)}%`;
+                }
+              }
+              return;
+            }
 
-        }finally{
-          for(const name of [inName,videoName,audioName,outName]){
-            try{ffmpeg.FS('unlink',name);}catch(e){}
-          }
-          try{ffmpeg.terminate();}catch(e){}
-          if(this.videoShortsFfmpeg===ffmpeg)this.videoShortsFfmpeg=null;
-        }
+            if(d.type==='result'){
+              try{
+                const buffer=d.buffer instanceof ArrayBuffer
+                  ? d.buffer.slice(Number(d.byteOffset)||0,(Number(d.byteOffset)||0)+(Number(d.byteLength)||d.buffer.byteLength))
+                  : d.buffer;
+                resolve(new Blob([buffer],{type:'video/mp4'}));
+              }catch(e){reject(e);}
+              return;
+            }
 
+            if(d.type==='error'){
+              reject(new Error(d.message||'MP4 export failed.'));
+            }
+          };
+
+          worker.onerror=(ev)=>{
+            reject(new Error(ev.message||'MP4 export worker stopped unexpectedly.'));
+          };
+
+          worker.postMessage({
+            type:'export',
+            id,
+            file:source,
+            start,
+            duration,
+            settings:{
+              aspect:settings.aspect,
+              ratio:this._videoShortsAspectRatio(settings.aspect),
+              resolution:Number(settings.resolution)||1080,
+              bitrate:Number(settings.bitrate)||0,
+              zoom:Number(settings.zoom)||1,
+              brightness:Number(settings.brightness)||1,
+              blur:Number(settings.blur)||0
+            }
+          });
+        });
+
+        if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+        if(!(result instanceof Blob) || result.size<1024)throw new Error('MP4 export produced an empty or invalid file.');
+
+        // Keep the result only after the worker completed the entire export.
+        const url=URL.createObjectURL(result);
+        const a=document.createElement('a');
+        a.href=url;
+        a.download=`sonvex-clip-${String(idx+1).padStart(2,'0')}.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),15000);
+
+        if(fill)fill.style.width='100%';
+        if(status)status.textContent='MP4 ready';
+        this.showToast('MP4 exported successfully.','success');
       }catch(e){
-        console.error('MP4 export failed:',e);
-        if(status)status.textContent=e.message==='CANCELLED'?'Export cancelled':'MP4 export failed';
-        if(fill&&e.message==='CANCELLED')fill.style.width='0%';
-        if(e.message!=='CANCELLED')this.showToast(e.message||'MP4 export failed.','error');
-      }finally{
-        if(this.videoShortsExportProgressTimer){
-          clearInterval(this.videoShortsExportProgressTimer);
-          this.videoShortsExportProgressTimer=null;
+        if(e && e.message==='CANCELLED'){
+          if(status)status.textContent='Export cancelled';
+          if(fill)fill.style.width='0%';
+        }else{
+          console.error('MP4 export failed:',e);
+          if(status)status.textContent='MP4 export failed';
+          this.showToast(e?.message||'MP4 export failed.','error');
         }
-        this.videoShortsMp4Phase=null;
-        this.videoShortsMp4CurrentDuration=0;
-          this.videoShortsExporting=false;
-        this.videoShortsExportRecorder=null;
-        this.videoShortsExportStream=null;
-        if(cancel)cancel.disabled=true;
-        this._hideVideoExportOverlay();
-        this._updateVideoShortsExportButtons();
+      }finally{
+        finishCleanup();
       }
     }
 
@@ -7768,58 +7677,21 @@
       if(!this.videoShortsExporting) return;
 
       this.videoShortsExportCancelRequested=true;
-      this.videoShortsCloudCancelRequested=true;
 
-      if(this.videoShortsExportProgressTimer){
-        clearInterval(this.videoShortsExportProgressTimer);
-        this.videoShortsExportProgressTimer=null;
+      const worker=this.videoShortsExportWorker;
+      this.videoShortsExportWorker=null;
+      if(worker){
+        try{worker.postMessage({type:'cancel'});}catch(e){}
+        try{worker.terminate();}catch(e){}
       }
 
-      try { if(this.videoShortsVideo) this.videoShortsVideo.pause(); } catch(e) {}
-      if(this.videoShortsRenderRAF){
-        cancelAnimationFrame(this.videoShortsRenderRAF);
-        this.videoShortsRenderRAF=null;
-      }
-
-      // Return to the editor immediately; do not wait for the wasm promise.
+      // The worker owns the FFmpeg operation, so terminating it really stops
+      // the encode and immediately releases the page from the heavy work.
+      this.videoShortsExporting=false;
+      this.videoShortsMp4Phase=null;
       this._hideVideoExportOverlay();
-
-      const status=document.getElementById('videoExportStatus');
-      const fill=document.getElementById('videoExportProgressFill');
-      const btn=document.getElementById('videoExportBtn');
-      const cancelBtn=document.getElementById('videoExportCancelBtn');
-      if(status)status.textContent='Export cancelled';
-      if(fill)fill.style.width='0%';
-      if(btn)btn.disabled=true;
-      if(cancelBtn)cancelBtn.disabled=true;
-
-      if(this.videoShortsExportStream){
-        this.videoShortsExportStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});
-        this.videoShortsExportStream=null;
-      }
-
-      const recorder=this.videoShortsExportRecorder;
-      if(recorder && recorder.state!=='inactive'){
-        try{recorder.stop();}catch(e){}
-      }
-
-      const ffmpeg=this.videoShortsFfmpeg;
-      if(ffmpeg){
-        try{ffmpeg.terminate();}catch(e){}
-        if(this.videoShortsFfmpeg===ffmpeg){
-          this.videoShortsFfmpeg=null;
-          this.videoShortsFfmpegLoading=null;
-        }
-      }
-
-      this.videoShortsExportQueue=[];
-      if(this.videoShortsExportTimer){
-        clearInterval(this.videoShortsExportTimer);
-        this.videoShortsExportTimer=null;
-      }
-
       this._updateVideoShortsExportButtons();
-      this.showToast('Video export cancelled.', 'info');
+      this.showToast('Video export cancelled.','info');
     }
 
     openStemStudio() {
