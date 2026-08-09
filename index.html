@@ -6911,184 +6911,90 @@
     }
 
     async _renderVideoShortRangeBlob(clip, format='webm') {
-      // IMPORTANT: each export gets its own fresh HTMLVideoElement.
-      // Reusing the preview element after a previous MediaRecorder export can
-      // leave browser media state in a bad state and make export #2 fail.
+      // Deterministic frame-by-frame export. We seek the source for each frame
+      // instead of relying on background playback advancing currentTime.
       const sourceFile=this.videoShortsSourceFile;
       if(!sourceFile) throw new Error('Original source file is unavailable.');
       const settings=this._videoShortsGetExportSettings(clip);
-      const start=Number(clip.start)||0, end=Number(clip.end)||0;
-      if(end<=start) throw new Error('Invalid clip range.');
+      const startTime=Math.max(0,Number(clip.start)||0);
+      const endTime=Math.max(startTime,Number(clip.end)||0);
+      const duration=endTime-startTime;
+      if(duration<=0) throw new Error('Invalid clip range.');
 
       const ratio=this._videoShortsAspectRatio(settings.aspect);
-      let h=settings.resolution, w=Math.round(h*ratio);
+      let h=settings.resolution,w=Math.round(h*ratio);
       if(settings.aspect==='16:9'){w=settings.resolution;h=Math.round(w/ratio);}
       if(settings.aspect==='1:1'){w=h=settings.resolution;}
-      if(settings.aspect==='4:5'){w=Math.round(h*.8);}
+      if(settings.aspect==='4:5')w=Math.round(h*.8);
 
-      const exportVideo=document.createElement('video');
-      exportVideo.muted=true;
-      exportVideo.playsInline=true;
-      exportVideo.preload='auto';
-      exportVideo.crossOrigin='anonymous';
-      exportVideo.style.position='fixed';
-      exportVideo.style.left='-10000px';
-      exportVideo.style.top='-10000px';
-      exportVideo.style.width='1px';
-      exportVideo.style.height='1px';
-      document.body.appendChild(exportVideo);
+      const v=document.createElement('video');
+      v.muted=true; v.playsInline=true; v.preload='auto';
+      v.style.position='fixed';v.style.left='-10000px';v.style.top='-10000px';
+      v.style.width='2px';v.style.height='2px';document.body.appendChild(v);
+      const srcUrl=URL.createObjectURL(sourceFile);v.src=srcUrl;
 
-      const sourceUrl=URL.createObjectURL(sourceFile);
-      exportVideo.src=sourceUrl;
-
-      const cleanupVideo=()=>{
-        try{exportVideo.pause();}catch(e){}
-        try{exportVideo.removeAttribute('src');exportVideo.load();}catch(e){}
-        try{exportVideo.remove();}catch(e){}
-        try{URL.revokeObjectURL(sourceUrl);}catch(e){}
-      };
-
-      const canvas=document.createElement('canvas');
-      canvas.width=w; canvas.height=h;
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
       const stream=canvas.captureStream(24);
+      const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(x=>MediaRecorder.isTypeSupported(x))||'';
+      if(!mime){URL.revokeObjectURL(srcUrl);v.remove();throw new Error('No supported video recording format.');}
 
-      let mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
-        .find(x=>MediaRecorder.isTypeSupported(x))||'';
-      if(!mime){cleanupVideo();throw new Error('No supported video recording format.');}
-
-      const recorder=new MediaRecorder(stream,{
-        mimeType:mime,
-        videoBitsPerSecond:settings.bitrate*1000000
-      });
+      const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:settings.bitrate*1000000});
       const chunks=[];
-      this.videoShortsExportRecorder=recorder;
-      this.videoShortsExportStream=stream;
-
-      const old={rate:this.videoShortsVideo?.playbackRate||1,muted:this.videoShortsVideo?.muted||false};
-      if(this.videoShortsVideo){
-        try{this.videoShortsVideo.pause();}catch(e){}
-      }
-      exportVideo.playbackRate=1;
+      this.videoShortsExportRecorder=recorder;this.videoShortsExportStream=stream;
 
       const cleanup=()=>{
-        try{exportVideo.pause();}catch(e){}
+        try{v.pause();v.removeAttribute('src');v.load();v.remove();}catch(e){}
+        try{URL.revokeObjectURL(srcUrl);}catch(e){}
         try{stream.getTracks().forEach(t=>t.stop());}catch(e){}
-        cleanupVideo();
-        this.videoShortsExportStream=null;
-        this.videoShortsExportRecorder=null;
-        if(this.videoShortsVideo){
-          try{this.videoShortsVideo.playbackRate=old.rate;}catch(e){}
-          try{this.videoShortsVideo.muted=old.muted;}catch(e){}
-        }
+        this.videoShortsExportRecorder=null;this.videoShortsExportStream=null;
       };
-
-      const waitEvent=(target,event,timeout=15000)=>{
-        return new Promise((resolve,reject)=>{
-          let timer=setTimeout(()=>{cleanupListeners();reject(new Error(`Timed out waiting for ${event}.`));},timeout);
-          const ok=()=>{cleanupListeners();resolve();};
-          const fail=()=>{cleanupListeners();reject(new Error(`Source video failed while waiting for ${event}.`));};
-          const cleanupListeners=()=>{
-            clearTimeout(timer);
-            target.removeEventListener(event,ok);
-            target.removeEventListener('error',fail);
-          };
-          target.addEventListener(event,ok,{once:true});
-          target.addEventListener('error',fail,{once:true});
-        });
-      };
-
-      return await new Promise(async (resolve,reject)=>{
+      const seekTo=(t)=>new Promise((resolve,reject)=>{
         let done=false;
-        const finish=(err,blob)=>{
-          if(done)return;
-          done=true;
-          cleanup();
-          err?reject(err):resolve({blob,mime,width:w,height:h});
+        const timer=setTimeout(()=>finish(new Error('Video seek timed out.')),15000);
+        const finish=(err)=>{
+          if(done)return;done=true;clearTimeout(timer);
+          v.removeEventListener('seeked',ok);v.removeEventListener('error',bad);
+          err?reject(err):resolve();
         };
+        const ok=()=>finish();const bad=()=>finish(new Error('Source video seek failed.'));
+        v.addEventListener('seeked',ok,{once:true});v.addEventListener('error',bad,{once:true});
+        try{v.currentTime=Math.min(t,Math.max(0,(v.duration||t)-0.001));}catch(e){finish(e);}
+      });
 
-        recorder.ondataavailable=e=>{
-          if(e.data&&e.data.size)chunks.push(e.data);
+      return await new Promise(async(resolve,reject)=>{
+        let finished=false;
+        const finish=(err,blob)=>{
+          if(finished)return;finished=true;cleanup();err?reject(err):resolve({blob,mime,width:w,height:h});
         };
+        recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data);};
         recorder.onerror=()=>finish(new Error('Video recorder error.'));
-        recorder.onstop=()=>{
-          if(this.videoShortsExportCancelRequested){
-            finish(new Error('CANCELLED'));
-            return;
-          }
-          finish(null,new Blob(chunks,{type:mime}));
-        };
+        recorder.onstop=()=>this.videoShortsExportCancelRequested?finish(new Error('CANCELLED')):finish(null,new Blob(chunks,{type:mime}));
 
         try{
-          if(exportVideo.readyState<1){
-            await waitEvent(exportVideo,'loadedmetadata');
-          }
-          if(exportVideo.readyState<2){
-            try{await exportVideo.play();}catch(e){}
-            exportVideo.pause();
-          }
-
-          exportVideo.currentTime=Math.max(0,Math.min(start,Number.isFinite(exportVideo.duration)?exportVideo.duration:start));
-          await new Promise((resolveSeek,rejectSeek)=>{
-            const timer=setTimeout(()=>{cleanupListeners();rejectSeek(new Error('Could not seek to clip start.'));},15000);
-            const cleanupListeners=()=>{
-              clearTimeout(timer);
-              exportVideo.removeEventListener('seeked',ok);
-              exportVideo.removeEventListener('error',fail);
-            };
-            const ok=()=>{cleanupListeners();resolveSeek();};
-            const fail=()=>{cleanupListeners();rejectSeek(new Error('Source video seek failed.'));};
-            if(Math.abs((exportVideo.currentTime||0)-start)<.02){cleanupListeners();resolveSeek();return;}
-            exportVideo.addEventListener('seeked',ok,{once:true});
-            exportVideo.addEventListener('error',fail,{once:true});
+          await new Promise((res,rej)=>{
+            if(v.readyState>=1)return res();
+            const timer=setTimeout(()=>rej(new Error('Source video metadata timed out.')),15000);
+            const ok=()=>{clearTimeout(timer);res()};const bad=()=>{clearTimeout(timer);rej(new Error('Source video could not be loaded.'))};
+            v.addEventListener('loadedmetadata',ok,{once:true});v.addEventListener('error',bad,{once:true});
           });
 
+          const fps=24,total=Math.max(1,Math.ceil(duration*fps));
           recorder.start(250);
-          const renderStartedAt = performance.now();
-
-          const loop=()=>{
-            if(done)return;
-            if(this.videoShortsExportCancelRequested){
-              if(recorder.state!=='inactive')recorder.stop();
-              else finish(new Error('CANCELLED'));
-              return;
-            }
-
+          for(let i=0;i<total;i++){
+            if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+            await seekTo(startTime+Math.min(duration-0.001,i/fps));
             this._videoShortsApplyExportSettings(settings);
-
-            // Drive the source time ourselves. This makes CanvasCaptureStream
-            // receive genuinely changing frames even when the browser throttles
-            // a hidden/offscreen video element during a long export.
-            const elapsed = Math.max(0, (performance.now() - renderStartedAt) / 1000);
-            const targetTime = Math.min(end, start + elapsed);
-            if (Math.abs(exportVideo.currentTime - targetTime) > 0.012) {
-              try { exportVideo.currentTime = targetTime; } catch(e) {}
-            }
-            this.videoShortsRenderFrame(canvas, exportVideo);
-
-            const pct=Math.max(0,Math.min(1,(targetTime-start)/(end-start)));
-            const fill=document.getElementById('videoExportProgressFill');
-            if(fill){
-              const scaled=this.videoShortsMp4Phase==='render'?pct*55:pct*100;
-              fill.style.width=scaled.toFixed(1)+'%';
-            }
+            this.videoShortsRenderFrame(canvas,v);
+            await new Promise(r=>setTimeout(r,8));
+            const pct=(i+1)/total,fill=document.getElementById('videoExportProgressFill');
+            if(fill)fill.style.width=((this.videoShortsMp4Phase==='render'?pct*.55:pct)*100).toFixed(1)+'%';
             const status=document.getElementById('videoExportStatus');
-            if(status&&this.videoShortsMp4Phase==='render'){
-              status.textContent=`Rendering video… ${(pct*100).toFixed(0)}%`;
-            }
-
-            if(targetTime>=end-.001){
-              exportVideo.pause();
-              if(recorder.state!=='inactive')recorder.stop();
-              return;
-            }
-            this.videoShortsRenderRAF=requestAnimationFrame(loop);
-          };
-
-          this.videoShortsRenderRAF=requestAnimationFrame(loop);
-          await exportVideo.play();
-        }catch(e){
-          if(recorder.state!=='inactive')try{recorder.stop();}catch(_e){}
-          finish(e);
+            if(status&&this.videoShortsMp4Phase==='render')status.textContent=`Rendering video… ${(pct*100).toFixed(0)}%`;
+          }
+          if(recorder.state!=='inactive')recorder.stop();
+        }catch(err){
+          if(recorder.state!=='inactive')try{recorder.stop()}catch(e){}
+          finish(err);
         }
       });
     }
