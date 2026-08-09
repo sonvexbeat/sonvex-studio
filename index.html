@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SONVEX STUDIO — AI Audio & Lyrics Workbench</title>
-  <meta name="description" content="Next-generation audio analyzer, universal format converter, and AI lyric streaming workspace.">
+  <title>SONVEX STUDIO — Audio & Music Studio</title>
+  <meta name="description" content="SONVEX STUDIO is a free, client-side audio and music workspace for lyrics, stems, mastering, trimming, analysis, and format conversion.">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -1458,10 +1458,10 @@
               <i class="fa-solid fa-closed-captioning text-cyan-400 text-xl"></i>
               <span data-i18n="heroLyricTitle">💬 Lyric & Subtitle Studio</span>
             </h2>
-            <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 font-bold tracking-wider" data-i18n="heroLyricBadge">AI SYNC ENGINE</span>
+            <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 font-bold tracking-wider" data-i18n="heroLyricBadge">MANUAL SYNC STUDIO</span>
           </div>
           <p class="text-xs text-indigo-300 light:text-indigo-880 leading-relaxed mb-6" data-i18n="heroLyricDesc">
-            Generate AI audio-synced lyrics, edit timestamped subtitles, format song dialogue, and export <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.srt</code>, <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.lrc</code>, and <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.txt</code> subtitle files for video and music platforms.
+            Create, edit, and sync lyrics and subtitles with audio. Adjust timing and export <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.srt</code>, <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.lrc</code>, or <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.txt</code> files for video and music platforms.
           </p>
         </div>
         <button onclick="app.openLyricStudio()" class="w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/35 transition-all group-hover:scale-[1.01]">
@@ -1471,13 +1471,35 @@
     </div>
 
 
+    <!-- ================= BRAND STATEMENT ================= -->
+    <section class="glass-panel rounded-2xl px-6 py-7 md:px-8 md:py-8 relative overflow-hidden border border-cyan-500/15 light:border-indigo-200">
+      <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-72 h-32 bg-cyan-500/10 blur-3xl pointer-events-none"></div>
+      <div class="relative text-center max-w-4xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/60 light:bg-indigo-50 border border-indigo-500/20 light:border-indigo-200 text-[9px] uppercase tracking-[0.18em] font-bold text-cyan-300 light:text-indigo-700 mb-4">
+          <i class="fa-solid fa-waveform-lines"></i>
+          <span data-i18n="brandStatementKicker">SONVEX STUDIO</span>
+        </div>
+        <h2 class="text-xl md:text-2xl font-black tracking-wide text-indigo-50 light:text-indigo-950" data-i18n="brandStatementTitle">
+          Your Sound. Your Workflow. One Studio.
+        </h2>
+        <p class="mt-3 text-xs md:text-sm leading-7 text-indigo-300 light:text-indigo-700" data-i18n="brandStatementDesc">
+          Create, edit, refine, and prepare your music and audio — from lyrics and stems to mastering, trimming, analysis, and format conversion, all in one place.
+        </p>
+        <div class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 light:bg-emerald-50 border border-emerald-400/20 light:border-emerald-200 text-[10px] md:text-xs font-bold text-emerald-300 light:text-emerald-700">
+          <i class="fa-solid fa-circle-check"></i>
+          <span data-i18n="brandStatementFree">All SONVEX STUDIO tools are free to use — no subscriptions and no paid plans.</span>
+        </div>
+      </div>
+    </section>
+
+
  <!-- ================= 3. AI AUDIO REMASTERER MODULE (100% CLIENT-SIDE DSP WITH CUSTOM A/B PLAYERS) ================= -->
     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
       <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
       
       <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
         <h2 class="text-base font-bold flex items-center gap-2" data-i18n="audioRemastererTitle">
-          <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> AI Audio Remasterer
+          <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> Audio Remasterer
         </h2>
         <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">100% Client-Side DSP</span>
       </div>
@@ -1610,73 +1632,18 @@
     </div>
 
 
-<!-- ================= 4. UNIVERSAL AUDIO CONVERTER (STEP-BY-STEP WORKFLOW) ================= -->
-    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
-      <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
-      <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
-        <h2 class="text-base font-bold flex items-center gap-2">
-          <i class="fa-solid fa-arrows-rotate text-indigo-300"></i>
-          <span data-i18n="audioConverterTitle">Universal Audio Converter</span>
-        </h2>
-        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Client-Side Engine</span>
-      </div>
-      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="audioConverterDesc">
-        Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly without server uploads.
-      </p>
-      <div class="space-y-4">
-        <!-- Drag & Drop Zone -->
-        <div id="dropZone" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
-          <input type="file" id="audioFileInput" accept="audio/*,video/mp4" class="hidden" onchange="app.handleAudioUpload(this.files[0])">
-          <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
-          <div>
-            <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="dropAudioText">Drag & Drop file or browse</p>
-          </div>
-        </div>
-
-  <!-- File Info Card -->
-        <div id="fileLoadedCard" class="hidden p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 flex items-center justify-between shadow-inner">
-          <div class="flex items-center gap-3 overflow-hidden">
-            <div class="w-10 h-10 rounded-lg bg-indigo-900/40 flex items-center justify-center text-indigo-300 shrink-0">
-              <i class="fa-solid fa-file-audio text-lg"></i>
-            </div>
-            <div class="truncate">
-              <p id="fileNameDisplay" class="text-xs font-bold truncate text-indigo-100 light:text-indigo-950">filename.mp3</p>
-              <div class="flex items-center gap-2 mt-0.5">
-                <span id="fileSizeDisplay" class="text-[10px] text-indigo-300">0.0 MB</span>
-                <span class="w-1 h-1 bg-indigo-50 rounded-full"></span>
-                <span id="detectedFormatBadge" class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10 badge-exclude">MP3</span>
-              </div>
-            </div>
-          </div>
-          <button onclick="app.resetAudio()" class="text-indigo-300 hover:text-red-400 text-xs px-3 py-1.5 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
-            <i class="fa-solid fa-trash-can mr-1"></i> Remove
-          </button>
-        </div>
-
- <!-- Target Selector & Convert button -->
-        <div id="converterActionsBar" class="hidden pt-2 border-t border-indigo-500/5 light:border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3 w-full sm:w-auto">
-            <label class="text-xs font-medium text-indigo-300 light:text-indigo-900 shrink-0" data-i18n="targetFormat">Target Format:</label>
-            <select id="targetFormatSelect" class="w-full sm:w-48 glass-input text-xs font-semibold px-3 py-2 rounded-lg border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
-              <!-- Dynamically populated via JS -->
-            </select>
-          </div>
-
-
- <button id="convertBtn" onclick="app.processAudioConversion()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-700 text-white shadow-lg transition-all">
-            <i class="fa-solid fa-bolt"></i>
-            <span data-i18n="convertBtn">Convert & Download</span>
-          </button>
-        </div>
-      </div>
-    </div>
-    <!-- ================= 5. DYNAMIC TRACK INSPECTOR (AT VERY BOTTOM) ================= -->
+<!-- ================= 5. DYNAMIC TRACK INSPECTOR (AT VERY BOTTOM) ================= -->
     <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
-          <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="inspectorTitle">
-            <i class="fa-solid fa-chart-simple text-indigo-350"></i> Dynamic Track Inspector
-          </h2>
+          <div class="flex flex-col min-w-0">
+            <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="inspectorTitle">
+              <i class="fa-solid fa-chart-simple text-indigo-350"></i> Dynamic Track Inspector
+            </h2>
+            <p class="text-[9px] text-indigo-400 light:text-indigo-600 mt-1 leading-relaxed" data-i18n="inspectorNote">
+              Analyze loudness, peak level, BPM, and streaming impact, then fine-tune gain, filters, EQ, and limiting before exporting a processed master WAV.
+            </p>
+          </div>
           <span id="inspectorStatus" class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Awaiting File...</span>
         </div>
         <!-- Inspector Drag & Drop Zone -->
@@ -1920,7 +1887,100 @@
               </div>
             </div>
           </div>
-    <!-- ================= 6. PITCH & TEMPO TRANSPOSER ================= -->
+    </div>
+
+
+<!-- ================= 7. AUDIO TRIMMER & TEASER MAKER (AT THE ABSOLUTE BOTTOM) ================= -->
+    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
+      <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
+        <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="trimmerTitle">
+          <i class="fa-solid fa-scissors text-indigo-350"></i>
+          <span>Audio Trimmer & Social Teaser Maker</span>
+        </h2>
+        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Wavesurfer Engine</span>
+      </div>
+      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="trimmerDesc">
+        Crop and slice your uploaded audio file client-side instantly. Select a region to create short social media audio previews and teasers.
+      </p>
+      <!-- Trimmer Drag & Drop Zone -->
+      <div id="trimmerPlaceholder" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
+        <input type="file" id="trimmerFileInput" accept="audio/*" class="hidden" onchange="app.handleTrimmerFileUpload(this.files[0])">
+        <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
+        <div>
+          <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="trimmerDropzone">Drag & Drop audio file here or browse to Trim</p>
+        </div>
+      </div>
+      <div id="trimmerContent" class="hidden space-y-4">
+        <!-- File Info Card inside Trimmer -->
+        <div id="trimmerFileLoadedCard" class="flex items-center justify-between p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 shadow-inner">
+          <div class="flex items-center gap-2.5 truncate">
+            <i class="fa-solid fa-file-audio text-indigo-300"></i>
+            <span id="trimmerFileNameDisplay" class="text-xs font-bold text-indigo-100 light:text-indigo-955 truncate">filename.mp3</span>
+          </div>
+          <button onclick="app.resetTrimmerState()" class="text-indigo-300 hover:text-red-400 text-xs px-2.5 py-1 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
+            <i class="fa-solid fa-trash-can mr-1"></i> <span data-i18n="removeBtn">Remove</span>
+          </button>
+        </div>
+
+
+ <!-- Wavesurfer Container -->
+        <div class="relative w-full bg-[#04040f]/60 rounded-xl border border-indigo-500/15 light:border-indigo-200 p-2 overflow-hidden shadow-inner">
+          <div id="trimmerWaveform" class="w-full"></div>
+        </div>
+        <!-- Selections & Precision Timestamps -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerStart">Start Time</div>
+            <div id="trimStartDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
+          </div>
+          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerEnd">End Time</div>
+            <div id="trimEndDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
+          </div>
+          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerDuration">Selection Duration</div>
+            <div id="trimDurationDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">0.00s</div>
+          </div>
+        </div>
+
+
+ <!-- Quick Presets -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-indigo-300 light:text-indigo-900 font-semibold mr-1" data-i18n="trimmerPresets">Quick Teaser Presets:</span>
+          <button onclick="app.applyTrimmerPreset(15)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">15s Preset</button>
+          <button onclick="app.applyTrimmerPreset(30)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">30s Preset</button>
+          <button onclick="app.applyTrimmerPreset(60)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">60s Preset</button>
+        </div>
+        <!-- Action Row -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-indigo-500/5 light:border-indigo-200">
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <!-- Play Selection Preview -->
+            <button id="trimPlayPreviewBtn" onclick="app.toggleTrimmerPreview()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-indigo-955/60 light:bg-indigo-50 hover:border-indigo-400 border border-indigo-500/10 text-indigo-100 light:text-indigo-955 transition-all">
+              <i id="trimPlayIcon" class="fa-solid fa-circle-play text-sm"></i>
+              <span data-i18n="trimmerPlay">Play Selection</span>
+            </button>
+            
+            <!-- Slice Action Button -->
+            <button onclick="app.cropAudioSelection()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md transition-all">
+              <i class="fa-solid fa-scissors"></i>
+              <span data-i18n="trimmerCrop">Trim & Crop Audio</span>
+            </button>
+          </div>
+          <!-- Sliced Output Card -->
+          <div id="trimOutputBar" class="hidden w-full sm:w-auto flex items-center gap-3 bg-indigo-950/40 light:bg-indigo-50/50 p-2 rounded-xl border border-indigo-500/10 light:border-indigo-200 shadow-inner shrink-0">
+            <span class="text-[10px] uppercase font-mono px-2 py-1 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10" data-i18n="trimmerOutputReady">Trimmed Output Ready</span>
+            <button id="downloadTrimmedBtn" class="px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-all">
+              <i class="fa-solid fa-cloud-arrow-down"></i>
+              <span data-i18n="trimmerDownload">Download WAV</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<!-- ================= 6. PITCH & TEMPO TRANSPOSER ================= -->
     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
       <div class="absolute -top-16 -left-16 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-12 -right-12 w-36 h-36 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none"></div>
@@ -2077,95 +2137,81 @@
     </div>
 
 
- <!-- ================= 7. AUDIO TRIMMER & TEASER MAKER (AT THE ABSOLUTE BOTTOM) ================= -->
-    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
+<!-- ================= 4. UNIVERSAL AUDIO CONVERTER (STEP-BY-STEP WORKFLOW) ================= -->
+    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
       <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
       <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
-        <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="trimmerTitle">
-          <i class="fa-solid fa-scissors text-indigo-350"></i>
-          <span>Audio Trimmer & Social Teaser Maker</span>
+        <h2 class="text-base font-bold flex items-center gap-2">
+          <i class="fa-solid fa-arrows-rotate text-indigo-300"></i>
+          <span data-i18n="audioConverterTitle">Universal Audio Converter</span>
         </h2>
-        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Wavesurfer Engine</span>
+        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Client-Side Engine</span>
       </div>
-      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="trimmerDesc">
-        Crop and slice your uploaded audio file client-side instantly. Select a region to create short social media audio previews and teasers.
+      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="audioConverterDesc">
+        Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly without server uploads.
       </p>
-      <!-- Trimmer Drag & Drop Zone -->
-      <div id="trimmerPlaceholder" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
-        <input type="file" id="trimmerFileInput" accept="audio/*" class="hidden" onchange="app.handleTrimmerFileUpload(this.files[0])">
-        <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
-        <div>
-          <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="trimmerDropzone">Drag & Drop audio file here or browse to Trim</p>
-        </div>
-      </div>
-      <div id="trimmerContent" class="hidden space-y-4">
-        <!-- File Info Card inside Trimmer -->
-        <div id="trimmerFileLoadedCard" class="flex items-center justify-between p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 shadow-inner">
-          <div class="flex items-center gap-2.5 truncate">
-            <i class="fa-solid fa-file-audio text-indigo-300"></i>
-            <span id="trimmerFileNameDisplay" class="text-xs font-bold text-indigo-100 light:text-indigo-955 truncate">filename.mp3</span>
+      <div class="space-y-4">
+        <!-- Drag & Drop Zone -->
+        <div id="dropZone" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
+          <input type="file" id="audioFileInput" accept="audio/*,video/mp4" class="hidden" onchange="app.handleAudioUpload(this.files[0])">
+          <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
+          <div>
+            <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="dropAudioText">Drag & Drop file or browse</p>
           </div>
-          <button onclick="app.resetTrimmerState()" class="text-indigo-300 hover:text-red-400 text-xs px-2.5 py-1 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
-            <i class="fa-solid fa-trash-can mr-1"></i> <span data-i18n="removeBtn">Remove</span>
+        </div>
+
+  <!-- File Info Card -->
+        <div id="fileLoadedCard" class="hidden p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 flex items-center justify-between shadow-inner">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-10 h-10 rounded-lg bg-indigo-900/40 flex items-center justify-center text-indigo-300 shrink-0">
+              <i class="fa-solid fa-file-audio text-lg"></i>
+            </div>
+            <div class="truncate">
+              <p id="fileNameDisplay" class="text-xs font-bold truncate text-indigo-100 light:text-indigo-950">filename.mp3</p>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span id="fileSizeDisplay" class="text-[10px] text-indigo-300">0.0 MB</span>
+                <span class="w-1 h-1 bg-indigo-50 rounded-full"></span>
+                <span id="detectedFormatBadge" class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10 badge-exclude">MP3</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="app.resetAudio()" class="text-indigo-300 hover:text-red-400 text-xs px-3 py-1.5 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
+            <i class="fa-solid fa-trash-can mr-1"></i> Remove
           </button>
         </div>
 
-
- <!-- Wavesurfer Container -->
-        <div class="relative w-full bg-[#04040f]/60 rounded-xl border border-indigo-500/15 light:border-indigo-200 p-2 overflow-hidden shadow-inner">
-          <div id="trimmerWaveform" class="w-full"></div>
-        </div>
-        <!-- Selections & Precision Timestamps -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
-            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerStart">Start Time</div>
-            <div id="trimStartDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
-          </div>
-          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
-            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerEnd">End Time</div>
-            <div id="trimEndDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
-          </div>
-          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
-            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerDuration">Selection Duration</div>
-            <div id="trimDurationDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">0.00s</div>
-          </div>
-        </div>
-
-
- <!-- Quick Presets -->
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs text-indigo-300 light:text-indigo-900 font-semibold mr-1" data-i18n="trimmerPresets">Quick Teaser Presets:</span>
-          <button onclick="app.applyTrimmerPreset(15)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">15s Preset</button>
-          <button onclick="app.applyTrimmerPreset(30)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">30s Preset</button>
-          <button onclick="app.applyTrimmerPreset(60)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">60s Preset</button>
-        </div>
-        <!-- Action Row -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-indigo-500/5 light:border-indigo-200">
+ <!-- Target Selector & Convert button -->
+        <div id="converterActionsBar" class="hidden pt-2 border-t border-indigo-500/5 light:border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full sm:w-auto">
-            <!-- Play Selection Preview -->
-            <button id="trimPlayPreviewBtn" onclick="app.toggleTrimmerPreview()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-indigo-955/60 light:bg-indigo-50 hover:border-indigo-400 border border-indigo-500/10 text-indigo-100 light:text-indigo-955 transition-all">
-              <i id="trimPlayIcon" class="fa-solid fa-circle-play text-sm"></i>
-              <span data-i18n="trimmerPlay">Play Selection</span>
-            </button>
-            
-            <!-- Slice Action Button -->
-            <button onclick="app.cropAudioSelection()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md transition-all">
-              <i class="fa-solid fa-scissors"></i>
-              <span data-i18n="trimmerCrop">Trim & Crop Audio</span>
-            </button>
+            <label class="text-xs font-medium text-indigo-300 light:text-indigo-900 shrink-0" data-i18n="targetFormat">Target Format:</label>
+            <select id="targetFormatSelect" class="w-full sm:w-48 glass-input text-xs font-semibold px-3 py-2 rounded-lg border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
+              <!-- Dynamically populated via JS -->
+            </select>
           </div>
-          <!-- Sliced Output Card -->
-          <div id="trimOutputBar" class="hidden w-full sm:w-auto flex items-center gap-3 bg-indigo-950/40 light:bg-indigo-50/50 p-2 rounded-xl border border-indigo-500/10 light:border-indigo-200 shadow-inner shrink-0">
-            <span class="text-[10px] uppercase font-mono px-2 py-1 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10" data-i18n="trimmerOutputReady">Trimmed Output Ready</span>
-            <button id="downloadTrimmedBtn" class="px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-all">
-              <i class="fa-solid fa-cloud-arrow-down"></i>
-              <span data-i18n="trimmerDownload">Download WAV</span>
-            </button>
-          </div>
+
+
+ <button id="convertBtn" onclick="app.processAudioConversion()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-700 text-white shadow-lg transition-all">
+            <i class="fa-solid fa-bolt"></i>
+            <span data-i18n="convertBtn">Convert & Download</span>
+          </button>
         </div>
       </div>
     </div>
 </main>
+  <footer class="max-w-5xl mx-auto px-5 pb-8 pt-2">
+    <div class="glass-panel rounded-2xl px-5 py-5 border border-indigo-500/10 light:border-indigo-200 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="text-center md:text-left">
+        <div class="text-xs font-bold text-indigo-100 light:text-indigo-950">SONVEX STUDIO</div>
+        <div class="text-[10px] text-indigo-400 light:text-indigo-700 mt-1" data-i18n="footerTagline">Free tools for creators, musicians, and audio enthusiasts.</div>
+      </div>
+      <nav class="flex items-center gap-4 text-[10px] font-semibold">
+        <a href="about.html" class="text-indigo-300 hover:text-cyan-300 light:text-indigo-700 light:hover:text-indigo-950 transition-colors" data-i18n="footerAbout">About Us</a>
+        <span class="text-indigo-700/50">•</span>
+        <a href="privacy.html" class="text-indigo-300 hover:text-cyan-300 light:text-indigo-700 light:hover:text-indigo-950 transition-colors" data-i18n="footerPrivacy">Privacy Policy</a>
+      </nav>
+      <div class="text-[9px] text-indigo-500 light:text-indigo-600" data-i18n="footerCopyright">SONVEX STUDIO — All rights reserved.</div>
+    </div>
+  </footer>
   </div><!-- /#mainView -->
 
 
@@ -2175,7 +2221,7 @@
   <div id="stemStudioView" dir="ltr" class="lang-en">
     <!-- STEM HEADER -->
     <div class="stem-header">
-      <button class="studio-btn" onclick="app.closeStemStudio()" title="Back to Sonvex Workbench">
+      <button class="studio-btn" onclick="app.closeStemStudio()" title="Back to SONVEX STUDIO">
         <i class="fa-solid fa-arrow-left"></i>
         <span>Back</span>
       </button>
@@ -2590,7 +2636,10 @@
       <!-- Title -->
       <div class="flex items-center gap-2 flex-1">
         <i class="fa-solid fa-closed-captioning text-cyan-400"></i>
-        <span class="text-sm font-bold text-white light:text-indigo-900" data-i18n="lyricStudioTitle">Subtitle &amp; Lyric Studio</span>
+        <div class="flex flex-col min-w-0">
+          <span class="text-sm font-bold text-white light:text-indigo-900" data-i18n="lyricStudioTitle">Lyric &amp; Subtitle Studio</span>
+          <span class="text-[9px] text-indigo-400 light:text-indigo-600 mt-0.5" data-i18n="lyricStudioNote">Edit lyrics and subtitles, fine-tune timing, and export SRT, LRC, or TXT files.</span>
+        </div>
         <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono" data-i18n="lyricStudioBadge">SRT &amp; LRC Maker</span>
       </div>
       <!-- Import / Export Actions -->
@@ -2784,6 +2833,7 @@
       targetFormat: "Target Format:",
       convertBtn: "Convert & Download",
       inspectorTitle: "Dynamic Track Inspector",
+      inspectorNote: "Analyze loudness, peak level, BPM, and streaming impact, then fine-tune gain, filters, EQ, and limiting before exporting a processed master WAV.",
       uploadPrompt: "Upload audio to inspect waveform, Gain Peak dB & BPM",
       gainOffset: "Gain Peak Offset",
       gainDesc: "Peak amplitude relative to standard digital dynamic headroom.",
@@ -2809,7 +2859,11 @@
       regenerateBtn: "Re-generate",
       sendChat: "Send",
       chatWelcome: "Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe, then click Generate Original Lyrics Stream. You can also chat directly with me to refine rhymes.",
-      audioRemastererTitle: "AI Audio Remasterer",
+      brandStatementKicker: "SONVEX STUDIO",
+      brandStatementTitle: "Your Sound. Your Workflow. One Studio.",
+      brandStatementDesc: "Create, edit, refine, and prepare your music and audio — from lyrics and stems to mastering, trimming, analysis, and format conversion, all in one place.",
+      brandStatementFree: "All SONVEX STUDIO tools are free to use — no subscriptions and no paid plans.",
+      audioRemastererTitle: "Audio Remasterer",
       audioRemastererDesc: "Remaster your audio locally with high-pass filtering, 3-band parametric EQ, dynamics compression, and hard limiting.",
       dropRemasterText: "Drag & Drop track to remaster or browse",
       remasterBtn: "Remaster Audio",
@@ -2848,11 +2902,12 @@
       heroStemDesc: "Separate audio into Vocals, Drums, Bass, and Instruments. Slice, edit, trim, record microphone vocals, and mix non-destructive multitrack audio locally in real time.",
       heroStemBtn: "Launch Stem Studio ➔",
       heroLyricTitle: "💬 Lyric & Subtitle Studio",
-      heroLyricBadge: "AI SYNC ENGINE",
-      heroLyricDesc: "Generate AI audio-synced lyrics, edit timestamped subtitles, format song dialogue, and export .srt, .lrc, and .txt subtitle files for video and music platforms.",
+      heroLyricBadge: "MANUAL SYNC STUDIO",
+      heroLyricDesc: "Create, edit, and sync lyrics and subtitles with audio. Adjust timing and export .srt, .lrc, or .txt files for video and music platforms.",
       heroLyricBtn: "Launch Lyric Studio ➔",
       backBtn: "Back",
-      lyricStudioTitle: "Subtitle & Lyric Studio",
+      lyricStudioTitle: "Lyric & Subtitle Studio",
+      lyricStudioNote: "Edit lyrics and subtitles, fine-tune timing, and export SRT, LRC, or TXT files.",
       lyricStudioBadge: "SRT & LRC Maker",
       importSrt: "Import SRT",
       importLrc: "Import LRC",
@@ -2892,7 +2947,11 @@
       exportStemsBtnText: "Export Stems",
       stemDropzoneTitle: "Upload Song to Separate Stems",
       stemDropzoneDesc: "Drag & drop your song file (MP3, WAV, FLAC, AAC, OGG) to extract 4 synchronized tracks: Vocals, Drums, Bass & Instruments.",
-      selectAudioFileBtn: "Select Audio File"
+      selectAudioFileBtn: "Select Audio File",
+      footerTagline: "Free tools for creators, musicians, and audio enthusiasts.",
+      footerAbout: "About Us",
+      footerPrivacy: "Privacy Policy",
+      footerCopyright: "SONVEX STUDIO — All rights reserved."
     },
     ar: {
       audioConverterTitle: "المحول الصوتي الشامل",
@@ -2901,6 +2960,7 @@
       targetFormat: "الصيغة المستهدفة:",
       convertBtn: "تحويل وتحميل فوراً",
       inspectorTitle: "محلل الصوت والسرعة (BPM & dB)",
+      inspectorNote: "تحليل مستوى الصوت، القمة الصوتية، سرعة الإيقاع BPM وتأثير المعالجة على منصات البث، ثم ضبط الكسب والفلاتر وEQ والـLimiter قبل تصدير ملف Master WAV.",
       uploadPrompt: "قم برفع مقطع صوتي لتحليل الموجة، الفروق الصوتية والسرعة BPM",
       gainOffset: "فرق مستوى الصوت",
       gainDesc: "قياس أعلى قمة صوتية مقارنة بالمدى الديناميكي القياسي (0 dBFS).",
@@ -2926,7 +2986,11 @@
       regenerateBtn: "إعادة التوليد",
       sendChat: "إرسال",
       chatWelcome: "مرحباً بك في SONVEX STUDIO! قم بضبط نوع الموسيقى، اللغة، وعدد الأبيات أعلاه ثم اضغط على توليد كلمات الأغنية. يمكنك أيضاً الدردشة معي مباشرة لتعديل القوافي والأبيات!",
-      audioRemastererTitle: "محسن الصوت بالذكاء الاصطناعي",
+      brandStatementKicker: "SONVEX STUDIO",
+      brandStatementTitle: "صَوْتُكَ. أُسْلُوبُكَ. استوديو واحد.",
+      brandStatementDesc: "أنشئ، عدّل، حسّن، وجهّز موسيقاك وملفاتك الصوتية — من الكلمات والـStems إلى الماسترينج والقص والتحليل وتحويل الصيغ، كل ذلك في مكان واحد.",
+      brandStatementFree: "جميع أدوات SONVEX STUDIO مجانية للاستخدام — بدون اشتراكات وبدون خطط مدفوعة.",
+      audioRemastererTitle: "محسن الصوت",
       audioRemastererDesc: "تحسين هندسة وجودة مقاطعك الصوتية محلياً عبر فلاتر الترددات، معالجة الديناميكيات، والـ Peak Limiter.",
       dropRemasterText: "اسحب وأسقط الملف هنا لتحسين جودته أو تصفح",
       remasterBtn: "بدء معالجة وتحسين الصوت",
@@ -2964,12 +3028,13 @@
       heroStemBadge: "محرك DAW محلي 100%",
       heroStemDesc: "فصل الأغاني فورياً إلى مسارات منفصلة: الصوت (Vocals)، الدفوف (Drums)، الباص (Bass)، والآلات. قص، تعديل، تسجيل ميكروفون، ومكس متعدد المسارات محلياً.",
       heroStemBtn: "تشغيل ستوديو فك المسارات ➔",
-      heroLyricTitle: "💬 ستوديو الترجمة والكلمات",
-      heroLyricBadge: "محرك مزامنة الذكاء الاصطناعي",
-      heroLyricDesc: "صناعة وتعديل نصوص الترجمة المتزامنة، ضبط التوقيت، وتصدير ملفات الترجمة (.srt) والكلمات المتزامنة (.lrc) لجميع منصات الفيديو والأغاني.",
-      heroLyricBtn: "تشغيل ستوديو الترجمة ➔",
+      heroLyricTitle: "💬 ستوديو الكلمات والترجمة",
+      heroLyricBadge: "ستوديو المزامنة والتحرير",
+      heroLyricDesc: "إنشاء وتعديل ومزامنة كلمات الأغاني والترجمة مع الصوت، وضبط التوقيت وتصدير ملفات SRT وLRC وTXT لمنصات الفيديو والموسيقى.",
+      heroLyricBtn: "تشغيل ستوديو الكلمات والترجمة ➔",
       backBtn: "الرجوع",
-      lyricStudioTitle: "ستوديو الترجمة والكلمات",
+      lyricStudioTitle: "ستوديو الكلمات والترجمة",
+      lyricStudioNote: "تعديل الكلمات والترجمة، ضبط التوقيت بدقة، وتصدير ملفات SRT وLRC وTXT.",
       lyricStudioBadge: "صانع SRT & LRC",
       importSrt: "استيراد SRT",
       importLrc: "استيراد LRC",
@@ -3009,7 +3074,11 @@
       exportStemsBtnText: "تصدير المسارات منفصلة",
       stemDropzoneTitle: "رفع أغنية لفك مساراتها الهندسية",
       stemDropzoneDesc: "اسحب وأسقط الملف الصوتي (MP3, WAV, FLAC, AAC, OGG) لفك 4 مسارات متزامنة: الصوت، الدفوف، الباص، والآلات.",
-      selectAudioFileBtn: "اختر ملف صوتي"
+      selectAudioFileBtn: "اختر ملف صوتي",
+      footerTagline: "أدوات مجانية لصنّاع المحتوى والموسيقيين وكل من يهتم بالصوت.",
+      footerAbout: "من نحن",
+      footerPrivacy: "سياسة الخصوصية",
+      footerCopyright: "SONVEX STUDIO — جميع الحقوق محفوظة."
     }
   };
 
