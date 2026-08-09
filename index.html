@@ -6572,8 +6572,12 @@
       if(clip) { clip.settings = clip.settings || {}; clip.settings.bitrate=parseInt(value || '18',10); }
     }
 
-    videoShortsRenderFrame(targetCanvas) {
-      const video=this.videoShortsVideo;
+    videoShortsRenderFrame(targetCanvas, sourceVideo) {
+      // When exporting, use the dedicated export video element. The previous
+      // exporter passed that element as a second argument, but this method
+      // ignored it and always drew the preview video. That caused a frozen
+      // picture and made the exported frame unrelated to the export timeline.
+      const video=sourceVideo || this.videoShortsVideo;
       const canvas=targetCanvas || document.getElementById('videoShortsCanvas');
       if(!canvas) return;
       const ratio=this._videoShortsAspectRatio(this.videoShortsAspect);
@@ -6938,6 +6942,8 @@
       v.src=srcUrl;
 
       const canvas=document.createElement('canvas');
+      canvas.dataset.exportWidth=String(w);
+      canvas.dataset.exportHeight=String(h);
       canvas.width=w;canvas.height=h;
       const stream=canvas.captureStream(24);
       const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
