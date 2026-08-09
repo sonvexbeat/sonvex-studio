@@ -3671,6 +3671,7 @@
       this.videoShortsActiveClipIndex = -1;
       this.videoShortsSelectionActive = false;
       this.videoShortsLastTimelineClickSec = null;
+      this.videoShortsPlayheadOverrideSec = null;
       this.videoShortsDraggingHandle = null;
       this.videoShortsAudioContext = null;
       this.videoShortsMediaSource = null;
@@ -6046,7 +6047,8 @@
            const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left + scrollLeft));
           const sec = (x / rect.width) * this.videoShortsDuration;
           this.videoShortsLastTimelineClickSec = sec;
-           this.videoShortsActiveClipIndex = -1;
+                      this.videoShortsPlayheadOverrideSec = sec;
+this.videoShortsActiveClipIndex = -1;
           const wasPlaying = this.videoShortsVideo && !this.videoShortsVideo.paused;
           if (this.videoShortsVideo) {
             // A manual timeline seek must never inherit the previous playback stop point.
@@ -6441,6 +6443,7 @@
       }
 
       this.videoShortsLastTimelineClickSec = null;
+      this.videoShortsPlayheadOverrideSec = this.videoShortsStart;
       this.videoShortsSelectionActive = true;
       this.videoShortsVideo.currentTime = this.videoShortsStart;
       this.videoShortsPlaybackStopAt = this.videoShortsEnd;
@@ -6479,6 +6482,7 @@
       }
 
       this.videoShortsLastTimelineClickSec = null;
+      this.videoShortsPlayheadOverrideSec = this.videoShortsEnd;
       this.videoShortsSelectionActive = true;
       this.videoShortsVideo.currentTime = this.videoShortsEnd;
       this.videoShortsPlaybackStopAt = this.videoShortsEnd;
@@ -6553,7 +6557,7 @@
         inHandle.style.display = this.videoShortsSelectionActive ? 'block' : 'none';
         outHandle.style.display = this.videoShortsSelectionActive ? 'block' : 'none';
         inHandle.style.left=`${left}px`; outHandle.style.left=`${right}px`;
-        const now=this.videoShortsVideo ? this.videoShortsVideo.currentTime : 0;
+        const now=Number.isFinite(Number(this.videoShortsPlayheadOverrideSec)) ? Number(this.videoShortsPlayheadOverrideSec) : (this.videoShortsVideo ? this.videoShortsVideo.currentTime : 0);
         playhead.style.left=`${Math.max(0,Math.min(width,(now/duration)*width))}px`;
       } else {
         selection.style.left='0'; selection.style.width='0'; selection.style.display='none'; selection.classList.remove('interactive'); inHandle.style.display='none'; outHandle.style.display='none'; inHandle.style.left='0'; outHandle.style.left='100%'; playhead.style.left='0';
@@ -7451,7 +7455,7 @@
         let videoOptions=undefined;
 
         if(isShort){
-          const track=input.getPrimaryVideoTrack();
+          const track=await input.getPrimaryVideoTrack();
           if(!track) throw new Error('The selected file has no video track.');
 
           const vw=await track.getDisplayWidth();
