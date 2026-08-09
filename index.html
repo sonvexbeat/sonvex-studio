@@ -1797,7 +1797,10 @@
       .video-export-progress { order: 3; max-width: none; flex-basis: 100%; }
     }
 
-  </style>
+  <style>
+.video-export-preparing { animation: sonvexExportPreparing 1.15s ease-in-out infinite alternate; }
+@keyframes sonvexExportPreparing { from { opacity: .55; } to { opacity: 1; } }
+</style></style>
 </head>
 
 
@@ -6037,7 +6040,7 @@
         timeline.addEventListener('pointerdown', e => {
           if (!this.videoShortsDuration) return;
           if (e.target && e.target.closest && e.target.closest('.video-range-handle')) return;
-          if (e.target && e.target.closest && e.target.closest('#videoTimelineSelection') && this.videoShortsSelectionActive) return;
+           // The selection overlay is not a click-blocking layer; timeline clicks seek the playhead.
           const content = document.getElementById('videoTimelineContent');
           if (!content) return;
           const rect = content.getBoundingClientRect();
@@ -6178,9 +6181,12 @@ this.videoShortsActiveClipIndex = -1;
           const content = document.getElementById('videoTimelineContent');
           if (content && this.videoShortsVideo) {
             const rect = content.getBoundingClientRect();
-            const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
-            const sec = (x / rect.width) * this.videoShortsDuration;
-            this.videoShortsLastTimelineClickSec = sec;
+             const scrollEl = document.getElementById('videoTimelineScroll');
+             const scrollLeft = scrollEl ? scrollEl.scrollLeft : 0;
+             const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left + scrollLeft));
+             const sec = (x / rect.width) * this.videoShortsDuration;
+             this.videoShortsLastTimelineClickSec = sec;
+             this.videoShortsPlayheadOverrideSec = sec;
              this.videoShortsPlaybackStopAt = this.videoShortsDuration;
             try { this.videoShortsVideo.currentTime = sec; } catch (_) {}
             this._updateVideoShortsTimeDisplay();
@@ -6417,31 +6423,11 @@ this.videoShortsActiveClipIndex = -1;
     videoShortsSetIn() {
       if (!this.videoShortsDuration || !this.videoShortsVideo) return;
       this.videoShortsActiveClipIndex = -1;
-
-      const clicked = Number(this.videoShortsLastTimelineClickSec);
-      const hasClick = Number.isFinite(clicked);
-      const current = hasClick
-        ? Math.max(0, Math.min(this.videoShortsDuration, clicked))
-        : Math.max(0, Math.min(this.videoShortsDuration, this.videoShortsVideo.currentTime));
-      const defaultLen = Math.min(30, this.videoShortsDuration);
-
-      if (hasClick) {
-        const oldStart = Number(this.videoShortsStart) || 0;
-        const oldEnd = Number(this.videoShortsEnd) || 0;
-        const outside = !this.videoShortsSelectionActive || current < oldStart || current > oldEnd;
-        if (outside) {
-          this.videoShortsStart = current;
-          this.videoShortsEnd = Math.min(this.videoShortsDuration, current + defaultLen);
-        } else {
-          this.videoShortsStart = Math.max(0, Math.min(current, this.videoShortsEnd - 0.05));
-        }
-      } else if (!this.videoShortsSelectionActive) {
-        this.videoShortsStart = current;
-        this.videoShortsEnd = Math.min(this.videoShortsDuration, current + defaultLen);
-      } else {
-        this.videoShortsStart = Math.max(0, Math.min(current, this.videoShortsEnd - 0.05));
-      }
-
+      const current = Math.max(0, Math.min(this.videoShortsDuration, Number(this.videoShortsVideo.currentTime) || 0));
+      const minGap = 0.05;
+      const end = Math.max(current + minGap, Math.min(this.videoShortsDuration, Number(this.videoShortsEnd) || this.videoShortsDuration));
+      this.videoShortsStart = Math.min(current, end - minGap);
+      this.videoShortsEnd = end;
       this.videoShortsLastTimelineClickSec = null;
       this.videoShortsPlayheadOverrideSec = this.videoShortsStart;
       this.videoShortsSelectionActive = true;
@@ -6456,31 +6442,11 @@ this.videoShortsActiveClipIndex = -1;
     videoShortsSetOut() {
       if (!this.videoShortsDuration || !this.videoShortsVideo) return;
       this.videoShortsActiveClipIndex = -1;
-
-      const clicked = Number(this.videoShortsLastTimelineClickSec);
-      const hasClick = Number.isFinite(clicked);
-      const current = hasClick
-        ? Math.max(0, Math.min(this.videoShortsDuration, clicked))
-        : Math.max(0, Math.min(this.videoShortsDuration, this.videoShortsVideo.currentTime));
-      const defaultLen = Math.min(30, this.videoShortsDuration);
-
-      if (hasClick) {
-        const oldStart = Number(this.videoShortsStart) || 0;
-        const oldEnd = Number(this.videoShortsEnd) || 0;
-        const outside = !this.videoShortsSelectionActive || current < oldStart || current > oldEnd;
-        if (outside) {
-          this.videoShortsEnd = current;
-          this.videoShortsStart = Math.max(0, current - defaultLen);
-        } else {
-          this.videoShortsEnd = Math.min(this.videoShortsDuration, Math.max(current, this.videoShortsStart + 0.05));
-        }
-      } else if (!this.videoShortsSelectionActive) {
-        this.videoShortsEnd = current;
-        this.videoShortsStart = Math.max(0, current - defaultLen);
-      } else {
-        this.videoShortsEnd = Math.min(this.videoShortsDuration, Math.max(current, this.videoShortsStart + 0.05));
-      }
-
+      const current = Math.max(0, Math.min(this.videoShortsDuration, Number(this.videoShortsVideo.currentTime) || 0));
+      const minGap = 0.05;
+      const start = Math.max(0, Math.min(this.videoShortsDuration, Number(this.videoShortsStart) || 0));
+      this.videoShortsStart = start;
+      this.videoShortsEnd = Math.max(current, Math.min(this.videoShortsDuration, start + minGap));
       this.videoShortsLastTimelineClickSec = null;
       this.videoShortsPlayheadOverrideSec = this.videoShortsEnd;
       this.videoShortsSelectionActive = true;
@@ -7398,8 +7364,11 @@ this.videoShortsActiveClipIndex = -1;
       const fill=document.getElementById('videoExportProgressFill');
       const cancel=document.getElementById('videoExportCancelBtn');
       if(cancel) cancel.disabled=false;
-      if(fill) fill.style.width='1%';
-      if(status) status.textContent='Preparing MP4 export…';
+       if(fill) {
+         fill.style.width='1%';
+         fill.classList.add('video-export-preparing');
+       }
+       if(status) status.textContent='Preparing MP4 encoder…';
       this._showVideoExportOverlay();
       this._updateVideoShortsExportButtons();
 
@@ -7414,6 +7383,7 @@ this.videoShortsActiveClipIndex = -1;
         this.videoShortsExportCancelRequested=false;
         this.videoShortsExportWorker=null;
         this.videoShortsMediabunnyConversion=null;
+         if(fill) fill.classList.remove('video-export-preparing');
         if(cancel) cancel.disabled=true;
         this._hideVideoExportOverlay();
         this._updateVideoShortsExportButtons();
@@ -7500,12 +7470,24 @@ this.videoShortsActiveClipIndex = -1;
           if(!this.videoShortsExporting || this.videoShortsExportCancelRequested) return;
           const pct=Math.max(0,Math.min(1,Number(progress)||0));
           this.videoShortsRealProgressSeen=true;
+           if(fill) fill.classList.remove('video-export-preparing');
           if(fill) fill.style.width=`${(5+pct*92).toFixed(1)}%`;
           if(status) status.textContent=`Rendering selected clip… ${Math.round(pct*100)}%`;
         };
 
-        if(status) status.textContent='Rendering selected clip… 0%';
-        await conversion.execute();
+        if(status) status.textContent='Encoding selected clip… 0% — preparing video frames';
+         const progressStartedAt=performance.now();
+         let progressHeartbeat=null;
+         progressHeartbeat=setInterval(()=>{
+           if(!this.videoShortsExporting || this.videoShortsRealProgressSeen) return;
+           const seconds=Math.floor((performance.now()-progressStartedAt)/1000);
+           if(status) status.textContent=`Encoding selected clip… preparing (${seconds}s)`;
+         },1000);
+         try {
+           await conversion.execute();
+         } finally {
+           if(progressHeartbeat) clearInterval(progressHeartbeat);
+         }
 
         if(this.videoShortsExportCancelRequested) throw new Error('CANCELLED');
 
