@@ -7363,30 +7363,65 @@
 
     async exportVideoShortMp4() {
       if(this.videoShortsExporting || !this.videoShortsVideo || this.videoShortsActiveClipIndex<0) return;
-      this.videoShortsExporting=true;this.videoShortsExportCancelRequested=false;
-      const status=document.getElementById('videoExportStatus'),fill=document.getElementById('videoExportProgressFill'),cancel=document.getElementById('videoExportCancelBtn');
-      if(cancel)cancel.disabled=false;if(fill)fill.style.width='0%';if(status)status.textContent='Preparing MP4…';
-      this._showVideoExportOverlay();this._updateVideoShortsExportButtons();
+      this.videoShortsExporting=true;
+      this.videoShortsExportCancelRequested=false;
+
+      const status=document.getElementById('videoExportStatus');
+      const fill=document.getElementById('videoExportProgressFill');
+      const cancel=document.getElementById('videoExportCancelBtn');
+      if(cancel)cancel.disabled=false;
+      if(fill)fill.style.width='0%';
+      if(status)status.textContent='Preparing MP4…';
+      this._showVideoExportOverlay();
+      this._updateVideoShortsExportButtons();
+
       try{
         const idx=this.videoShortsActiveClipIndex;
         const clip=this.videoShortsClips[idx];
+        if(!clip)throw new Error('No clip is selected.');
+
         const settings=this._videoShortsGetExportSettings(clip);
         const ffmpeg=await this._loadVideoShortsFfmpeg(true);
         const fetchFile=window.FFmpeg?.fetchFile;
         if(!fetchFile)throw new Error('FFmpeg file helper is unavailable.');
         if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
-        if(Math.abs(Number(settings.speed||1)-1)>0.0001)throw new Error('Playback speed must be 1.00x for direct MP4 export.');
+
+        if(Math.abs(Number(settings.speed||1)-1)>0.0001){
+          throw new Error('Playback speed must be 1.00x for direct MP4 export.');
+        }
+
         const source=this.videoShortsSourceFile;
         if(!source)throw new Error('Original source file is unavailable.');
-        const start=Math.max(0,Number(clip.start)||0), duration=Math.max(0,(Number(clip.end)||0)-start);
-        if(!duration)throw new Error('Invalid clip duration.');
+
+        const start=Math.max(0,Number(clip.start)||0);
+        const end=Math.max(start,Number(clip.end)||0);
+        const duration=end-start;
+        if(duration<=0)throw new Error('Invalid clip duration.');
+
         const token=`${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
         const ext=(source.name.match(/\.([a-z0-9]+)$/i)?.[1]||'mp4').toLowerCase();
-        const inName=`direct_${token}.${ext}`,outName=`direct_${token}.mp4`;
+        const inName=`direct_${token}.${ext}`;
+        const videoName=`video_${token}.mp4`;
+        const audioName=`audio_${token}.m4a`;
+        const outName=`direct_${token}.mp4`;
+
+        const getSize=(name)=>{
+          try{return Number(ffmpeg.FS('stat',name)?.size||0);}catch(e){return 0;}
+        };
+
+        const run=async(args,expected)=>{
+          try{
+            await ffmpeg.run(...args);
+          }catch(err){
+            const statusCode=Number(err?.status);
+            if(!(statusCode===0 && getSize(expected)>0))throw err;
+          }
+          if(getSize(expected)<=0)throw new Error(`FFmpeg did not produce ${expected}.`);
+        };
+
         try{
           ffmpeg.FS('writeFile',inName,await fetchFile(source));
-          this.videoShortsMp4Phase='encode';
-          if(status)status.textContent='Encoding selected clip… 0%';
+
           const ratio=this._videoShortsAspectRatio(settings.aspect);
           const res=Number(settings.resolution)||1080;
           let outW=res,outH=Math.round(res/ratio);
@@ -7394,33 +7429,153 @@
           else if(settings.aspect==='16:9'){outW=res;outH=Math.round(res*9/16);}
           else if(settings.aspect==='1:1'){outW=outH=res;}
           else if(settings.aspect==='4:5'){outW=Math.round(res*4/5);outH=res;}
-          // Render ONLY the requested range. The source is read directly; no Canvas/MediaRecorder/WebM stage.
-          // Audio stays stream-copied from the original file.
+
           let vf=`scale=${outW}:${outH}:force_original_aspect_ratio=increase,crop=${outW}:${outH}`;
           if(Number(settings.zoom||1)!==1){
             const z=Math.max(1,Number(settings.zoom));
-            const zw=Math.max(outW,Math.round(outW*z)),zh=Math.max(outH,Math.round(outH*z));
+            const zw=Math.max(outW,Math.round(outW*z));
+            const zh=Math.max(outH,Math.round(outH*z));
             vf=`scale=${zw}:${zh}:force_original_aspect_ratio=increase,crop=${outW}:${outH}`;
           }
-          if(Number(settings.brightness||1)!==1)vf+=`,eq=brightness=${Number(settings.brightness)-1}`;
-          if(Number(settings.blur||0)>0)vf+=`,boxblur=${Math.max(1,Math.round(Number(settings.blur)))}:1`;
-          const args=['-i',inName,'-ss',String(start),'-t',String(duration),'-map','0:v:0','-map','0:a:0?','-vf',vf,'-c:v','libx264','-preset','ultrafast','-crf',String(Math.max(18,Math.min(28,Number(settings.bitrate)?Math.round(28-Number(settings.bitrate)/2):23))),'-pix_fmt','yuv420p','-tag:v','avc1','-c:a','copy','-avoid_negative_ts','make_zero','-movflags','+faststart','-f','mp4',outName];
-          await ffmpeg.run(...args);
+          if(Number(settings.brightness||1)!==1){
+            vf+=`,eq=brightness=${Number(settings.brightness)-1}`;
+          }
+          if(Number(settings.blur||0)>0){
+            vf+=`,boxblur=${Math.max(1,Math.round(Number(settings.blur)))}:1`;
+          }
+
+          /*
+           * IMPORTANT:
+           * The previous V10 command used:
+           *   -i source -ss IN -t duration ...
+           * which can leave FFmpeg decoding from the beginning while seeking
+           * on the output side. More importantly, the final mux combined
+           * streams whose timestamps still belonged to the full source.
+           *
+           * V11 deliberately makes THREE small stages:
+           *   1) decode/render ONLY the selected video range
+           *   2) stream-copy ONLY the selected audio range
+           *   3) mux those two already-trimmed streams
+           *
+           * The source is never rendered from 0 to the end. The audio is never
+           * re-encoded.
+           */
+
+          // Stage 1: render only IN -> OUT, with no audio in this intermediate.
+          this.videoShortsMp4Phase='render';
+          if(status)status.textContent=`Rendering selected clip… 0%`;
+          if(fill)fill.style.width='5%';
+
+          const videoArgs=[
+            '-ss',String(start),
+            '-i',inName,
+            '-t',String(duration),
+            '-map','0:v:0',
+            '-vf',vf,
+            '-an',
+            '-c:v','libx264',
+            '-preset','ultrafast',
+            '-crf',String(Math.max(18,Math.min(28,Number(settings.bitrate)?Math.round(28-Number(settings.bitrate)/2):23))),
+            '-pix_fmt','yuv420p',
+            '-tag:v','avc1',
+            '-movflags','+faststart',
+            '-f','mp4',
+            videoName
+          ];
+          await run(videoArgs,videoName);
+
           if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
-          const data=ffmpeg.FS('readFile',outName);const bytes=data instanceof Uint8Array?data:new Uint8Array(data);
+
+          // Stage 2: cut the original audio to exactly the same requested
+          // duration. AAC packets are copied; no decoding/re-encoding occurs.
+          this.videoShortsMp4Phase='audio';
+          if(status)status.textContent='Preparing original audio…';
+          if(fill)fill.style.width='65%';
+
+          const audioArgs=[
+            '-i',inName,
+            '-ss',String(start),
+            '-t',String(duration),
+            '-map','0:a:0?',
+            '-c:a','copy',
+            '-avoid_negative_ts','make_zero',
+            '-movflags','+faststart',
+            '-f','mp4',
+            audioName
+          ];
+          await run(audioArgs,audioName);
+
+          if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+
+          // Stage 3: mux only the two short intermediates. No video or audio
+          // re-encoding here.
+          this.videoShortsMp4Phase='mux';
+          if(status)status.textContent='Finalizing MP4…';
+          if(fill)fill.style.width='90%';
+
+          await run([
+            '-i',videoName,
+            '-i',audioName,
+            '-map','0:v:0',
+            '-map','1:a:0?',
+            '-c:v','copy',
+            '-c:a','copy',
+            '-shortest',
+            '-avoid_negative_ts','make_zero',
+            '-movflags','+faststart',
+            '-f','mp4',
+            outName
+          ],outName);
+
+          if(this.videoShortsExportCancelRequested)throw new Error('CANCELLED');
+
+          const data=ffmpeg.FS('readFile',outName);
+          const bytes=data instanceof Uint8Array?data:new Uint8Array(data);
           if(!bytes.byteLength)throw new Error('FFmpeg returned an empty MP4.');
-          let ftyp=false;for(let i=4;i+4<Math.min(bytes.length,65536);i++){if(bytes[i]===102&&bytes[i+1]===116&&bytes[i+2]===121&&bytes[i+3]===112){ftyp=true;break;}}
+
+          let ftyp=false;
+          for(let i=4;i+4<Math.min(bytes.length,65536);i++){
+            if(bytes[i]===102&&bytes[i+1]===116&&bytes[i+2]===121&&bytes[i+3]===112){
+              ftyp=true;break;
+            }
+          }
           if(!ftyp)throw new Error('FFmpeg did not produce a valid MP4 container.');
+
           const blob=new Blob([bytes],{type:'video/mp4'});
-          const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`sonvex-clip-${String(idx+1).padStart(2,'0')}.mp4`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
-          if(fill)fill.style.width='100%';if(status)status.textContent='MP4 exported';this.showToast('MP4 exported. The selected range was rendered directly from the original source.','success');
+          const url=URL.createObjectURL(blob);
+          const a=document.createElement('a');
+          a.href=url;
+          a.download=`sonvex-clip-${String(idx+1).padStart(2,'0')}.mp4`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(()=>URL.revokeObjectURL(url),10000);
+
+          if(fill)fill.style.width='100%';
+          if(status)status.textContent='MP4 exported';
+          this.showToast('MP4 exported — only the selected IN/OUT range was rendered.','success');
+
         }finally{
-          try{ffmpeg.FS('unlink',inName)}catch(e){}try{ffmpeg.FS('unlink',outName)}catch(e){}try{ffmpeg.terminate()}catch(e){}if(this.videoShortsFfmpeg===ffmpeg)this.videoShortsFfmpeg=null;
+          for(const name of [inName,videoName,audioName,outName]){
+            try{ffmpeg.FS('unlink',name);}catch(e){}
+          }
+          try{ffmpeg.terminate();}catch(e){}
+          if(this.videoShortsFfmpeg===ffmpeg)this.videoShortsFfmpeg=null;
         }
+
       }catch(e){
-        console.error('MP4 export failed:',e);if(status)status.textContent=e.message==='CANCELLED'?'Export cancelled':'MP4 export failed';if(fill&&e.message==='CANCELLED')fill.style.width='0%';if(e.message!=='CANCELLED')this.showToast(e.message||'MP4 export failed.','error');
+        console.error('MP4 export failed:',e);
+        if(status)status.textContent=e.message==='CANCELLED'?'Export cancelled':'MP4 export failed';
+        if(fill&&e.message==='CANCELLED')fill.style.width='0%';
+        if(e.message!=='CANCELLED')this.showToast(e.message||'MP4 export failed.','error');
       }finally{
-        this.videoShortsMp4Phase=null;this.videoShortsExporting=false;this.videoShortsExportRecorder=null;this.videoShortsExportStream=null;if(cancel)cancel.disabled=true;this._hideVideoExportOverlay();this._updateVideoShortsExportButtons();
+        this.videoShortsMp4Phase=null;
+        this.videoShortsExporting=false;
+        this.videoShortsExportRecorder=null;
+        this.videoShortsExportStream=null;
+        if(cancel)cancel.disabled=true;
+        this._hideVideoExportOverlay();
+        this._updateVideoShortsExportButtons();
       }
     }
 
