@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SONVEX STUDIO — AI Audio & Lyrics Workbench</title>
-  <meta name="description" content="Next-generation audio analyzer, universal format converter, and AI lyric streaming workspace.">
+  <title>SONVEX STUDIO — Audio & Music Studio</title>
+  <meta name="description" content="SONVEX STUDIO is a free, client-side audio and music workspace for lyrics, stems, mastering, trimming, analysis, and format conversion.">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -1330,7 +1330,418 @@
       color: #4338ca !important;
       border-left-color: rgba(99, 102, 241, 0.3) !important;
     }
-  </style>
+  
+
+/* ===== STEM STUDIO V24 ADDITIONS ===== */
+.stem-track-zoom-controls {
+      position: absolute;
+      right: 6px;
+      top: 5px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px;
+      margin: 5px 6px 0 0;
+      border: 1px solid rgba(99, 102, 241, 0.28);
+      border-radius: 7px;
+      background: rgba(6, 8, 24, 0.88);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      user-select: none;
+    }
+    .stem-track-zoom-controls button {
+      width: 22px;
+      height: 20px;
+      border: 0;
+      border-radius: 4px;
+      background: rgba(99, 102, 241, 0.12);
+      color: #a5b4fc;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 20px;
+      padding: 0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .stem-track-zoom-controls button:hover {
+      background: rgba(0, 255, 204, 0.16);
+      color: #00FFCC;
+    }
+    .stem-track-zoom-controls .stem-track-zoom-value {
+      min-width: 42px;
+      text-align: center;
+      color: #67e8f9;
+      font: 700 9px/20px 'JetBrains Mono', monospace;
+      pointer-events: none;
+    }
+    .stem-track-zoom-controls .stem-track-zoom-reset {
+      font-size: 9px;
+      color: #94a3b8;
+    }
+    .light .stem-track-zoom-controls {
+      background: rgba(255,255,255,0.9);
+      border-color: rgba(99,102,241,0.25);
+    }
+    
+
+    /* SONVEX FX — polished ON/OFF switches */
+    .stem-fx-toggle{position:relative;width:42px;height:22px;flex:0 0 auto;display:inline-block}
+    .stem-fx-toggle input{position:absolute;opacity:0;width:0;height:0}
+    .stem-fx-switch{position:absolute;inset:0;cursor:pointer;border-radius:999px;background:rgba(71,85,105,.55);border:1px solid rgba(148,163,184,.22);box-shadow:inset 0 1px 3px rgba(0,0,0,.25);transition:.18s ease}
+    .stem-fx-switch::after{content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;border-radius:50%;background:#e2e8f0;box-shadow:0 2px 5px rgba(0,0,0,.35);transition:.18s ease}
+    .stem-fx-toggle input:checked+.stem-fx-switch{background:rgba(6,182,212,.24);border-color:rgba(34,211,238,.65);box-shadow:0 0 10px rgba(34,211,238,.16),inset 0 0 8px rgba(34,211,238,.08)}
+    .stem-fx-toggle input:checked+.stem-fx-switch::after{transform:translateX(20px);background:#67e8f9;box-shadow:0 0 8px rgba(34,211,238,.65)}
+    .stem-fx-toggle::after{content:"OFF";position:absolute;right:7px;top:4px;font:800 7px/14px Arial,sans-serif;color:#94a3b8;pointer-events:none;transition:.18s ease}
+    .stem-fx-toggle:has(input:checked)::after{content:"ON";left:7px;right:auto;color:#67e8f9}
+    .light .stem-fx-switch{background:rgba(148,163,184,.18);border-color:rgba(100,116,139,.25)}
+    .light .stem-fx-toggle input:checked+.stem-fx-switch{background:rgba(6,182,212,.14);border-color:rgba(8,145,178,.45)}
+    .light .stem-fx-toggle input:checked+.stem-fx-switch::after{background:#0891b2}
+    .stem-track-controls{width:235px;gap:9px;padding:14px 16px}
+    .stem-track-card{min-height:112px}
+    .stem-track-waveform-wrap{height:90px}
+    .stem-track-action-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:28px}
+    .stem-track-action-row .stem-btn-mute,.stem-track-action-row .stem-btn-solo,.stem-track-action-row .stem-fx-btn,.stem-track-action-row .stem-btn-del-track{margin:0!important}
+    .stem-track-action-row .stem-btn-del-track{margin-left:auto!important}
+
+        .stem-project-name{width:150px;max-width:22vw;height:30px;padding:0 10px;border-radius:8px;border:1px solid rgba(99,102,241,.22);background:rgba(8,12,30,.45);color:#e2e8f0;font:700 11px/30px inherit;outline:none;transition:.18s ease}
+    .stem-project-name:focus{border-color:rgba(34,211,238,.55);box-shadow:0 0 10px rgba(34,211,238,.10)}
+    .light .stem-project-name{background:rgba(255,255,255,.8);color:#0b0f2f;border-color:rgba(99,102,241,.25)}
+/* STEM STUDIO — LIGHT MODE CONTRAST OVERRIDES */
+    .light #stemStudioView {
+      background: #f0f4ff !important;
+      color: #0b0f2f !important;
+    }
+    .light .stem-header,
+    .light .stem-master-toolbar {
+      background: rgba(224, 231, 255, 0.9) !important;
+      border-color: rgba(99, 102, 241, 0.25) !important;
+    }
+    .light #stemToolsPillGroup,
+    .light #stemTimeDisplayPill {
+      background: #ffffff !important;
+      border-color: rgba(99, 102, 241, 0.3) !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    }
+
+ .light #stemToolSelect,
+    .light #stemToolRazor {
+      color: #312e81 !important;
+      font-weight: 700 !important;
+    }
+    .light #stemToolSelect.active {
+      background: rgba(6, 182, 212, 0.18) !important;
+      color: #0e7490 !important;
+      border: 1px solid rgba(6, 182, 212, 0.5) !important;
+    }
+    .light #stemToolRazor.active {
+      background: rgba(168, 85, 247, 0.18) !important;
+      color: #7e22ce !important;
+      border: 1px solid rgba(168, 85, 247, 0.5) !important;
+    }
+    .light #stemCurrentTime {
+      color: #0284c7 !important;
+      font-weight: 800 !important;
+    }
+    .light #stemDurationTime {
+      color: #4338ca !important;
+      font-weight: 700 !important;
+    }
+    /* WAVESURFER TRIMMER REGION SELECTION BOX & DRAG HANDLES */
+    .wavesurfer-region {
+      border-left: 3px solid #06b6d4 !important;
+      border-right: 3px solid #06b6d4 !important;
+      border-top: 2px solid rgba(6, 182, 212, 0.7) !important;
+      border-bottom: 2px solid rgba(6, 182, 212, 0.7) !important;
+      background-color: rgba(6, 182, 212, 0.28) !important;
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.4), inset 0 0 20px rgba(6, 182, 212, 0.15) !important;
+      box-sizing: border-box !important;
+      border-radius: 4px !important;
+      z-index: 10 !important;
+    }
+    .wavesurfer-region::before,
+    .wavesurfer-region::after {
+      content: '' !important;
+      position: absolute !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      width: 8px !important;
+      height: 32px !important;
+      background: #06b6d4 !important;
+      border: 1.5px solid #ffffff !important;
+      border-radius: 4px !important;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.9), 0 0 4px #ffffff !important;
+      z-index: 12 !important;
+      cursor: ew-resize !important;
+    }
+
+ .wavesurfer-region::before {
+      left: -5px !important;
+    }
+    .wavesurfer-region::after {
+      right: -5px !important;
+    }
+    .wavesurfer-handle {
+      background-color: #06b6d4 !important;
+      width: 6px !important;
+      border-radius: 3px !important;
+      box-shadow: 0 0 8px rgba(6, 182, 212, 0.8) !important;
+    }
+    /* TRACK DELETE BUTTON SYSTEM */
+    .stem-btn-del-track {
+      width: 24px;
+      height: 26px;
+      border-radius: 8px;
+      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      background: rgba(239, 68, 68, 0.08);
+      color: #f87171;
+      transition: all 0.2s ease;
+    }
+    .stem-btn-del-track:hover {
+      background: #dc2626 !important;
+      color: #ffffff !important;
+      border-color: #dc2626 !important;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
+      transform: translateY(-1px);
+    }
+    .light .stem-btn-del-track {
+      background: rgba(239, 68, 68, 0.06) !important;
+      color: #dc2626 !important;
+      border-color: rgba(239, 68, 68, 0.25) !important;
+    }
+
+ .light .stem-btn-del-track:hover {
+      background: #dc2626 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35) !important;
+    }
+    /* STEM STUDIO TRACK MUTE & SOLO BUTTON SYSTEM */
+    .stem-btn-mute, .stem-btn-solo {
+      width: 28px;
+      height: 26px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    /* Dark Mode Mute [M] */
+    .stem-btn-mute {
+      background: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+    .stem-btn-mute:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.5);
+      transform: translateY(-1px);
+    }
+    .stem-btn-mute.active {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
+      border-color: #f87171;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+    }
+
+
+  /* Dark Mode Solo [S] */
+    .stem-btn-solo {
+      background: rgba(245, 158, 11, 0.12);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.25);
+    }
+    .stem-btn-solo:hover {
+      background: rgba(245, 158, 11, 0.25);
+      color: #fde68a;
+      border-color: rgba(245, 158, 11, 0.5);
+      transform: translateY(-1px);
+    }
+    .stem-btn-solo.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #ffffff;
+      border-color: #fbbf24;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+    }
+    /* Light Mode Overrides */
+    .light .stem-btn-mute {
+      background: rgba(239, 68, 68, 0.08) !important;
+      color: #dc2626 !important;
+      border-color: rgba(239, 68, 68, 0.2) !important;
+    }
+    .light .stem-btn-mute:hover {
+      background: rgba(239, 68, 68, 0.18) !important;
+      border-color: rgba(239, 68, 68, 0.4) !important;
+    }
+    .light .stem-btn-mute.active {
+      background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+      color: #ffffff !important;
+      border-color: #dc2626 !important;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35) !important;
+    }
+    .light .stem-btn-solo {
+      background: rgba(245, 158, 11, 0.08) !important;
+      color: #d97706 !important;
+      border-color: rgba(245, 158, 11, 0.25) !important;
+    }
+
+
+ .light .stem-btn-solo:hover {
+      background: rgba(245, 158, 11, 0.18) !important;
+      border-color: rgba(245, 158, 11, 0.4) !important;
+    }
+    .light .stem-btn-solo.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+      color: #ffffff !important;
+      border-color: #d97706 !important;
+      box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35) !important;
+    }
+    /* STEM STUDIO WORKSTATION LIGHT & DARK THEME OVERRIDES */
+    .light #stemStudioView {
+      background: #f0f4ff !important;
+      color: #0b0f2f !important;
+    }
+    .light .stem-header {
+      background: rgba(240, 244, 255, 0.95) !important;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.25) !important;
+      color: #0b0f2f !important;
+    }
+    .light .stem-header h1,
+    .light .stem-header h2,
+    .light .stem-header span {
+      color: #0b0f2f !important;
+    }
+    .light .stem-master-toolbar {
+      background: rgba(224, 231, 255, 0.9) !important;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.2) !important;
+      color: #0b0f2f !important;
+    }
+    .light .stem-master-toolbar button,
+    .light .stem-master-toolbar span,
+    .light .stem-master-toolbar label {
+      color: #0b0f2f !important;
+    }
+
+ .light .stem-master-toolbar button.glass-input {
+      background: rgba(255, 255, 255, 0.9) !important;
+      border-color: rgba(99, 102, 241, 0.3) !important;
+      color: #0b0f2f !important;
+    }
+    .light .stem-track-card {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border: 1px solid rgba(99, 102, 241, 0.25) !important;
+      box-shadow: 0 4px 15px rgba(9, 12, 35, 0.05) !important;
+    }
+    .light .stem-track-controls {
+      color: #0b0f2f !important;
+    }
+    .light .stem-track-controls span,
+    .light .stem-track-controls strong,
+    .light .stem-track-controls label {
+      color: #0b0f2f !important;
+    }
+    .light .stem-track-waveform-wrap {
+      background: rgba(238, 242, 255, 0.95) !important;
+      border-left: 1px solid rgba(99, 102, 241, 0.2) !important;
+    }
+    .light #stemDropZone {
+      background: rgba(238, 242, 255, 0.85) !important;
+      border: 2px dashed rgba(99, 102, 241, 0.45) !important;
+    }
+    .light #stemDropZone h2,
+    .light #stemDropZone p,
+    .light #stemDropZone span,
+    .light #stemDropZone i {
+      color: #0b0f2f !important;
+    }
+    .light .stem-ruler-timeline {
+      background: rgba(224, 231, 255, 0.9) !important;
+      border-left: 1px solid rgba(99, 102, 241, 0.2) !important;
+    }
+    .light .stem-ruler-mark {
+      color: #4338ca !important;
+      border-left-color: rgba(99, 102, 241, 0.3) !important;
+    }
+  
+
+/* ===== STEM STUDIO V24 FX RACK CSS — RESTORED ===== */
+.stem-fx-btn {
+      min-width: 28px; height: 24px; padding: 0 7px; border-radius: 7px;
+      border: 1px solid rgba(34,211,238,.25); background: rgba(34,211,238,.07);
+      color: #67e8f9; font-size: 9px; font-weight: 900; letter-spacing: .04em;
+      cursor: pointer; transition: .15s ease;
+    }
+    .stem-fx-btn:hover, .stem-fx-btn.active {
+      background: rgba(34,211,238,.18); border-color: rgba(34,211,238,.55);
+      box-shadow: 0 0 10px rgba(34,211,238,.12);
+    }
+    .stem-fx-modal {
+      position: fixed; inset: 0; z-index: 120; display: none; align-items: center; justify-content: center;
+      background: rgba(2,5,18,.72); backdrop-filter: blur(8px); padding: 18px;
+    }
+    .stem-fx-modal.open { display: flex; }
+    .stem-fx-panel {
+      width: min(920px, 96vw); max-height: 90vh; overflow: auto;
+      background: rgba(10,14,38,.97); border: 1px solid rgba(99,102,241,.28);
+      border-radius: 18px; box-shadow: 0 24px 80px rgba(0,0,0,.45);
+    }
+    .light .stem-fx-panel { background: rgba(248,250,252,.98); border-color: rgba(79,70,229,.18); }
+    .stem-fx-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; padding: 14px; }
+    .stem-fx-card { border: 1px solid rgba(99,102,241,.16); border-radius: 12px; padding: 11px; background: rgba(15,23,42,.48); }
+    .light .stem-fx-card { background: rgba(255,255,255,.75); border-color: rgba(79,70,229,.12); }
+    .stem-fx-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+    .stem-fx-row label { width:92px; font-size:9px; color:#a5b4fc; flex:none; }
+    .light .stem-fx-row label { color:#475569; }
+    .stem-fx-row input[type=range] { flex:1; min-width:0; }
+    .stem-fx-value { width:54px; text-align:right; font:10px monospace; color:#67e8f9; }
+    .light .stem-fx-value { color:#0e7490; }
+    .stem-fx-enabled { accent-color:#22d3ee; }
+    @media(max-width:700px){ .stem-fx-grid{grid-template-columns:1fr;} }
+
+    
+
+/* ===== STEM STUDIO V24 FULLSCREEN SAFETY ===== */
+#stemStudioView {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  flex-direction: column;
+  overflow: hidden;
+}
+#stemStudioView[style*="display: flex"] {
+  display: flex !important;
+}
+#mainView {
+  position: relative;
+  z-index: 1;
+}
+.stem-fx-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 120 !important;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.stem-fx-modal.open {
+  display: flex !important;
+}
+.stem-fx-panel {
+  position: relative;
+  z-index: 121;
+}
+</style>
 </head>
 
 
@@ -1424,11 +1835,34 @@
   <!-- MAIN LANDING VIEW -->
   <div id="mainView">
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+
+
+    <!-- ================= BRAND STATEMENT ================= -->
+    <section class="glass-panel rounded-2xl px-6 py-7 md:px-8 md:py-8 relative overflow-hidden border border-cyan-500/15 light:border-indigo-200">
+      <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-72 h-32 bg-cyan-500/10 blur-3xl pointer-events-none"></div>
+      <div class="relative text-center max-w-4xl mx-auto">
+        
+        <h2 class="text-xl md:text-2xl font-black tracking-wide text-indigo-50 light:text-indigo-950" data-i18n="brandStatementTitle">
+          Your Sound. Your Workflow. One Studio.
+        </h2>
+        <p class="mt-3 text-xs md:text-sm leading-7 text-indigo-300 light:text-indigo-700 max-w-6xl mx-auto" data-i18n="brandStatementDesc">
+          Create, edit, refine, and prepare your music and audio — from lyrics and stems to mastering, trimming, analysis, and format conversion, all in one place.
+        </p>
+        <div class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 light:bg-emerald-50 border border-emerald-400/20 light:border-emerald-200 text-[10px] md:text-xs font-bold text-emerald-300 light:text-emerald-700">
+          <i class="fa-solid fa-circle-check"></i>
+          <span data-i18n="brandStatementFree">All SONVEX STUDIO tools are free to use — no subscriptions and no paid plans.</span>
+        </div>
+      </div>
+    </section>
+
+
+ 
     <!-- ================= HERO FEATURED STUDIOS GRID (STEM STUDIO & LYRIC STUDIO) ================= -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       
       <!-- Card 1: Stem Studio (Multitrack DAW Workbench) -->
-      <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group border border-purple-500/20 hover:border-purple-500/40 transition-all flex flex-col justify-between">
+<div class="glass-panel rounded-2xl p-6 relative overflow-hidden group border border-purple-500/20 hover:border-purple-500/40 transition-all flex flex-col justify-between">
         <div class="absolute -top-12 -right-12 w-36 h-36 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
  <div>
@@ -1458,10 +1892,10 @@
               <i class="fa-solid fa-closed-captioning text-cyan-400 text-xl"></i>
               <span data-i18n="heroLyricTitle">💬 Lyric & Subtitle Studio</span>
             </h2>
-            <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 font-bold tracking-wider" data-i18n="heroLyricBadge">AI SYNC ENGINE</span>
+            <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-cyan-950/80 text-cyan-300 border border-cyan-500/30 font-bold tracking-wider" data-i18n="heroLyricBadge">MANUAL SYNC STUDIO</span>
           </div>
           <p class="text-xs text-indigo-300 light:text-indigo-880 leading-relaxed mb-6" data-i18n="heroLyricDesc">
-            Generate AI audio-synced lyrics, edit timestamped subtitles, format song dialogue, and export <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.srt</code>, <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.lrc</code>, and <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.txt</code> subtitle files for video and music platforms.
+            Create, edit, and sync lyrics and subtitles with audio. Adjust timing and export <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.srt</code>, <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.lrc</code>, or <code class="font-mono text-cyan-300 bg-cyan-950/60 light:bg-indigo-100 px-1 py-0.5 rounded">.txt</code> files for video and music platforms.
           </p>
         </div>
         <button onclick="app.openLyricStudio()" class="w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/35 transition-all group-hover:scale-[1.01]">
@@ -1469,15 +1903,13 @@
         </button>
       </div>
     </div>
-
-
- <!-- ================= 3. AI AUDIO REMASTERER MODULE (100% CLIENT-SIDE DSP WITH CUSTOM A/B PLAYERS) ================= -->
+<!-- ================= 3. AI AUDIO REMASTERER MODULE (100% CLIENT-SIDE DSP WITH CUSTOM A/B PLAYERS) ================= -->
     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
       <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
       
       <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
         <h2 class="text-base font-bold flex items-center gap-2" data-i18n="audioRemastererTitle">
-          <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> AI Audio Remasterer
+          <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> Audio Remasterer
         </h2>
         <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">100% Client-Side DSP</span>
       </div>
@@ -1610,73 +2042,18 @@
     </div>
 
 
-<!-- ================= 4. UNIVERSAL AUDIO CONVERTER (STEP-BY-STEP WORKFLOW) ================= -->
-    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
-      <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
-      <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
-        <h2 class="text-base font-bold flex items-center gap-2">
-          <i class="fa-solid fa-arrows-rotate text-indigo-300"></i>
-          <span data-i18n="audioConverterTitle">Universal Audio Converter</span>
-        </h2>
-        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Client-Side Engine</span>
-      </div>
-      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="audioConverterDesc">
-        Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly without server uploads.
-      </p>
-      <div class="space-y-4">
-        <!-- Drag & Drop Zone -->
-        <div id="dropZone" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
-          <input type="file" id="audioFileInput" accept="audio/*,video/mp4" class="hidden" onchange="app.handleAudioUpload(this.files[0])">
-          <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
-          <div>
-            <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="dropAudioText">Drag & Drop file or browse</p>
-          </div>
-        </div>
-
-  <!-- File Info Card -->
-        <div id="fileLoadedCard" class="hidden p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 flex items-center justify-between shadow-inner">
-          <div class="flex items-center gap-3 overflow-hidden">
-            <div class="w-10 h-10 rounded-lg bg-indigo-900/40 flex items-center justify-center text-indigo-300 shrink-0">
-              <i class="fa-solid fa-file-audio text-lg"></i>
-            </div>
-            <div class="truncate">
-              <p id="fileNameDisplay" class="text-xs font-bold truncate text-indigo-100 light:text-indigo-950">filename.mp3</p>
-              <div class="flex items-center gap-2 mt-0.5">
-                <span id="fileSizeDisplay" class="text-[10px] text-indigo-300">0.0 MB</span>
-                <span class="w-1 h-1 bg-indigo-50 rounded-full"></span>
-                <span id="detectedFormatBadge" class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10 badge-exclude">MP3</span>
-              </div>
-            </div>
-          </div>
-          <button onclick="app.resetAudio()" class="text-indigo-300 hover:text-red-400 text-xs px-3 py-1.5 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
-            <i class="fa-solid fa-trash-can mr-1"></i> Remove
-          </button>
-        </div>
-
- <!-- Target Selector & Convert button -->
-        <div id="converterActionsBar" class="hidden pt-2 border-t border-indigo-500/5 light:border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3 w-full sm:w-auto">
-            <label class="text-xs font-medium text-indigo-300 light:text-indigo-900 shrink-0" data-i18n="targetFormat">Target Format:</label>
-            <select id="targetFormatSelect" class="w-full sm:w-48 glass-input text-xs font-semibold px-3 py-2 rounded-lg border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
-              <!-- Dynamically populated via JS -->
-            </select>
-          </div>
-
-
- <button id="convertBtn" onclick="app.processAudioConversion()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-700 text-white shadow-lg transition-all">
-            <i class="fa-solid fa-bolt"></i>
-            <span data-i18n="convertBtn">Convert & Download</span>
-          </button>
-        </div>
-      </div>
-    </div>
-    <!-- ================= 5. DYNAMIC TRACK INSPECTOR (AT VERY BOTTOM) ================= -->
+<!-- ================= 5. DYNAMIC TRACK INSPECTOR (AT VERY BOTTOM) ================= -->
     <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
-          <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="inspectorTitle">
-            <i class="fa-solid fa-chart-simple text-indigo-350"></i> Dynamic Track Inspector
-          </h2>
+          <div class="flex flex-col min-w-0">
+            <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="inspectorTitle">
+              <i class="fa-solid fa-chart-simple text-indigo-350"></i> Dynamic Track Inspector
+            </h2>
+            <p class="text-[9px] text-indigo-400 light:text-indigo-600 mt-1 leading-relaxed" data-i18n="inspectorNote">
+              Analyze loudness, peak level, BPM, and streaming impact, then fine-tune gain, filters, EQ, and limiting before exporting a processed master WAV.
+            </p>
+          </div>
           <span id="inspectorStatus" class="text-[9px] font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Awaiting File...</span>
         </div>
         <!-- Inspector Drag & Drop Zone -->
@@ -1922,7 +2299,98 @@
           </div>
     </div>
 
-    <!-- ================= 6. PITCH & TEMPO TRANSPOSER ================= -->
+
+<!-- ================= 7. AUDIO TRIMMER & TEASER MAKER (AT THE ABSOLUTE BOTTOM) ================= -->
+    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
+      <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
+        <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="trimmerTitle">
+          <i class="fa-solid fa-scissors text-indigo-350"></i>
+          <span>Audio Trimmer & Social Teaser Maker</span>
+        </h2>
+        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Wavesurfer Engine</span>
+      </div>
+      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="trimmerDesc">
+        Crop and slice your uploaded audio file client-side instantly. Select a region to create short social media audio previews and teasers.
+      </p>
+      <!-- Trimmer Drag & Drop Zone -->
+      <div id="trimmerPlaceholder" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
+        <input type="file" id="trimmerFileInput" accept="audio/*" class="hidden" onchange="app.handleTrimmerFileUpload(this.files[0])">
+        <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
+        <div>
+          <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="trimmerDropzone">Drag & Drop audio file here or browse to Trim</p>
+        </div>
+      </div>
+      <div id="trimmerContent" class="hidden space-y-4">
+        <!-- File Info Card inside Trimmer -->
+        <div id="trimmerFileLoadedCard" class="flex items-center justify-between p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 shadow-inner">
+          <div class="flex items-center gap-2.5 truncate">
+            <i class="fa-solid fa-file-audio text-indigo-300"></i>
+            <span id="trimmerFileNameDisplay" class="text-xs font-bold text-indigo-100 light:text-indigo-955 truncate">filename.mp3</span>
+          </div>
+          <button onclick="app.resetTrimmerState()" class="text-indigo-300 hover:text-red-400 text-xs px-2.5 py-1 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
+            <i class="fa-solid fa-trash-can mr-1"></i> <span data-i18n="removeBtn">Remove</span>
+          </button>
+        </div>
+
+
+ <!-- Wavesurfer Container -->
+        <div class="relative w-full bg-[#04040f]/60 rounded-xl border border-indigo-500/15 light:border-indigo-200 p-2 overflow-hidden shadow-inner">
+          <div id="trimmerWaveform" class="w-full"></div>
+        </div>
+        <!-- Selections & Precision Timestamps -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerStart">Start Time</div>
+            <div id="trimStartDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
+          </div>
+          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerEnd">End Time</div>
+            <div id="trimEndDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
+          </div>
+          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
+            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerDuration">Selection Duration</div>
+            <div id="trimDurationDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">0.00s</div>
+          </div>
+        </div>
+
+
+ <!-- Quick Presets -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs text-indigo-300 light:text-indigo-900 font-semibold mr-1" data-i18n="trimmerPresets">Quick Teaser Presets:</span>
+          <button onclick="app.applyTrimmerPreset(15)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">15s Preset</button>
+          <button onclick="app.applyTrimmerPreset(30)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">30s Preset</button>
+          <button onclick="app.applyTrimmerPreset(60)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">60s Preset</button>
+        </div>
+        <!-- Action Row -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-indigo-500/5 light:border-indigo-200">
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <!-- Play Selection Preview -->
+            <button id="trimPlayPreviewBtn" onclick="app.toggleTrimmerPreview()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-indigo-955/60 light:bg-indigo-50 hover:border-indigo-400 border border-indigo-500/10 text-indigo-100 light:text-indigo-955 transition-all">
+              <i id="trimPlayIcon" class="fa-solid fa-circle-play text-sm"></i>
+              <span data-i18n="trimmerPlay">Play Selection</span>
+            </button>
+            
+            <!-- Slice Action Button -->
+            <button onclick="app.cropAudioSelection()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md transition-all">
+              <i class="fa-solid fa-scissors"></i>
+              <span data-i18n="trimmerCrop">Trim & Crop Audio</span>
+            </button>
+          </div>
+          <!-- Sliced Output Card -->
+          <div id="trimOutputBar" class="hidden w-full sm:w-auto flex items-center gap-3 bg-indigo-950/40 light:bg-indigo-50/50 p-2 rounded-xl border border-indigo-500/10 light:border-indigo-200 shadow-inner shrink-0">
+            <span class="text-[10px] uppercase font-mono px-2 py-1 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10" data-i18n="trimmerOutputReady">Trimmed Output Ready</span>
+            <button id="downloadTrimmedBtn" class="px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-all">
+              <i class="fa-solid fa-cloud-arrow-down"></i>
+              <span data-i18n="trimmerDownload">Download WAV</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+<!-- ================= 6. PITCH & TEMPO TRANSPOSER ================= -->
     <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
       <div class="absolute -top-16 -left-16 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-12 -right-12 w-36 h-36 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none"></div>
@@ -2034,9 +2502,24 @@
 
   <!-- Preview Waveform -->
         <div class="relative w-full h-20 bg-[#04040f]/70 rounded-xl overflow-hidden border border-purple-500/15 light:border-purple-200 flex items-center justify-center shadow-inner">
-          <canvas id="transposerWaveCanvas" class="w-full h-full"></canvas>
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <canvas id="transposerWaveCanvas"
+            class="w-full h-full cursor-crosshair"
+            onpointerdown="app.handleTransposerWavePointerDown(event)"
+            onpointermove="app.handleTransposerWavePointerMove(event)"
+            onpointerup="app.handleTransposerWavePointerUp(event)"
+            onpointercancel="app.handleTransposerWavePointerUp(event)"></canvas>
+          <div class="absolute inset-0 pointer-events-none">
             <div id="transposerProgressBar" class="absolute left-0 top-0 h-full bg-purple-500/10 transition-all duration-100" style="width:0%"></div>
+            <div id="transposerPlayhead"
+              class="absolute top-0 bottom-0 w-[2px] bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)] -translate-x-1/2"
+              style="left:0%">
+              <div class="absolute -top-0.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,1)]"></div>
+            </div>
+          </div>
+          <div class="absolute bottom-1.5 right-2 z-10 pointer-events-none px-2 py-0.5 rounded bg-black/50 border border-cyan-400/10 text-[9px] font-mono text-cyan-200">
+            <span id="transposerTimeCurrent">00:00</span>
+            <span class="text-indigo-400"> / </span>
+            <span id="transposerTimeTotal">00:00</span>
           </div>
         </div>
         <!-- Action Row -->
@@ -2064,95 +2547,100 @@
     </div>
 
 
- <!-- ================= 7. AUDIO TRIMMER & TEASER MAKER (AT THE ABSOLUTE BOTTOM) ================= -->
-    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group mt-6">
+<!-- ================= 4. UNIVERSAL AUDIO CONVERTER (STEP-BY-STEP WORKFLOW) ================= -->
+    <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
       <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl"></div>
       <div class="flex items-center justify-between mb-4 border-b border-indigo-500/10 light:border-indigo-200 pb-3">
-        <h2 class="text-base font-bold flex items-center gap-2 text-indigo-100 light:text-indigo-955" data-i18n="trimmerTitle">
-          <i class="fa-solid fa-scissors text-indigo-350"></i>
-          <span>Audio Trimmer & Social Teaser Maker</span>
+        <h2 class="text-base font-bold flex items-center gap-2">
+          <i class="fa-solid fa-arrows-rotate text-indigo-300"></i>
+          <span data-i18n="audioConverterTitle">Universal Audio Converter</span>
         </h2>
-        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Wavesurfer Engine</span>
+        <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Client-Side Engine</span>
       </div>
-      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="trimmerDesc">
-        Crop and slice your uploaded audio file client-side instantly. Select a region to create short social media audio previews and teasers.
+      <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="audioConverterDesc">
+        Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly without server uploads.
       </p>
-      <!-- Trimmer Drag & Drop Zone -->
-      <div id="trimmerPlaceholder" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
-        <input type="file" id="trimmerFileInput" accept="audio/*" class="hidden" onchange="app.handleTrimmerFileUpload(this.files[0])">
-        <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
-        <div>
-          <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="trimmerDropzone">Drag & Drop audio file here or browse to Trim</p>
-        </div>
-      </div>
-      <div id="trimmerContent" class="hidden space-y-4">
-        <!-- File Info Card inside Trimmer -->
-        <div id="trimmerFileLoadedCard" class="flex items-center justify-between p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 shadow-inner">
-          <div class="flex items-center gap-2.5 truncate">
-            <i class="fa-solid fa-file-audio text-indigo-300"></i>
-            <span id="trimmerFileNameDisplay" class="text-xs font-bold text-indigo-100 light:text-indigo-955 truncate">filename.mp3</span>
+      <div class="space-y-4">
+        <!-- Drag & Drop Zone -->
+        <div id="dropZone" class="border border-dashed border-indigo-500/10 hover:border-indigo-400 rounded-xl p-6 text-center cursor-pointer hover:bg-white/[0.01] flex flex-col items-center justify-center gap-2 transition-all">
+          <input type="file" id="audioFileInput" accept="audio/*,video/mp4" class="hidden" onchange="app.handleAudioUpload(this.files[0])">
+          <i class="fa-solid fa-cloud-arrow-up text-indigo-300 text-2xl"></i>
+          <div>
+            <p class="text-xs font-semibold text-indigo-100 light:text-indigo-955" data-i18n="dropAudioText">Drag & Drop file or browse</p>
           </div>
-          <button onclick="app.resetTrimmerState()" class="text-indigo-300 hover:text-red-400 text-xs px-2.5 py-1 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
-            <i class="fa-solid fa-trash-can mr-1"></i> <span data-i18n="removeBtn">Remove</span>
+        </div>
+
+  <!-- File Info Card -->
+        <div id="fileLoadedCard" class="hidden p-4 rounded-xl bg-indigo-950/40 border border-indigo-500/15 light:border-indigo-200 flex items-center justify-between shadow-inner">
+          <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-10 h-10 rounded-lg bg-indigo-900/40 flex items-center justify-center text-indigo-300 shrink-0">
+              <i class="fa-solid fa-file-audio text-lg"></i>
+            </div>
+            <div class="truncate">
+              <p id="fileNameDisplay" class="text-xs font-bold truncate text-indigo-100 light:text-indigo-950">filename.mp3</p>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span id="fileSizeDisplay" class="text-[10px] text-indigo-300">0.0 MB</span>
+                <span class="w-1 h-1 bg-indigo-50 rounded-full"></span>
+                <span id="detectedFormatBadge" class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10 badge-exclude">MP3</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="app.resetAudio()" class="text-indigo-300 hover:text-red-400 text-xs px-3 py-1.5 rounded-lg border border-indigo-500/10 hover:border-red-500/20 hover:bg-red-500/5 transition-all">
+            <i class="fa-solid fa-trash-can mr-1"></i> Remove
           </button>
         </div>
 
-
- <!-- Wavesurfer Container -->
-        <div class="relative w-full bg-[#04040f]/60 rounded-xl border border-indigo-500/15 light:border-indigo-200 p-2 overflow-hidden shadow-inner">
-          <div id="trimmerWaveform" class="w-full"></div>
-        </div>
-        <!-- Selections & Precision Timestamps -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
-            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerStart">Start Time</div>
-            <div id="trimStartDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
-          </div>
-          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
-            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerEnd">End Time</div>
-            <div id="trimEndDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">00:00.00</div>
-          </div>
-          <div class="glass-input p-3.5 rounded-xl border border-indigo-500/10 light:border-indigo-200">
-            <div class="text-[10px] font-bold text-indigo-350 light:text-indigo-800 uppercase tracking-wider mb-1" data-i18n="trimmerDuration">Selection Duration</div>
-            <div id="trimDurationDisplay" class="text-lg font-black font-mono text-indigo-100 light:text-indigo-955">0.00s</div>
-          </div>
-        </div>
-
-
- <!-- Quick Presets -->
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs text-indigo-300 light:text-indigo-900 font-semibold mr-1" data-i18n="trimmerPresets">Quick Teaser Presets:</span>
-          <button onclick="app.applyTrimmerPreset(15)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">15s Preset</button>
-          <button onclick="app.applyTrimmerPreset(30)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">30s Preset</button>
-          <button onclick="app.applyTrimmerPreset(60)" class="glass-input px-3 py-1.5 rounded-lg text-xs font-bold hover:border-indigo-400 transition-all">60s Preset</button>
-        </div>
-        <!-- Action Row -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 border-t border-indigo-500/5 light:border-indigo-200">
+ <!-- Target Selector & Convert button -->
+        <div id="converterActionsBar" class="hidden pt-2 border-t border-indigo-500/5 light:border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full sm:w-auto">
-            <!-- Play Selection Preview -->
-            <button id="trimPlayPreviewBtn" onclick="app.toggleTrimmerPreview()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-indigo-955/60 light:bg-indigo-50 hover:border-indigo-400 border border-indigo-500/10 text-indigo-100 light:text-indigo-955 transition-all">
-              <i id="trimPlayIcon" class="fa-solid fa-circle-play text-sm"></i>
-              <span data-i18n="trimmerPlay">Play Selection</span>
-            </button>
-            
-            <!-- Slice Action Button -->
-            <button onclick="app.cropAudioSelection()" class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md transition-all">
-              <i class="fa-solid fa-scissors"></i>
-              <span data-i18n="trimmerCrop">Trim & Crop Audio</span>
-            </button>
+            <label class="text-xs font-medium text-indigo-300 light:text-indigo-900 shrink-0" data-i18n="targetFormat">Target Format:</label>
+            <select id="targetFormatSelect" class="w-full sm:w-48 glass-input text-xs font-semibold px-3 py-2 rounded-lg border border-indigo-500/10 bg-indigo-950 text-indigo-100 focus:outline-none focus:border-indigo-400">
+              <!-- Dynamically populated via JS -->
+            </select>
           </div>
-          <!-- Sliced Output Card -->
-          <div id="trimOutputBar" class="hidden w-full sm:w-auto flex items-center gap-3 bg-indigo-950/40 light:bg-indigo-50/50 p-2 rounded-xl border border-indigo-500/10 light:border-indigo-200 shadow-inner shrink-0">
-            <span class="text-[10px] uppercase font-mono px-2 py-1 rounded bg-indigo-950 text-indigo-300 font-semibold border border-indigo-500/10" data-i18n="trimmerOutputReady">Trimmed Output Ready</span>
-            <button id="downloadTrimmedBtn" class="px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-all">
-              <i class="fa-solid fa-cloud-arrow-down"></i>
-              <span data-i18n="trimmerDownload">Download WAV</span>
-            </button>
-          </div>
+
+
+ <button id="convertBtn" onclick="app.processAudioConversion()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-700 text-white shadow-lg transition-all">
+            <i class="fa-solid fa-bolt"></i>
+            <span data-i18n="convertBtn">Convert & Download</span>
+          </button>
         </div>
       </div>
     </div>
 </main>
+  <footer class="max-w-5xl mx-auto px-5 pb-8 pt-2">
+    <!-- Sonvex Beat creator block -->
+    <div class="glass-panel rounded-2xl px-5 py-5 mb-4 border border-indigo-500/10 light:border-indigo-200 text-center">
+      <div class="text-[11px] font-semibold text-indigo-200 light:text-indigo-800" data-i18n="footerCreator">
+        Created &amp; developed by Sonvex Beat Music Production.
+      </div>
+      <div class="flex items-center justify-center mt-3">
+        <a href="https://sonvexbeat.com/" target="_blank" rel="noopener noreferrer"
+           class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-400/20 text-[10px] font-semibold text-cyan-300 light:text-slate-800 transition-colors"
+           data-i18n="footerVisitSonvex">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          Visit Sonvex Beat
+        </a>
+      </div>
+    </div>
+
+    <!-- Main footer -->
+    <div class="glass-panel rounded-2xl px-5 py-5 border border-indigo-500/10 light:border-indigo-200 text-center">
+      <div class="text-xs font-black tracking-wide text-indigo-100 light:text-indigo-950">SONVEX STUDIO</div>
+
+      <div class="text-[10px] leading-5 text-indigo-400 light:text-indigo-700 mt-2" data-i18n="footerTagline">
+        Free tools for creators, musicians, and audio enthusiasts.
+      </div>
+      <div class="text-[9px] text-indigo-500 light:text-indigo-600 mt-4" data-i18n="footerCopyright">
+        SONVEX STUDIO — All rights reserved.
+      </div>
+
+      <div class="flex flex-col items-center justify-center gap-2 mt-3 text-[10px] font-semibold">
+        <a href="https://sonvexbeat.github.io/sonvex-studio/about.html" class="text-indigo-300 hover:text-cyan-300 light:text-indigo-700 light:hover:text-indigo-950 transition-colors" data-i18n="footerAbout">About Us</a>
+        <a href="https://sonvexbeat.github.io/sonvex-studio/privacy.html" class="text-indigo-300 hover:text-cyan-300 light:text-indigo-700 light:hover:text-indigo-950 transition-colors" data-i18n="footerPrivacy">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
   </div><!-- /#mainView -->
 
 
@@ -2171,7 +2659,8 @@
         <span class="text-sm font-bold text-white">Stem Studio</span>
         <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-mono">5-Track Non-Destructive DAW</span>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 flex-wrap justify-end">
+        <input id="stemProjectName" class="stem-project-name" value="Untitled Project" aria-label="Project name" title="Project name">
         <label class="studio-btn purple cursor-pointer" style="font-size: 11px; padding: 5px 12px;" title="Load Project State (.sonvex)">
           <i class="fa-solid fa-folder-open mr-1"></i> Load Project
           <input type="file" accept=".sonvex,.json" class="hidden" onchange="app.loadSonvexProject(this.files[0])">
@@ -2345,13 +2834,12 @@
           <div class="stem-track-controls">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5 cursor-pointer hover:underline" onclick="app.renameTrackPrompt(0)" title="Click to rename track"><i class="fa-solid fa-compact-disc"></i> <span id="trackTitle_0">Original Master</span> <i class="fa-solid fa-pen text-[9px] opacity-40 hover:opacity-100 ml-1"></i></span>
-
-
- <div class="flex items-center gap-1">
-                <button class="stem-btn-mute" id="mute_0" onclick="app.toggleStemMute(0)" title="Mute Original Master">M</button>
-                <button class="stem-btn-solo" id="solo_0" onclick="app.toggleStemSolo(0)" title="Solo Original Master">S</button>
-                <button class="stem-btn-del-track ml-1" onclick="app.deleteTrack(0)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
+            </div>
+            <div class="stem-track-action-row">
+              <button class="stem-btn-mute" id="mute_0" onclick="app.toggleStemMute(0)" title="Mute Original Master">M</button>
+              <button class="stem-btn-solo" id="solo_0" onclick="app.toggleStemSolo(0)" title="Solo Original Master">S</button>
+              <button class="stem-fx-btn" id="fxBtn_0" onclick="app.openStemFx(0)" title="Track Effects">FX</button>
+              <button class="stem-btn-del-track" onclick="app.deleteTrack(0)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
             </div>
             <div class="flex items-center justify-between text-[10px] text-indigo-300">
               <span>Vol: <strong id="volVal_0">100%</strong></span>
@@ -2390,11 +2878,12 @@
           <div class="stem-track-controls">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-cyan-300 flex items-center gap-1.5 cursor-pointer hover:underline" onclick="app.renameTrackPrompt(1)" title="Click to rename track"><i class="fa-solid fa-microphone"></i> <span id="trackTitle_1">Vocals</span> <i class="fa-solid fa-pen text-[9px] opacity-40 hover:opacity-100 ml-1"></i></span>
-              <div class="flex items-center gap-1">
-                <button class="stem-btn-mute" id="mute_1" onclick="app.toggleStemMute(1)" title="Mute Vocals">M</button>
-                <button class="stem-btn-solo" id="solo_1" onclick="app.toggleStemSolo(1)" title="Solo Vocals">S</button>
-                <button class="stem-btn-del-track ml-1" onclick="app.deleteTrack(1)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
+            </div>
+            <div class="stem-track-action-row">
+              <button class="stem-btn-mute" id="mute_1" onclick="app.toggleStemMute(1)" title="Mute Vocals">M</button>
+              <button class="stem-btn-solo" id="solo_1" onclick="app.toggleStemSolo(1)" title="Solo Vocals">S</button>
+              <button class="stem-fx-btn" id="fxBtn_1" onclick="app.openStemFx(1)" title="Track Effects">FX</button>
+              <button class="stem-btn-del-track" onclick="app.deleteTrack(1)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
             </div>
             <div class="flex items-center justify-between text-[10px] text-indigo-300">
               <span>Vol: <strong id="volVal_1">100%</strong></span>
@@ -2431,11 +2920,12 @@
           <div class="stem-track-controls">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-purple-300 flex items-center gap-1.5 cursor-pointer hover:underline" onclick="app.renameTrackPrompt(2)" title="Click to rename track"><i class="fa-solid fa-drum"></i> <span id="trackTitle_2">Drums</span> <i class="fa-solid fa-pen text-[9px] opacity-40 hover:opacity-100 ml-1"></i></span>
-              <div class="flex items-center gap-1">
-                <button class="stem-btn-mute" id="mute_2" onclick="app.toggleStemMute(2)" title="Mute Drums">M</button>
-                <button class="stem-btn-solo" id="solo_2" onclick="app.toggleStemSolo(2)" title="Solo Drums">S</button>
-                <button class="stem-btn-del-track ml-1" onclick="app.deleteTrack(2)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
+            </div>
+            <div class="stem-track-action-row">
+              <button class="stem-btn-mute" id="mute_2" onclick="app.toggleStemMute(2)" title="Mute Drums">M</button>
+              <button class="stem-btn-solo" id="solo_2" onclick="app.toggleStemSolo(2)" title="Solo Drums">S</button>
+              <button class="stem-fx-btn" id="fxBtn_2" onclick="app.openStemFx(2)" title="Track Effects">FX</button>
+              <button class="stem-btn-del-track" onclick="app.deleteTrack(2)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
             </div>
             <div class="flex items-center justify-between text-[10px] text-indigo-300">
               <span>Vol: <strong id="volVal_2">100%</strong></span>
@@ -2471,11 +2961,12 @@
           <div class="stem-track-controls">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-emerald-300 flex items-center gap-1.5 cursor-pointer hover:underline" onclick="app.renameTrackPrompt(3)" title="Click to rename track"><i class="fa-solid fa-guitar"></i> <span id="trackTitle_3">Bass</span> <i class="fa-solid fa-pen text-[9px] opacity-40 hover:opacity-100 ml-1"></i></span>
-              <div class="flex items-center gap-1">
-                <button class="stem-btn-mute" id="mute_3" onclick="app.toggleStemMute(3)" title="Mute Bass">M</button>
-                <button class="stem-btn-solo" id="solo_3" onclick="app.toggleStemSolo(3)" title="Solo Bass">S</button>
-                <button class="stem-btn-del-track ml-1" onclick="app.deleteTrack(3)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
+            </div>
+            <div class="stem-track-action-row">
+              <button class="stem-btn-mute" id="mute_3" onclick="app.toggleStemMute(3)" title="Mute Bass">M</button>
+              <button class="stem-btn-solo" id="solo_3" onclick="app.toggleStemSolo(3)" title="Solo Bass">S</button>
+              <button class="stem-fx-btn" id="fxBtn_3" onclick="app.openStemFx(3)" title="Track Effects">FX</button>
+              <button class="stem-btn-del-track" onclick="app.deleteTrack(3)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
             </div>
             <div class="flex items-center justify-between text-[10px] text-indigo-300">
               <span>Vol: <strong id="volVal_3">100%</strong></span>
@@ -2512,11 +3003,12 @@
           <div class="stem-track-controls">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5 cursor-pointer hover:underline" onclick="app.renameTrackPrompt(4)" title="Click to rename track"><i class="fa-solid fa-keyboard"></i> <span id="trackTitle_4">Instruments</span> <i class="fa-solid fa-pen text-[9px] opacity-40 hover:opacity-100 ml-1"></i></span>
-              <div class="flex items-center gap-1">
-                <button class="stem-btn-mute" id="mute_4" onclick="app.toggleStemMute(4)" title="Mute Synths &amp; Instruments">M</button>
-                <button class="stem-btn-solo" id="solo_4" onclick="app.toggleStemSolo(4)" title="Solo Synths &amp; Instruments">S</button>
-                <button class="stem-btn-del-track ml-1" onclick="app.deleteTrack(4)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
+            </div>
+            <div class="stem-track-action-row">
+              <button class="stem-btn-mute" id="mute_4" onclick="app.toggleStemMute(4)" title="Mute Synths &amp; Instruments">M</button>
+              <button class="stem-btn-solo" id="solo_4" onclick="app.toggleStemSolo(4)" title="Solo Instruments">S</button>
+              <button class="stem-fx-btn" id="fxBtn_4" onclick="app.openStemFx(4)" title="Track Effects">FX</button>
+              <button class="stem-btn-del-track" onclick="app.deleteTrack(4)" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
             </div>
             <div class="flex items-center justify-between text-[10px] text-indigo-300">
               <span>Vol: <strong id="volVal_4">100%</strong></span>
@@ -2562,6 +3054,61 @@
   </div>
 
 
+
+
+  <!-- ============================================================
+       STEM FX RACK — Web Audio API only
+  ============================================================ -->
+  <div id="stemFxModal" class="stem-fx-modal" onclick="if(event.target===this) app.closeStemFx()">
+    <div class="stem-fx-panel">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-indigo-500/15 sticky top-0 bg-inherit z-10">
+        <div>
+          <div class="text-sm font-black text-white light:text-indigo-900 flex items-center gap-2"><i class="fa-solid fa-sliders text-cyan-400"></i> Track FX Rack</div>
+          <div id="stemFxTrackName" class="text-[10px] text-indigo-300 light:text-slate-500 mt-0.5">Track</div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="studio-btn" onclick="app.resetStemFx()">Reset FX</button>
+          <button class="studio-btn cyan" onclick="app.closeStemFx()">Done</button>
+        </div>
+      </div>
+      <div class="stem-fx-grid">
+        <div class="stem-fx-card">
+          <div class="flex items-center justify-between"><b class="text-xs text-cyan-300 light:text-cyan-700">3-Band EQ</b><label class="stem-fx-toggle" title="Toggle eq"><input id="fxEqOn" type="checkbox" onchange="app.setStemFxEnabled('eq',this.checked)"><span class="stem-fx-switch"></span></label></div>
+          <div class="stem-fx-row"><label>Low</label><input id="fxEqLow" type="range" min="-12" max="12" step="0.5" value="0" oninput="app.setStemFxParam('eq','low',this.value)"><span id="fxEqLowVal" class="stem-fx-value">0 dB</span></div>
+          <div class="stem-fx-row"><label>Mid</label><input id="fxEqMid" type="range" min="-12" max="12" step="0.5" value="0" oninput="app.setStemFxParam('eq','mid',this.value)"><span id="fxEqMidVal" class="stem-fx-value">0 dB</span></div>
+          <div class="stem-fx-row"><label>High</label><input id="fxEqHigh" type="range" min="-12" max="12" step="0.5" value="0" oninput="app.setStemFxParam('eq','high',this.value)"><span id="fxEqHighVal" class="stem-fx-value">0 dB</span></div>
+        </div>
+        <div class="stem-fx-card">
+          <div class="flex items-center justify-between"><b class="text-xs text-purple-300 light:text-purple-700">Compressor</b><label class="stem-fx-toggle" title="Toggle compressor"><input id="fxCompOn" type="checkbox" onchange="app.setStemFxEnabled('compressor',this.checked)"><span class="stem-fx-switch"></span></label></div>
+          <div class="stem-fx-row"><label>Threshold</label><input id="fxCompThreshold" type="range" min="-60" max="0" step="1" value="-24" oninput="app.setStemFxParam('compressor','threshold',this.value)"><span id="fxCompThresholdVal" class="stem-fx-value">-24 dB</span></div>
+          <div class="stem-fx-row"><label>Ratio</label><input id="fxCompRatio" type="range" min="1" max="20" step="0.5" value="4" oninput="app.setStemFxParam('compressor','ratio',this.value)"><span id="fxCompRatioVal" class="stem-fx-value">4:1</span></div>
+          <div class="stem-fx-row"><label>Attack</label><input id="fxCompAttack" type="range" min="0" max="1" step="0.001" value="0.003" oninput="app.setStemFxParam('compressor','attack',this.value)"><span id="fxCompAttackVal" class="stem-fx-value">3 ms</span></div>
+          <div class="stem-fx-row"><label>Release</label><input id="fxCompRelease" type="range" min="0.01" max="1" step="0.01" value="0.25" oninput="app.setStemFxParam('compressor','release',this.value)"><span id="fxCompReleaseVal" class="stem-fx-value">250 ms</span></div>
+        </div>
+        <div class="stem-fx-card">
+          <div class="flex items-center justify-between"><b class="text-xs text-emerald-300 light:text-emerald-700">Reverb</b><label class="stem-fx-toggle" title="Toggle reverb"><input id="fxReverbOn" type="checkbox" onchange="app.setStemFxEnabled('reverb',this.checked)"><span class="stem-fx-switch"></span></label></div>
+          <div class="stem-fx-row"><label>Mix</label><input id="fxReverbMix" type="range" min="0" max="1" step="0.01" value="0.2" oninput="app.setStemFxParam('reverb','mix',this.value)"><span id="fxReverbMixVal" class="stem-fx-value">20%</span></div>
+          <div class="stem-fx-row"><label>Decay</label><input id="fxReverbDecay" type="range" min="0.2" max="6" step="0.1" value="1.8" oninput="app.setStemFxParam('reverb','decay',this.value)"><span id="fxReverbDecayVal" class="stem-fx-value">1.8 s</span></div>
+        </div>
+        <div class="stem-fx-card">
+          <div class="flex items-center justify-between"><b class="text-xs text-amber-300 light:text-amber-700">Delay</b><label class="stem-fx-toggle" title="Toggle delay"><input id="fxDelayOn" type="checkbox" onchange="app.setStemFxEnabled('delay',this.checked)"><span class="stem-fx-switch"></span></label></div>
+          <div class="stem-fx-row"><label>Time</label><input id="fxDelayTime" type="range" min="0.01" max="1.5" step="0.01" value="0.25" oninput="app.setStemFxParam('delay','time',this.value)"><span id="fxDelayTimeVal" class="stem-fx-value">250 ms</span></div>
+          <div class="stem-fx-row"><label>Feedback</label><input id="fxDelayFeedback" type="range" min="0" max="0.85" step="0.01" value="0.25" oninput="app.setStemFxParam('delay','feedback',this.value)"><span id="fxDelayFeedbackVal" class="stem-fx-value">25%</span></div>
+          <div class="stem-fx-row"><label>Mix</label><input id="fxDelayMix" type="range" min="0" max="1" step="0.01" value="0.2" oninput="app.setStemFxParam('delay','mix',this.value)"><span id="fxDelayMixVal" class="stem-fx-value">20%</span></div>
+        </div>
+        <div class="stem-fx-card">
+          <div class="flex items-center justify-between"><b class="text-xs text-pink-300 light:text-pink-700">Distortion</b><label class="stem-fx-toggle" title="Toggle distortion"><input id="fxDistortionOn" type="checkbox" onchange="app.setStemFxEnabled('distortion',this.checked)"><span class="stem-fx-switch"></span></label></div>
+          <div class="stem-fx-row"><label>Drive</label><input id="fxDistortionDrive" type="range" min="0" max="100" step="1" value="15" oninput="app.setStemFxParam('distortion','drive',this.value)"><span id="fxDistortionDriveVal" class="stem-fx-value">15%</span></div>
+          <div class="stem-fx-row"><label>Mix</label><input id="fxDistortionMix" type="range" min="0" max="1" step="0.01" value="0.2" oninput="app.setStemFxParam('distortion','mix',this.value)"><span id="fxDistortionMixVal" class="stem-fx-value">20%</span></div>
+        </div>
+        <div class="stem-fx-card">
+          <div class="flex items-center justify-between"><b class="text-xs text-red-300 light:text-red-700">Limiter</b><label class="stem-fx-toggle" title="Toggle limiter"><input id="fxLimiterOn" type="checkbox" onchange="app.setStemFxEnabled('limiter',this.checked)"><span class="stem-fx-switch"></span></label></div>
+          <div class="stem-fx-row"><label>Ceiling</label><input id="fxLimiterThreshold" type="range" min="-12" max="0" step="0.1" value="-1" oninput="app.setStemFxParam('limiter','threshold',this.value)"><span id="fxLimiterThresholdVal" class="stem-fx-value">-1 dB</span></div>
+        </div>
+      </div>
+      <div class="px-4 pb-4 text-[9px] text-indigo-400 light:text-slate-500 text-center"><span data-i18n="stemFxPoweredBy">SONVEX STUDIO FX</span></div>
+    </div>
+  </div>
 
  <!-- ============================================================
        LYRIC STUDIO — FULL-SCREEN WORKSTATION VIEW
@@ -2759,6 +3306,7 @@
 </div><!-- /.studio-body -->
 </div><!-- /#lyricStudioView -->
 <!-- TOAST NOTIFICATION CONTAINER -->
+
 <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 <!-- CORE JAVASCRIPT APPLICATION LOGIC -->
 <script>
@@ -2771,6 +3319,7 @@
       targetFormat: "Target Format:",
       convertBtn: "Convert & Download",
       inspectorTitle: "Dynamic Track Inspector",
+      inspectorNote: "Analyze loudness, peak level, BPM, and streaming impact, then fine-tune gain, filters, EQ, and limiting before exporting a processed master WAV.",
       uploadPrompt: "Upload audio to inspect waveform, Gain Peak dB & BPM",
       gainOffset: "Gain Peak Offset",
       gainDesc: "Peak amplitude relative to standard digital dynamic headroom.",
@@ -2796,7 +3345,11 @@
       regenerateBtn: "Re-generate",
       sendChat: "Send",
       chatWelcome: "Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe, then click Generate Original Lyrics Stream. You can also chat directly with me to refine rhymes.",
-      audioRemastererTitle: "AI Audio Remasterer",
+      brandStatementKicker: "SONVEX STUDIO",
+      brandStatementTitle: "Your Sound. Your Workflow. One Studio.",
+      brandStatementDesc: "Everything you need to create, edit, refine, and prepare your music and audio — all in one place.",
+      brandStatementFree: "All SONVEX STUDIO tools are free to use — no subscriptions and no paid plans.",
+      audioRemastererTitle: "Audio Remasterer",
       audioRemastererDesc: "Remaster your audio locally with high-pass filtering, 3-band parametric EQ, dynamics compression, and hard limiting.",
       dropRemasterText: "Drag & Drop track to remaster or browse",
       remasterBtn: "Remaster Audio",
@@ -2835,11 +3388,12 @@
       heroStemDesc: "Separate audio into Vocals, Drums, Bass, and Instruments. Slice, edit, trim, record microphone vocals, and mix non-destructive multitrack audio locally in real time.",
       heroStemBtn: "Launch Stem Studio ➔",
       heroLyricTitle: "💬 Lyric & Subtitle Studio",
-      heroLyricBadge: "AI SYNC ENGINE",
-      heroLyricDesc: "Generate AI audio-synced lyrics, edit timestamped subtitles, format song dialogue, and export .srt, .lrc, and .txt subtitle files for video and music platforms.",
+      heroLyricBadge: "MANUAL SYNC STUDIO",
+      heroLyricDesc: "Create, edit, and sync lyrics and subtitles with audio. Adjust timing and export .srt, .lrc, or .txt files for video and music platforms.",
       heroLyricBtn: "Launch Lyric Studio ➔",
       backBtn: "Back",
-      lyricStudioTitle: "Subtitle & Lyric Studio",
+      lyricStudioTitle: "Lyric & Subtitle Studio",
+      lyricStudioNote: "Edit lyrics and subtitles, fine-tune timing, and export SRT, LRC, or TXT files.",
       lyricStudioBadge: "SRT & LRC Maker",
       importSrt: "Import SRT",
       importLrc: "Import LRC",
@@ -2879,7 +3433,13 @@
       exportStemsBtnText: "Export Stems",
       stemDropzoneTitle: "Upload Song to Separate Stems",
       stemDropzoneDesc: "Drag & drop your song file (MP3, WAV, FLAC, AAC, OGG) to extract 4 synchronized tracks: Vocals, Drums, Bass & Instruments.",
-      selectAudioFileBtn: "Select Audio File"
+      selectAudioFileBtn: "Select Audio File",
+      footerTagline: "Free tools for creators, musicians, and audio enthusiasts.",
+      footerAbout: "About Us",
+      footerPrivacy: "Privacy Policy",
+      footerCopyright: "SONVEX STUDIO — All rights reserved.",
+      footerCreator: "Created & developed by Sonvex Beat Music Production.",
+      footerVisitSonvex: "Visit Sonvex Beat",
     },
     ar: {
       audioConverterTitle: "المحول الصوتي الشامل",
@@ -2888,6 +3448,7 @@
       targetFormat: "الصيغة المستهدفة:",
       convertBtn: "تحويل وتحميل فوراً",
       inspectorTitle: "محلل الصوت والسرعة (BPM & dB)",
+      inspectorNote: "تحليل مستوى الصوت، القمة الصوتية، سرعة الإيقاع BPM وتأثير المعالجة على منصات البث، ثم ضبط الكسب والفلاتر وEQ والـLimiter قبل تصدير ملف Master WAV.",
       uploadPrompt: "قم برفع مقطع صوتي لتحليل الموجة، الفروق الصوتية والسرعة BPM",
       gainOffset: "فرق مستوى الصوت",
       gainDesc: "قياس أعلى قمة صوتية مقارنة بالمدى الديناميكي القياسي (0 dBFS).",
@@ -2913,7 +3474,11 @@
       regenerateBtn: "إعادة التوليد",
       sendChat: "إرسال",
       chatWelcome: "مرحباً بك في SONVEX STUDIO! قم بضبط نوع الموسيقى، اللغة، وعدد الأبيات أعلاه ثم اضغط على توليد كلمات الأغنية. يمكنك أيضاً الدردشة معي مباشرة لتعديل القوافي والأبيات!",
-      audioRemastererTitle: "محسن الصوت بالذكاء الاصطناعي",
+      brandStatementKicker: "SONVEX STUDIO",
+      brandStatementTitle: "صَوْتُكَ. أُسْلُوبُكَ. استوديو واحد.",
+      brandStatementDesc: "كل ما تحتاجه لإنشاء موسيقاك وملفاتك الصوتية وتعديلها وتحسينها وتجهيزها — كل ذلك في مكان واحد.",
+      brandStatementFree: "جميع أدوات SONVEX STUDIO مجانية للاستخدام — بدون اشتراكات وبدون خطط مدفوعة.",
+      audioRemastererTitle: "محسن الصوت",
       audioRemastererDesc: "تحسين هندسة وجودة مقاطعك الصوتية محلياً عبر فلاتر الترددات، معالجة الديناميكيات، والـ Peak Limiter.",
       dropRemasterText: "اسحب وأسقط الملف هنا لتحسين جودته أو تصفح",
       remasterBtn: "بدء معالجة وتحسين الصوت",
@@ -2951,12 +3516,13 @@
       heroStemBadge: "محرك DAW محلي 100%",
       heroStemDesc: "فصل الأغاني فورياً إلى مسارات منفصلة: الصوت (Vocals)، الدفوف (Drums)، الباص (Bass)، والآلات. قص، تعديل، تسجيل ميكروفون، ومكس متعدد المسارات محلياً.",
       heroStemBtn: "تشغيل ستوديو فك المسارات ➔",
-      heroLyricTitle: "💬 ستوديو الترجمة والكلمات",
-      heroLyricBadge: "محرك مزامنة الذكاء الاصطناعي",
-      heroLyricDesc: "صناعة وتعديل نصوص الترجمة المتزامنة، ضبط التوقيت، وتصدير ملفات الترجمة (.srt) والكلمات المتزامنة (.lrc) لجميع منصات الفيديو والأغاني.",
-      heroLyricBtn: "تشغيل ستوديو الترجمة ➔",
+      heroLyricTitle: "💬 ستوديو الكلمات والترجمة",
+      heroLyricBadge: "ستوديو المزامنة والتحرير",
+      heroLyricDesc: "إنشاء وتعديل ومزامنة كلمات الأغاني والترجمة مع الصوت، وضبط التوقيت وتصدير ملفات SRT وLRC وTXT لمنصات الفيديو والموسيقى.",
+      heroLyricBtn: "تشغيل ستوديو الكلمات والترجمة ➔",
       backBtn: "الرجوع",
-      lyricStudioTitle: "ستوديو الترجمة والكلمات",
+      lyricStudioTitle: "ستوديو الكلمات والترجمة",
+      lyricStudioNote: "تعديل الكلمات والترجمة، ضبط التوقيت بدقة، وتصدير ملفات SRT وLRC وTXT.",
       lyricStudioBadge: "صانع SRT & LRC",
       importSrt: "استيراد SRT",
       importLrc: "استيراد LRC",
@@ -2996,7 +3562,13 @@
       exportStemsBtnText: "تصدير المسارات منفصلة",
       stemDropzoneTitle: "رفع أغنية لفك مساراتها الهندسية",
       stemDropzoneDesc: "اسحب وأسقط الملف الصوتي (MP3, WAV, FLAC, AAC, OGG) لفك 4 مسارات متزامنة: الصوت، الدفوف، الباص، والآلات.",
-      selectAudioFileBtn: "اختر ملف صوتي"
+      selectAudioFileBtn: "اختر ملف صوتي",
+      footerTagline: "أدوات مجانية لصنّاع المحتوى والموسيقيين وكل من يهتم بالصوت.",
+      footerAbout: "من نحن",
+      footerPrivacy: "سياسة الخصوصية",
+      footerCopyright: "SONVEX STUDIO — جميع الحقوق محفوظة.",
+      footerCreator: "تم إنشاء وتطوير SONVEX STUDIO بواسطة Sonvex Beat Music Production.",
+      footerVisitSonvex: "زيارة Sonvex Beat",
     }
   };
 
@@ -3035,6 +3607,7 @@
       this.transposerStartTime = 0;
       this.transposerPauseOffset = 0;
       this.transposerAnimFrame = null;
+      this.transposerWaveDragging = false;
 
       // Lyric Studio state
       this.lyricLines = [];
@@ -3063,6 +3636,8 @@
       this.stemSources = [null, null, null, null, null];
       this.stemGainNodes = [null, null, null, null, null];
       this.stemPanNodes = [null, null, null, null, null];
+      this.stemFxNodes = [null, null, null, null, null];
+      this.stemFx = Array.from({length: 5}, () => this._defaultStemFxState());
       this.stemMuted = [false, false, false, false, false];
       this.stemSoloed = [false, false, false, false, false];
       this.stemGains = [1, 1, 1, 1, 1];
@@ -3085,6 +3660,9 @@
       this.stemDuration = 0;
       this.stemAnimFrame = null;
       this.stemTrackColors = ['#94a3b8', '#06b6d4', '#c084fc', '#34d399', '#fbbf24'];
+      this.stemTrackZoom = [1, 1, 1, 1, 1];
+      this.stemTrackScrollLeft = [0, 0, 0, 0, 0];
+      this.projectName = 'Untitled Project';
 
       this.supportedFormats = [
         { value: 'wav', label: 'WAV (.wav)' },
@@ -4450,8 +5028,8 @@
       const canvas = document.getElementById('transposerWaveCanvas');
       if (!canvas || !this.transposerBuffer) return;
       const dpr = window.devicePixelRatio || 1;
-      canvas.width = canvas.offsetWidth * dpr;
-      canvas.height = canvas.offsetHeight * dpr;
+      canvas.width = Math.max(1, Math.floor(canvas.offsetWidth * dpr));
+      canvas.height = Math.max(1, Math.floor(canvas.offsetHeight * dpr));
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const data = this.transposerBuffer.getChannelData(0);
@@ -4479,6 +5057,76 @@
         ctx.lineTo(i, y2);
       }
       ctx.stroke();
+
+      const total = this.transposerBuffer.duration || 0;
+      const totalEl = document.getElementById('transposerTimeTotal');
+      if (totalEl) totalEl.textContent = this.formatTransposerTime(total);
+      this.updateTransposerPlayhead(this.transposerPauseOffset || 0);
+    }
+
+    formatTransposerTime(seconds) {
+      seconds = Math.max(0, Number(seconds) || 0);
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+    }
+
+    updateTransposerPlayhead(seconds) {
+      if (!this.transposerBuffer) return;
+      const duration = this.transposerBuffer.duration || 0;
+      const pct = duration ? Math.max(0, Math.min(100, (seconds / duration) * 100)) : 0;
+      const head = document.getElementById('transposerPlayhead');
+      const bar = document.getElementById('transposerProgressBar');
+      const current = document.getElementById('transposerTimeCurrent');
+      if (head) head.style.left = pct + '%';
+      if (bar) bar.style.width = pct + '%';
+      if (current) current.textContent = this.formatTransposerTime(seconds);
+    }
+
+    _transposerWaveTimeFromPointer(event) {
+      const canvas = document.getElementById('transposerWaveCanvas');
+      if (!canvas || !this.transposerBuffer) return 0;
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+      return (x / rect.width) * this.transposerBuffer.duration;
+    }
+
+    seekTransposerTo(seconds, resumeIfPlaying = false) {
+      if (!this.transposerBuffer) return;
+      const duration = this.transposerBuffer.duration || 0;
+      const target = Math.max(0, Math.min(duration, Number(seconds) || 0));
+      const wasPlaying = !!this.transposerIsPlaying;
+
+      if (wasPlaying) this.stopTransposerPlayback();
+      this.transposerPauseOffset = target;
+      this.updateTransposerPlayhead(target);
+
+      if (wasPlaying || resumeIfPlaying) {
+        this.startTransposerPlayback();
+      }
+    }
+
+    handleTransposerWavePointerDown(event) {
+      if (!this.transposerBuffer) return;
+      this.transposerWaveDragging = true;
+      const canvas = document.getElementById('transposerWaveCanvas');
+      if (canvas && canvas.setPointerCapture) {
+        try { canvas.setPointerCapture(event.pointerId); } catch (_) {}
+      }
+      this.seekTransposerTo(this._transposerWaveTimeFromPointer(event), false);
+    }
+
+    handleTransposerWavePointerMove(event) {
+      if (!this.transposerWaveDragging || !this.transposerBuffer) return;
+      this.seekTransposerTo(this._transposerWaveTimeFromPointer(event), false);
+    }
+
+    handleTransposerWavePointerUp(event) {
+      this.transposerWaveDragging = false;
+      const canvas = document.getElementById('transposerWaveCanvas');
+      if (canvas && canvas.releasePointerCapture) {
+        try { canvas.releasePointerCapture(event.pointerId); } catch (_) {}
+      }
     }
 
     setSemitones(val) {
@@ -4603,8 +5251,7 @@
           this.transposerPauseOffset = 0;
           const icon = document.getElementById('transposerPlayIcon');
           if (icon) icon.className = 'fa-solid fa-circle-play text-purple-400 text-sm';
-          const bar = document.getElementById('transposerProgressBar');
-          if (bar) bar.style.width = '0%';
+          this.updateTransposerPlayhead(0);
           cancelAnimationFrame(this.transposerAnimFrame);
         }
       };
@@ -4612,9 +5259,8 @@
       const animate = () => {
         if (!this.transposerIsPlaying) return;
         const elapsed = (this.transposerCtx.currentTime - this.transposerStartTime) * this.transposerSpeed;
-        const pct = Math.min(100, (elapsed / this.transposerBuffer.duration) * 100);
-        const bar = document.getElementById('transposerProgressBar');
-        if (bar) bar.style.width = pct + '%';
+        const elapsedClamped = Math.min(this.transposerBuffer.duration, Math.max(0, elapsed));
+        this.updateTransposerPlayhead(elapsedClamped);
         this.transposerAnimFrame = requestAnimationFrame(animate);
       };
 
@@ -4706,7 +5352,8 @@
       document.getElementById('transposerContent').classList.add('hidden');
       document.getElementById('transposerPlaceholder').classList.remove('hidden');
       document.getElementById('transposerOutputBar').classList.add('hidden');
-      document.getElementById('transposerProgressBar').style.width = '0%';
+      this.transposerWaveDragging = false;
+      this.updateTransposerPlayhead(0);
 
       const canvas = document.getElementById('transposerWaveCanvas');
       if (canvas) canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
@@ -5452,6 +6099,7 @@
       if (main) main.style.display = 'block';
     }
 
+
     async handleStemFileUpload(file) {
       if (!file) return;
       this.stemStop();
@@ -5479,6 +6127,9 @@
           this.stemAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
         const fullBuffer = await this.stemAudioCtx.decodeAudioData(arrayBuffer);
+        // Loading a Song File starts a fresh song session so added/recorded tracks
+        // from the previous song cannot leak into the new project.
+        this._resetStemStateForNewSong();
         this.stemDuration = fullBuffer.duration;
         const timeDur = document.getElementById('stemDurationTime');
         if (timeDur) timeDur.textContent = this._secToTimeStr(this.stemDuration);
@@ -5644,6 +6295,8 @@
             this.stemSoloed[newTrackIdx] = false;
             this.stemFadeIn[newTrackIdx] = 0;
             this.stemFadeOut[newTrackIdx] = 0;
+            this.stemFx[newTrackIdx] = this._defaultStemFxState();
+            this.stemFxNodes[newTrackIdx] = null;
             const recClip = new AudioClip(
               'rec_vocal_' + Date.now(),
               newTrackIdx,
@@ -5882,6 +6535,8 @@
         this.stemSoloed[newTrackIdx] = false;
         this.stemFadeIn[newTrackIdx] = 0;
         this.stemFadeOut[newTrackIdx] = 0;
+        this.stemFx[newTrackIdx] = this._defaultStemFxState();
+        this.stemFxNodes[newTrackIdx] = null;
 
         const startSec = (dropTargetTime !== null && dropTargetTime !== undefined) ? dropTargetTime : (this.stemPauseTime || 0);
         const customClip = new AudioClip(
@@ -5929,11 +6584,12 @@
         <div class="stem-track-controls">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:underline" style="color: ${color};" onclick="app.renameTrackPrompt(${idx})" title="Click to rename track"><i class="fa-solid ${iconClass}"></i> <span id="trackTitle_${idx}">${name}</span> <i class="fa-solid fa-pen text-[9px] opacity-40 hover:opacity-100 ml-1"></i></span>
-            <div class="flex items-center gap-1">
-              <button class="stem-btn-mute" id="mute_${idx}" onclick="app.toggleStemMute(${idx})" title="Mute ${name}">M</button>
-              <button class="stem-btn-solo" id="solo_${idx}" onclick="app.toggleStemSolo(${idx})" title="Solo ${name}">S</button>
-              <button class="stem-btn-del-track ml-1" onclick="app.deleteTrack(${idx})" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
-            </div>
+          </div>
+          <div class="stem-track-action-row">
+            <button class="stem-btn-mute" id="mute_${idx}" onclick="app.toggleStemMute(${idx})" title="Mute ${name}">M</button>
+            <button class="stem-btn-solo" id="solo_${idx}" onclick="app.toggleStemSolo(${idx})" title="Solo ${name}">S</button>
+            <button class="stem-fx-btn" id="fxBtn_${idx}" onclick="app.openStemFx(${idx})" title="Track Effects">FX</button>
+            <button class="stem-btn-del-track" onclick="app.deleteTrack(${idx})" title="Delete Track"><i class="fa-solid fa-trash-can"></i></button>
           </div>
           <div class="flex items-center justify-between text-[10px] text-indigo-300">
             <span>Vol: <strong id="volVal_${idx}">100%</strong></span>
@@ -6298,15 +6954,38 @@
       }
     }
 
-    _renderAllStemCanvases() {
+    _renderAllStemCanvases(options = {}) {
       const defaultColors = ['#94a3b8', '#06b6d4', '#c084fc', '#34d399', '#fbbf24', '#f43f5e', '#f97316', '#ec4899', '#8b5cf6', '#10b981'];
       const numTracks = this.tracks ? this.tracks.length : 5;
+      this._ensureStemTrackViewControls();
+
       for (let i = 0; i < numTracks; i++) {
         const canvas = document.getElementById(`stemCanvas_${i}`);
         const buf = this.stemBuffers ? this.stemBuffers[i] : null;
-        if (!canvas || !buf) continue;
-        canvas.width = canvas.parentElement.clientWidth || 800;
-        canvas.height = canvas.parentElement.clientHeight || 70;
+        const wrap = canvas ? canvas.parentElement : null;
+        if (!canvas || !wrap) continue;
+
+        if (!Array.isArray(this.stemTrackZoom)) this.stemTrackZoom = [];
+        if (!Array.isArray(this.stemTrackScrollLeft)) this.stemTrackScrollLeft = [];
+        if (!Number.isFinite(this.stemTrackZoom[i])) this.stemTrackZoom[i] = 1;
+        if (!Number.isFinite(this.stemTrackScrollLeft[i])) this.stemTrackScrollLeft[i] = 0;
+
+        const savedScroll = options.preserveScroll === false ? (this.stemTrackScrollLeft[i] || 0) : (wrap.scrollLeft || this.stemTrackScrollLeft[i] || 0);
+        const contentWidth = this._getStemTrackContentWidth(i, wrap);
+        const contentHeight = Math.max(1, wrap.clientHeight || 70);
+
+        canvas.width = contentWidth;
+        canvas.height = contentHeight;
+        canvas.style.width = contentWidth + 'px';
+        canvas.style.height = contentHeight + 'px';
+
+        const clipsLayer = document.getElementById(`clipsLayer_${i}`);
+        if (clipsLayer) {
+          clipsLayer.style.width = contentWidth + 'px';
+          clipsLayer.style.height = contentHeight + 'px';
+          clipsLayer.style.right = 'auto';
+        }
+
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -6315,12 +6994,22 @@
           clips.push(new AudioClip('clip_' + Date.now() + '_' + i, i, 0, this.stemDuration || buf.duration, buf, false));
           this.stemClips[i] = clips;
         }
+        // No buffer means this fixed track was deleted/cleared: keep the bar,
+        // but do not draw any waveform, clip, or selection shading.
+        if (!buf) {
+          const emptyLayer = document.getElementById(`clipsLayer_${i}`);
+          if (emptyLayer) emptyLayer.innerHTML = '';
+          const maxScrollEmpty = Math.max(0, contentWidth - wrap.clientWidth);
+          wrap.scrollLeft = Math.max(0, Math.min(maxScrollEmpty, savedScroll));
+          this.stemTrackScrollLeft[i] = wrap.scrollLeft;
+          continue;
+        }
         const trackColor = (this.tracks && this.tracks[i] && this.tracks[i].color) ? this.tracks[i].color : defaultColors[i % defaultColors.length];
-        
+
         clips.forEach(clip => {
           if (!this.stemDuration || !clip.audioBuffer) return;
-          const clipStartX = Math.round((clip.startTime / this.stemDuration) * canvas.width);
-          const clipWidth = Math.max(2, Math.round((clip.duration / this.stemDuration) * canvas.width));
+          const clipStartX = Math.round((clip.startTime / this.stemDuration) * contentWidth);
+          const clipWidth = Math.max(2, Math.round((clip.duration / this.stemDuration) * contentWidth));
           const clipChannelData = clip.audioBuffer.getChannelData(0);
           const startSample = Math.floor((clip.bufferOffset || 0) * clip.audioBuffer.sampleRate);
           const durSamples = Math.floor(clip.duration * clip.audioBuffer.sampleRate);
@@ -6379,7 +7068,7 @@
         const fadeOutDur = Math.max(this.stemFadeOut[i] || 0, this.masterFadeOut || 0);
         if (this.stemDuration > 0) {
           if (fadeInDur > 0) {
-            const fadeX = Math.round((fadeInDur / this.stemDuration) * canvas.width);
+            const fadeX = Math.round((fadeInDur / this.stemDuration) * contentWidth);
             ctx.fillStyle = 'rgba(6, 182, 212, 0.25)';
             ctx.beginPath();
             ctx.moveTo(0, 0);
@@ -6396,23 +7085,28 @@
           }
 
           if (fadeOutDur > 0) {
-            const fadeOutX = Math.round(((this.stemDuration - fadeOutDur) / this.stemDuration) * canvas.width);
+            const fadeOutX = Math.round(((this.stemDuration - fadeOutDur) / this.stemDuration) * contentWidth);
             ctx.fillStyle = 'rgba(192, 132, 252, 0.25)';
             ctx.beginPath();
             ctx.moveTo(fadeOutX, 0);
-            ctx.lineTo(canvas.width, 0);
-            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(contentWidth, 0);
+            ctx.lineTo(contentWidth, canvas.height);
             ctx.closePath();
             ctx.fill();
             ctx.strokeStyle = '#c084fc';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(fadeOutX, 0);
-            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(contentWidth, canvas.height);
             ctx.stroke();
           }
         }
+
+        const maxScroll = Math.max(0, contentWidth - wrap.clientWidth);
+        wrap.scrollLeft = Math.max(0, Math.min(maxScroll, savedScroll));
+        this.stemTrackScrollLeft[i] = wrap.scrollLeft;
       }
+      this._updateStemTrackPlayheadVisuals();
     }
 
     stemTogglePlay() {
@@ -6473,6 +7167,12 @@
         this._applyRampsForTrack(i, gainNode, targetGain, offset, this.stemDuration);
         this.stemGainNodes[i] = gainNode;
         this.stemPanNodes[i] = pannerNode;
+        this.stemFxNodes[i] = {};
+        const fxOutput = gainNode;
+        const fxInput = this.stemAudioCtx.createGain();
+        fxInput.gain.value = 1;
+        this.stemFxNodes[i] = this._buildStemFxChain(this.stemAudioCtx, i, fxInput, fxOutput);
+        this.stemFxNodes[i].input = fxInput;
         this.stemSources[i] = [];
 
         clips.forEach(clip => {
@@ -6495,7 +7195,7 @@
           const src = this.stemAudioCtx.createBufferSource();
           src.buffer = clip.audioBuffer;
           src.playbackRate.value = this.stemSpeed || 1.0;
-          src.connect(gainNode);
+          src.connect(fxInput);
           src.start(now + startDelay, bufferOffset, playDuration);
           this.stemSources[i].push(src);
         });
@@ -6563,6 +7263,7 @@
         soloed: [...(this.stemSoloed || [])],
         fadeIn: [...(this.stemFadeIn || [])],
         fadeOut: [...(this.stemFadeOut || [])],
+        fx: JSON.parse(JSON.stringify(this.stemFx || [])),
         tracks: this.tracks ? JSON.parse(JSON.stringify(this.tracks)) : [],
         buffers: [...(this.stemBuffers || [])]
       };
@@ -6613,6 +7314,7 @@
         soloed: [...(this.stemSoloed || [])],
         fadeIn: [...(this.stemFadeIn || [])],
         fadeOut: [...(this.stemFadeOut || [])],
+        fx: JSON.parse(JSON.stringify(this.stemFx || [])),
         tracks: this.tracks ? JSON.parse(JSON.stringify(this.tracks)) : [],
         buffers: [...(this.stemBuffers || [])]
       });
@@ -6626,6 +7328,7 @@
       this.stemSoloed = lastState.soloed;
       this.stemFadeIn = lastState.fadeIn;
       this.stemFadeOut = lastState.fadeOut;
+      this.stemFx = JSON.parse(JSON.stringify(lastState.fx || this.stemFx || []));
       if (lastState.tracks) this.tracks = JSON.parse(JSON.stringify(lastState.tracks));
       if (lastState.buffers) this.stemBuffers = [...lastState.buffers];
 
@@ -6710,6 +7413,7 @@
       this.stemSoloed = nextState.soloed;
       this.stemFadeIn = nextState.fadeIn;
       this.stemFadeOut = nextState.fadeOut;
+      this.stemFx = JSON.parse(JSON.stringify(nextState.fx || this.stemFx || []));
       if (nextState.tracks) this.tracks = JSON.parse(JSON.stringify(nextState.tracks));
       if (nextState.buffers) this.stemBuffers = [...nextState.buffers];
 
@@ -7038,14 +7742,15 @@
         this.setPlaybackSpeed(speed);
       }
 
+
     saveSonvexProject() {
-      if (!this.stemDuration) {
-        this.showToast('No active project to save', 'error');
-        return;
-      }
+      const nameInput=document.getElementById('stemProjectName');
+      const projectName=(nameInput?.value || this.projectName || 'Untitled Project').trim() || 'Untitled Project';
+      this.projectName=projectName;
       const projectData = {
-        version: '2.0',
+        version: '2.1',
         appName: 'Sonvex Studio',
+        projectName,
         date: new Date().toISOString(),
         duration: this.stemDuration,
         masterGain: this.stemMasterGainVal,
@@ -7054,17 +7759,25 @@
         speed: this.stemSpeed,
         tracks: [0, 1, 2, 3, 4].map(i => ({
           index: i,
+          name: this.tracks?.[i]?.name || document.getElementById(`trackTitle_${i}`)?.textContent || `Track ${i + 1}`,
           gain: this.stemGains[i],
           pan: this.stemPans[i],
           muted: this.stemMuted[i],
           soloed: this.stemSoloed[i],
           fadeIn: this.stemFadeIn[i],
           fadeOut: this.stemFadeOut[i],
+          fx: this._ensureStemFxState(i),
           clips: this.stemClips[i] || []
         }))
       };
       const jsonStr = JSON.stringify(projectData, null, 2);
-      this._downloadFile(jsonStr, 'project.sonvex', 'application/json');
+      // Keep Unicode project names (including Arabic) in the downloaded filename.
+      // Only remove characters that are invalid in common filesystem filenames.
+      const safeName=projectName
+        .replace(/[<>:"/\\|?*\x00-\x1F]/g,'')
+        .trim()
+        .replace(/\s+/g,'_') || 'Untitled_Project';
+      this._downloadFile(jsonStr,safeName+'.sonvex','application/json');
       this.showToast('Saved Sonvex Studio project (.sonvex)!', 'success');
     }
 
@@ -7074,6 +7787,9 @@
         const text = await file.text();
         const data = JSON.parse(text);
         if (!data.tracks) throw new Error('Invalid project file format');
+        this.projectName=(data.projectName || 'Untitled Project').trim() || 'Untitled Project';
+        const projectNameInput=document.getElementById('stemProjectName');
+        if(projectNameInput) projectNameInput.value=this.projectName;
         if (data.masterGain !== undefined) this.setStemMasterGain(data.masterGain);
         if (data.masterFadeIn !== undefined) this.setMasterFadeIn(data.masterFadeIn);
         if (data.masterFadeOut !== undefined) this.setMasterFadeOut(data.masterFadeOut);
@@ -7081,12 +7797,18 @@
         data.tracks.forEach(t => {
           const i = t.index;
           if (i >= 0 && i < 5) {
+            if (!this.tracks) this.tracks = [];
+            if (!this.tracks[i]) this.tracks[i] = { index: i, name: `Track ${i + 1}` };
+            if (t.name) this.tracks[i].name = t.name;
+            const trackTitle = document.getElementById(`trackTitle_${i}`);
+            if (trackTitle && t.name) trackTitle.textContent = t.name;
             this.stemGains[i] = t.gain ?? 1;
             this.stemPans[i] = t.pan ?? 0;
             this.stemMuted[i] = !!t.muted;
             this.stemSoloed[i] = !!t.soloed;
             this.stemFadeIn[i] = t.fadeIn ?? 0;
             this.stemFadeOut[i] = t.fadeOut ?? 0;
+            this.stemFx[i] = t.fx || this._defaultStemFxState();
             this.stemClips[i] = t.clips || [];
             const volTxt = document.getElementById(`volVal_${i}`);
             if (volTxt) volTxt.textContent = Math.round(this.stemGains[i] * 100) + '%';
@@ -7121,18 +7843,18 @@
         Array.isArray(this.tracks) ? this.tracks.length : 0
       );
       for (let i = 0; i < sourceCount; i++) {
-        const sources = this.stemSources && this.stemSources[i];
-        if (Array.isArray(sources)) {
-          sources.forEach(src => {
+        if (Array.isArray(this.stemSources[i])) {
+          this.stemSources[i].forEach(src => {
             try { src.stop(); } catch(e) {}
           });
           this.stemSources[i] = [];
-        } else if (sources) {
-          try { sources.stop(); } catch(e) {}
+        } else if (this.stemSources[i]) {
+          try { this.stemSources[i].stop(); } catch(e) {}
           this.stemSources[i] = null;
         }
       }
       this.stemIsPlaying = false;
+      this.stemFxNodes = (this.stemFxNodes || []).map(() => null);
       const icon = document.getElementById('stemPlayIcon');
       if (icon) { icon.className = 'fa-solid fa-play'; }
       if (this.stemAnimFrame) cancelAnimationFrame(this.stemAnimFrame);
@@ -7233,12 +7955,13 @@
       const waveformWrap = document.querySelector('.stem-track-waveform-wrap');
       const multitrackConsole = document.getElementById('stemMultitrackConsole');
       if (!waveformWrap || !multitrackConsole) return;
+
       const wrapRect = waveformWrap.getBoundingClientRect();
       const consoleRect = multitrackConsole.getBoundingClientRect();
-      const startX = wrapRect.left - consoleRect.left;
-      const width = wrapRect.width;
       const pct = Math.max(0, Math.min(1, currentSec / this.stemDuration));
-      const globalLeftPos = startX + (pct * width);
+      const contentWidth = this._getStemTrackContentWidth(0, waveformWrap);
+      const visibleX = (pct * contentWidth) - waveformWrap.scrollLeft;
+      const globalLeftPos = (wrapRect.left - consoleRect.left) + visibleX;
       const playhead = document.getElementById('stemGlobalPlayhead');
       if (playhead) {
         playhead.style.display = 'block';
@@ -7246,25 +7969,7 @@
         playhead.style.willChange = 'transform';
       }
 
-      const localLeftPct = pct * 100;
-      const activeTrack = (this.selectedTrackIdx !== undefined && this.selectedTrackIdx !== null) ? this.selectedTrackIdx : 1;
-      const numTracks = this.tracks ? this.tracks.length : 5;
-      for (let i = 0; i < numTracks; i++) {
-        const localLine = document.getElementById(`stemLocalPlayhead_${i}`);
-        const card = document.querySelector(`.stem-track-card[data-track="${i}"]`);
-        const isSelected = (i === activeTrack);
-        if (card) {
-          card.classList.toggle('selected-track', isSelected);
-        }
-        if (localLine) {
-          if (isSelected) {
-            localLine.style.display = 'block';
-            localLine.style.left = localLeftPct + '%';
-          } else {
-            localLine.style.display = 'none';
-          }
-        }
-      }
+      this._updateStemTrackPlayheadVisuals(currentSec);
     }
 
     showConfirmDialog(title, message, options = {}) {
@@ -7374,87 +8079,197 @@
       });
     }
 
-    async deleteTrack(trackIdx) {
-      trackIdx = parseInt(trackIdx);
-      if (isNaN(trackIdx)) return;
-      const trackObj = this.tracks ? this.tracks.find(t => t.index === trackIdx) : null;
-      const trackName = trackObj ? trackObj.name : `Track ${trackIdx}`;
-      const confirmed = await this.showConfirmDialog(
-        'Delete Track',
-        `Are you sure you want to delete "${trackName}" from the multitrack timeline?`,
-        { danger: true, confirmText: 'Delete Track', icon: 'fa-solid fa-trash-can' }
-      );
-      if (!confirmed) return;
-      this._pushUndoState(`Delete Track ${trackName}`);
-      if (this.stemSources && Array.isArray(this.stemSources[trackIdx])) {
-        this.stemSources[trackIdx].forEach(src => {
-          try { src.stop(); } catch(e) {}
-        });
-        this.stemSources[trackIdx] = [];
-      }
-      if (this.stemGainNodes && this.stemGainNodes[trackIdx]) {
-        try {
-          this.stemGainNodes[trackIdx].gain.value = 0;
-          this.stemGainNodes[trackIdx].disconnect();
-        } catch(e) {}
-      }
-      if (this.stemPanNodes && this.stemPanNodes[trackIdx]) {
-        try { this.stemPanNodes[trackIdx].disconnect(); } catch(e) {}
+    deleteTrack(index) {
+      const idx = Number(index);
+      if (!Number.isInteger(idx) || idx < 0 || idx >= (this.tracks?.length || 0)) {
+        this.showToast('Track not found', 'error');
+        return;
       }
 
-      if (this.stemClips) this.stemClips[trackIdx] = [];
-      if (this.stemBuffers) this.stemBuffers[trackIdx] = null;
-      if (this.stemMuted) this.stemMuted[trackIdx] = true;
-      if (this.stemSoloed) this.stemSoloed[trackIdx] = false;
-      const cardEl = document.querySelector(`.stem-track-card[data-track="${trackIdx}"]`);
-      if (cardEl) {
-        cardEl.remove();
+      // Stop playback before changing the track graph.
+      try { this.stemStop(); } catch (e) {}
+
+      // Base five tracks stay as fixed slots in the DAW. Deleting one clears
+      // its audio/clip content instead of breaking the fixed track layout.
+      if (idx < 5) {
+        if (!this.stemClips[idx]) this.stemClips[idx] = [];
+        this.stemClips[idx] = [];
+        this.stemBuffers[idx] = null;
+        this.stemGains[idx] = 1;
+        this.stemPans[idx] = 0;
+        this.stemMuted[idx] = false;
+        this.stemSoloed[idx] = false;
+        this.stemFadeIn[idx] = 0;
+        this.stemFadeOut[idx] = 0;
+        this.stemFx[idx] = this._defaultStemFxState();
+        this.selectedClipId = null;
+        this.selectedTrackIdx = 0;
+
+        // A deleted fixed track stays visible, but its waveform/clip shading
+        // must be completely cleared so the track looks empty.
+        const deletedCanvas = document.getElementById(`stemCanvas_${idx}`);
+        if (deletedCanvas) {
+          const deletedCtx = deletedCanvas.getContext('2d');
+          if (deletedCtx) deletedCtx.clearRect(0, 0, deletedCanvas.width, deletedCanvas.height);
+        }
+        const deletedClipsLayer = document.getElementById(`clipsLayer_${idx}`);
+        if (deletedClipsLayer) deletedClipsLayer.innerHTML = '';
+
+        const mute = document.getElementById(`mute_${idx}`);
+        const solo = document.getElementById(`solo_${idx}`);
+        const fx = document.getElementById(`fxBtn_${idx}`);
+        if (mute) mute.classList.remove('active');
+        if (solo) solo.classList.remove('active');
+        if (fx) fx.classList.remove('active');
+
+        const vol = document.getElementById(`volVal_${idx}`);
+        const pan = document.getElementById(`panVal_${idx}`);
+        const fi = document.querySelector(`[oninput*="setStemFadeIn(${idx},"]`);
+        const fo = document.querySelector(`[oninput*="setStemFadeOut(${idx},"]`);
+        if (vol) vol.textContent = '100%';
+        if (pan) pan.textContent = 'C';
+        if (fi) fi.value = 0;
+        if (fo) fo.value = 0;
+        const fiText = document.getElementById(`fadeInVal_${idx}`);
+        const foText = document.getElementById(`fadeOutVal_${idx}`);
+        if (fiText) fiText.textContent = '0.0s';
+        if (foText) foText.textContent = '0.0s';
+
+        this._renderAllStemCanvases();
+        this._renderClipDOMElements();
+        this._renderTimelineRuler();
+        this.showToast(`${this.tracks[idx].name} cleared`, 'success');
+        return;
       }
-      if (this.tracks) {
-        this.tracks = this.tracks.filter(t => t.index !== trackIdx);
-      }
-      this._updateStemNodes();
-      this._renderClipDOMElements();
+
+      // Recorded / added tracks can be removed completely.
+      const removedTrack = this.tracks[idx];
+      this.tracks.splice(idx, 1);
+      this.stemBuffers.splice(idx, 1);
+      this.stemSources.splice(idx, 1);
+      this.stemGainNodes.splice(idx, 1);
+      this.stemPanNodes.splice(idx, 1);
+      this.stemFxNodes.splice(idx, 1);
+      this.stemFx.splice(idx, 1);
+      this.stemMuted.splice(idx, 1);
+      this.stemSoloed.splice(idx, 1);
+      this.stemGains.splice(idx, 1);
+      this.stemPans.splice(idx, 1);
+      this.stemFadeIn.splice(idx, 1);
+      this.stemFadeOut.splice(idx, 1);
+      this.stemClips.splice(idx, 1);
+
+      // Re-index tracks after removal.
+      this.tracks.forEach((track, i) => { track.index = i; });
+
+      // Remove all dynamic track cards and rebuild only the added tracks.
+      document.querySelectorAll('.stem-track-card').forEach(card => {
+        const cardIdx = Number(card.dataset.track);
+        if (Number.isInteger(cardIdx) && cardIdx >= 5) card.remove();
+      });
+      this.tracks.slice(5).forEach(track => {
+        this._appendDynamicTrackCardHTML(track.index, track.name, track.color);
+      });
+
+      this.selectedClipId = null;
+      this.selectedTrackIdx = Math.min(this.selectedTrackIdx || 0, this.tracks.length - 1);
       this._renderAllStemCanvases();
-      this.showToast(`🗑️ Deleted track "${trackName}". You can now add your own custom track!`, 'success');
+      this._renderClipDOMElements();
+      this._renderTimelineRuler();
+      this.showToast(`Removed "${removedTrack?.name || 'Track'}"`, 'success');
     }
 
-    async renameTrackPrompt(trackIdx) {
-      trackIdx = parseInt(trackIdx);
-      if (isNaN(trackIdx)) return;
-      if (!this.tracks) this.tracks = [];
-      if (!this.tracks || this.tracks.length === 0) {
-        this.tracks = [
-          { index: 0, name: 'Original Master', color: '#94a3b8', icon: 'fa-compact-disc' },
-          { index: 1, name: 'Vocals', color: '#06b6d4', icon: 'fa-microphone' },
-          { index: 2, name: 'Drums', color: '#c084fc', icon: 'fa-drum' },
-          { index: 3, name: 'Bass', color: '#34d399', icon: 'fa-guitar' },
-          { index: 4, name: 'Instruments', color: '#fbbf24', icon: 'fa-keyboard' }
-        ];
-      }
+    renameTrackPrompt(index) {
+      const idx = Number(index);
+      if (!Number.isInteger(idx) || idx < 0) return;
 
-      let trackObj = this.tracks.find(t => t.index === trackIdx);
-      if (!trackObj) {
-        const defaultNames = ['Original Master', 'Vocals', 'Drums', 'Bass', 'Instruments'];
-        const defaultColors = ['#94a3b8', '#06b6d4', '#c084fc', '#34d399', '#fbbf24'];
-        trackObj = {
-          index: trackIdx,
-          name: defaultNames[trackIdx] || `Track ${trackIdx}`,
-          color: defaultColors[trackIdx % 5] || '#06b6d4',
-          icon: 'fa-music'
-        };
-        this.tracks.push(trackObj);
-      }
-      const currentName = trackObj.name;
-      const newName = await this.showPromptDialog('✏️ Rename Track Title', currentName, 'Enter track title…');
-      if (newName !== null && newName.trim() !== '') {
-        this._pushUndoState('Rename Track');
-        const cleanName = newName.trim();
-        trackObj.name = cleanName;
-        const el = document.getElementById(`trackTitle_${trackIdx}`);
-        if (el) el.textContent = cleanName;
-        this.showToast(`✏️ Renamed track to "${cleanName}"`, 'success');
-      }
+      const track = Array.isArray(this.tracks) ? this.tracks[idx] : null;
+      const titleEl = document.getElementById(`trackTitle_${idx}`);
+      const currentName = (track?.name || titleEl?.textContent || `Track ${idx + 1}`).trim();
+
+      const modal = document.getElementById('sonvexPromptModal');
+      const card = document.getElementById('sonvexPromptCard');
+      const input = document.getElementById('sonvexPromptInput');
+      const saveBtn = document.getElementById('sonvexPromptSaveBtn');
+      const cancelBtn = document.getElementById('sonvexPromptCancelBtn');
+      if (!modal || !input || !saveBtn || !cancelBtn) return;
+
+      const title = document.getElementById('sonvexPromptTitle');
+      if (title) title.textContent = 'Rename Track';
+
+      input.value = currentName;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      const close = () => {
+        if (card) {
+          card.classList.remove('scale-100', 'opacity-100');
+          card.classList.add('scale-95', 'opacity-0');
+        }
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }, 120);
+      };
+
+      const cleanup = () => {
+        saveBtn.removeEventListener('click', save);
+        cancelBtn.removeEventListener('click', cancel);
+        input.removeEventListener('keydown', keydown);
+      };
+
+      const cancel = () => {
+        cleanup();
+        close();
+      };
+
+      const save = () => {
+        const newName = input.value.trim();
+        if (!newName) {
+          input.focus();
+          return;
+        }
+
+        if (!Array.isArray(this.tracks)) this.tracks = [];
+        if (!this.tracks[idx]) this.tracks[idx] = { index: idx, name: currentName };
+        this.tracks[idx].name = newName;
+        this.tracks[idx].index = idx;
+
+        if (titleEl) titleEl.textContent = newName;
+
+        // Keep button tooltips in sync with the renamed track.
+        const muteBtn = document.getElementById(`mute_${idx}`);
+        const soloBtn = document.getElementById(`solo_${idx}`);
+        if (muteBtn) muteBtn.title = `Mute ${newName}`;
+        if (soloBtn) soloBtn.title = `Solo ${newName}`;
+
+        cleanup();
+        close();
+        this.showToast(`Track renamed to "${newName}"`, 'success');
+      };
+
+      const keydown = (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          save();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          cancel();
+        }
+      };
+
+      saveBtn.addEventListener('click', save);
+      cancelBtn.addEventListener('click', cancel);
+      input.addEventListener('keydown', keydown);
+
+      requestAnimationFrame(() => {
+        if (card) {
+          card.classList.remove('scale-95', 'opacity-0');
+          card.classList.add('scale-100', 'opacity-100');
+        }
+        input.focus();
+        input.select();
+      });
     }
 
     setStemGain(idx, val) {
@@ -7573,141 +8388,36 @@
     }
 
     async exportRemixedMasterWav() {
-      if (!this.stemBuffers || !this.stemBuffers[0]) {
-        this.showToast('No stem audio buffers loaded', 'error');
-        return;
+      if (!this.stemBuffers || !this.stemBuffers[0]) { this.showToast('No stem audio buffers loaded','error'); return; }
+      this.showToast('Rendering timeline mix with FX, Slices, Fades & Speed…','info');
+      const sampleRate=this.stemBuffers[0].sampleRate;
+      const duration=Math.max(0.001,this.stemDuration||this.stemBuffers[0].duration);
+      const speed=this.stemSpeed||1;
+      const length=Math.max(1,Math.ceil((duration/speed)*sampleRate));
+      const ctx=new OfflineAudioContext(2,length,sampleRate);
+      const master=ctx.createGain(); master.gain.setValueAtTime(this.stemMasterGainVal||1,0); master.connect(ctx.destination);
+      const anySolo=this.stemSoloed.some(Boolean); const numTracks=this.tracks?this.tracks.length:5;
+      for(let i=0;i<numTracks;i++){
+        const clips=(this.stemClips&&this.stemClips[i])?this.stemClips[i]:[]; if(!clips.length) continue;
+        let gain=this.stemGains[i]??1; if(this.stemMuted[i]) gain=0; if(anySolo&&!this.stemSoloed[i]) gain=0; if(gain<=0) continue;
+        const trackGain=ctx.createGain();
+        const pan=ctx.createStereoPanner?ctx.createStereoPanner():null;
+        if(pan){pan.pan.value=this.stemPans[i]||0;trackGain.connect(pan);pan.connect(master);}else trackGain.connect(master);
+        const fxInput=ctx.createGain(); fxInput.gain.value=1;
+        this._applyRampsForTrackOffline(ctx,i,trackGain,gain,duration,speed);
+        this._buildStemFxChain(ctx,i,fxInput,trackGain);
+        clips.forEach(c=>{
+          if(!c||c.isSilenced||!c.audioBuffer||c.duration<=0) return;
+          const start=Math.max(0,c.startTime), end=Math.min(duration,c.startTime+c.duration); if(end<=start)return;
+          const off=Math.max(0,c.bufferOffset||0), avail=Math.max(0,c.audioBuffer.duration-off), dur=Math.min(end-start,avail); if(dur<=0)return;
+          const src=ctx.createBufferSource(); src.buffer=c.audioBuffer; src.playbackRate.value=speed; src.connect(fxInput); src.start(start/speed,off,dur);
+        });
       }
-
-      this.showToast('Rendering timeline mix with Slices, Trims, Fades & Speed…', 'info');
-
-      const sampleRate = this.stemBuffers[0].sampleRate;
-      const duration = Math.max(0.001, this.stemDuration || this.stemBuffers[0].duration);
-      const speed = this.stemSpeed || 1.0;
-      const length = Math.max(1, Math.ceil((duration / speed) * sampleRate));
-      const renderCtx = new OfflineAudioContext(2, length, sampleRate);
-
-      const masterGain = renderCtx.createGain();
-      masterGain.gain.setValueAtTime(this.stemMasterGainVal || 1, 0);
-      masterGain.connect(renderCtx.destination);
-
-      const anySolo = (this.stemSoloed || []).some(Boolean);
-      const numTracks = this.tracks ? this.tracks.length : Math.max(
-        5,
-        (this.stemClips || []).length,
-        (this.stemBuffers || []).length
-      );
-
-      for (let i = 0; i < numTracks; i++) {
-        const clips = (this.stemClips && this.stemClips[i]) ? this.stemClips[i] : [];
-        const fallbackBuffer = this.stemBuffers[i];
-
-        let targetGain = (this.stemGains && this.stemGains[i] != null) ? this.stemGains[i] : 1;
-        if (this.stemMuted && this.stemMuted[i]) targetGain = 0;
-        if (anySolo && !(this.stemSoloed && this.stemSoloed[i])) targetGain = 0;
-        if (targetGain <= 0) continue;
-
-        const gainNode = renderCtx.createGain();
-        const panner = renderCtx.createStereoPanner ? renderCtx.createStereoPanner() : null;
-
-        if (panner) {
-          panner.pan.setValueAtTime((this.stemPans && this.stemPans[i]) || 0, 0);
-          gainNode.connect(panner);
-          panner.connect(masterGain);
-        } else {
-          gainNode.connect(masterGain);
-        }
-
-        // Track/master fades apply to the track output, just like playback.
-        const fadeInDur = Math.max(
-          (this.stemFadeIn && this.stemFadeIn[i]) || 0,
-          this.masterFadeIn || 0
-        );
-        const fadeOutDur = Math.max(
-          (this.stemFadeOut && this.stemFadeOut[i]) || 0,
-          this.masterFadeOut || 0
-        );
-
-        gainNode.gain.setValueAtTime(fadeInDur > 0 ? 0 : targetGain, 0);
-        if (fadeInDur > 0) {
-          gainNode.gain.linearRampToValueAtTime(targetGain, Math.min(fadeInDur / speed, duration / speed));
-        }
-        if (fadeOutDur > 0) {
-          const fadeOutStart = Math.max(0, duration - fadeOutDur);
-          if (fadeOutStart > fadeInDur) {
-            gainNode.gain.setValueAtTime(targetGain, fadeOutStart / speed);
-          }
-          gainNode.gain.linearRampToValueAtTime(0, duration / speed);
-        }
-
-        // IMPORTANT: Render timeline clips, not the original full buffer.
-        // This makes trimmed/sliced clips export exactly as shown in the DAW.
-        const usableClips = clips.filter(clip =>
-          clip &&
-          clip.audioBuffer &&
-          !clip.isSilenced &&
-          Number.isFinite(clip.startTime) &&
-          Number.isFinite(clip.duration) &&
-          clip.duration > 0
-        );
-
-        // Compatibility fallback for a track with no clip object yet.
-        if (!usableClips.length && fallbackBuffer) {
-          const src = renderCtx.createBufferSource();
-          src.buffer = fallbackBuffer;
-          src.playbackRate.value = speed;
-          src.connect(gainNode);
-          src.start(0, 0, Math.min(fallbackBuffer.duration, duration));
-        } else {
-          usableClips.forEach(clip => {
-            const clipStart = Math.max(0, clip.startTime);
-            const clipEnd = Math.min(duration, clip.startTime + clip.duration);
-            if (clipEnd <= clipStart) return;
-
-            const bufferOffset = Math.max(0, clip.bufferOffset || 0);
-            const timelineDuration = clipEnd - clipStart;
-
-            const available = Math.max(
-              0,
-              clip.audioBuffer.duration - bufferOffset
-            );
-            const sourceDuration = Math.min(timelineDuration, available);
-            if (sourceDuration <= 0) return;
-
-            const src = renderCtx.createBufferSource();
-            src.buffer = clip.audioBuffer;
-            src.playbackRate.value = speed;
-            src.connect(gainNode);
-
-            // Timeline placement follows the same model as stemPlay():
-            // clip.startTime = position in the DAW, bufferOffset = trimmed source start.
-            src.start(
-              clipStart / speed,
-              bufferOffset,
-              sourceDuration
-            );
-          });
-        }
-      }
-
-      const rendered = await renderCtx.startRendering();
-      const pcmLeft = rendered.getChannelData(0);
-      const pcmRight = rendered.numberOfChannels > 1
-        ? rendered.getChannelData(1)
-        : pcmLeft;
-
-      const wavBlob = this._stereoPcmToWav(
-        pcmLeft,
-        pcmRight,
-        sampleRate
-      );
-
-      this._downloadFile(
-        wavBlob,
-        'sonvex_remixed_master.wav',
-        'audio/wav'
-      );
-
-      this.showToast('Exported timeline mix successfully!', 'success');
+      const rendered=await ctx.startRendering();
+      const left=rendered.getChannelData(0), right=rendered.numberOfChannels>1?rendered.getChannelData(1):left;
+      const blob=this._stereoPcmToWav(left,right,sampleRate);
+      this._downloadFile(blob,'sonvex_remixed_master.wav','audio/wav');
+      this.showToast('Exported timeline mix successfully!','success');
     }
 
     async exportIndividualStemsZip() {
@@ -7758,7 +8468,492 @@
         offset += 4;
       }
       return new Blob([buffer], { type: 'audio/wav' });
+    }    _applyRampsForTrackOffline(ctx,i,gainNode,targetGain,trackDur,speed){
+      const fadeIn=Math.max(this.stemFadeIn[i]||0,this.masterFadeIn||0), fadeOut=Math.max(this.stemFadeOut[i]||0,this.masterFadeOut||0);
+      gainNode.gain.setValueAtTime(fadeIn>0?0:targetGain,0);
+      if(fadeIn>0) gainNode.gain.linearRampToValueAtTime(targetGain,Math.min(fadeIn/speed,trackDur/speed));
+      if(fadeOut>0){const s=Math.max(0,trackDur-fadeOut); if(s>fadeIn) gainNode.gain.setValueAtTime(targetGain,s/speed); gainNode.gain.linearRampToValueAtTime(0,trackDur/speed);}
     }
+
+    _buildStemFxChain(ctx, idx, input, output) {
+      const f=this._ensureStemFxState(idx);
+      const refs={};
+      let current=input;
+      // EQ: three BiquadFilterNodes, always safe and native.
+      if(f.eq.enabled) {
+        const low=ctx.createBiquadFilter(); low.type='lowshelf'; low.frequency.value=120; low.gain.value=f.eq.low;
+        const mid=ctx.createBiquadFilter(); mid.type='peaking'; mid.frequency.value=1000; mid.Q.value=0.9; mid.gain.value=f.eq.mid;
+        const high=ctx.createBiquadFilter(); high.type='highshelf'; high.frequency.value=5000; high.gain.value=f.eq.high;
+        current.connect(low); low.connect(mid); mid.connect(high); current=high; refs.eq={low,mid,high};
+      }
+      if(f.compressor.enabled) {
+        const n=ctx.createDynamicsCompressor(); n.threshold.value=f.compressor.threshold; n.ratio.value=f.compressor.ratio; n.attack.value=f.compressor.attack; n.release.value=f.compressor.release; current.connect(n); current=n; refs.compressor=n;
+      }
+      if(f.distortion.enabled) {
+        const sh=ctx.createWaveShaper(); const curve=new Float32Array(44100); const amount=1+f.distortion.drive*0.08; for(let i=0;i<curve.length;i++){const x=i*2/curve.length-1; curve[i]=Math.tanh(amount*x);} sh.curve=curve; sh.oversample='2x';
+        const next=ctx.createGain(); const wd=this._connectWetDry(ctx,current,sh,next,f.distortion.mix); current=next; refs.distortion={sh,wetDry:wd};
+      }
+      if(f.delay.enabled) {
+        const d=ctx.createDelay(2); d.delayTime.value=Math.min(2,f.delay.time); const fb=ctx.createGain(); fb.gain.value=Math.min(.9,f.delay.feedback); d.connect(fb); fb.connect(d); const next=ctx.createGain(); const wd=this._connectWetDry(ctx,current,d,next,f.delay.mix); current=next; refs.delay={d,fb,wetDry:wd};
+      }
+      if(f.reverb.enabled) {
+        const conv=ctx.createConvolver(); conv.buffer=this._makeImpulseResponse(ctx,Math.max(.2,f.reverb.decay),2.2); const next=ctx.createGain(); const wd=this._connectWetDry(ctx,current,conv,next,f.reverb.mix); current=next; refs.reverb={conv,wetDry:wd};
+      }
+      if(f.limiter.enabled) {
+        const n=ctx.createDynamicsCompressor(); n.threshold.value=f.limiter.threshold; n.knee.value=0; n.ratio.value=20; n.attack.value=0.001; n.release.value=0.08; current.connect(n); current=n; refs.limiter=n;
+      }
+      current.connect(output);
+      return refs;
+    }
+
+    _connectWetDry(ctx, input, processed, output, mix) {
+      const dry=ctx.createGain(), wet=ctx.createGain();
+      dry.gain.value=Math.max(0,1-mix); wet.gain.value=Math.max(0,Math.min(1,mix));
+      input.connect(dry); dry.connect(output); processed.connect(wet); wet.connect(output);
+      return {dry,wet};
+    }
+
+    _defaultStemFxState() {
+      return {
+        eq: { enabled: false, low: 0, mid: 0, high: 0 },
+        compressor: { enabled: false, threshold: -24, ratio: 4, attack: 0.003, release: 0.25 },
+        reverb: { enabled: false, mix: 0.2, decay: 1.8 },
+        delay: { enabled: false, time: 0.25, feedback: 0.25, mix: 0.2 },
+        distortion: { enabled: false, drive: 15, mix: 0.2 },
+        limiter: { enabled: false, threshold: -1 }
+      };
+    }
+
+    _disconnectStemFxGraph(idx) {
+      const refs = this.stemFxNodes && this.stemFxNodes[idx];
+      if (!refs) return;
+
+      const disconnect = (node) => {
+        try {
+          if (node && typeof node.disconnect === 'function') node.disconnect();
+        } catch (e) {}
+      };
+
+      disconnect(refs.input);
+
+      if (refs.eq) {
+        disconnect(refs.eq.low);
+        disconnect(refs.eq.mid);
+        disconnect(refs.eq.high);
+      }
+      disconnect(refs.compressor);
+      disconnect(refs.limiter);
+
+      if (refs.distortion) {
+        disconnect(refs.distortion.sh);
+        if (refs.distortion.wetDry) {
+          disconnect(refs.distortion.wetDry.dry);
+          disconnect(refs.distortion.wetDry.wet);
+        }
+      }
+
+      if (refs.delay) {
+        disconnect(refs.delay.d);
+        disconnect(refs.delay.fb);
+        if (refs.delay.wetDry) {
+          disconnect(refs.delay.wetDry.dry);
+          disconnect(refs.delay.wetDry.wet);
+        }
+      }
+
+      if (refs.reverb) {
+        disconnect(refs.reverb.conv);
+        if (refs.reverb.wetDry) {
+          disconnect(refs.reverb.wetDry.dry);
+          disconnect(refs.reverb.wetDry.wet);
+        }
+      }
+
+      this.stemFxNodes[idx] = null;
+    }
+
+    _ensureStemFxState(idx) {
+      if (!this.stemFx) this.stemFx = [];
+      if (!this.stemFx[idx]) this.stemFx[idx] = this._defaultStemFxState();
+      return this.stemFx[idx];
+    }
+
+    _ensureStemTrackViewControls() {
+      const wraps = document.querySelectorAll('.stem-track-waveform-wrap');
+      wraps.forEach((wrap) => {
+        const card = wrap.closest('.stem-track-card');
+        const idx = card ? parseInt(card.getAttribute('data-track'), 10) : NaN;
+        if (!Number.isFinite(idx)) return;
+        if (!Array.isArray(this.stemTrackZoom)) this.stemTrackZoom = [];
+        if (!Array.isArray(this.stemTrackScrollLeft)) this.stemTrackScrollLeft = [];
+        if (!Number.isFinite(this.stemTrackZoom[idx])) this.stemTrackZoom[idx] = 1;
+        if (!Number.isFinite(this.stemTrackScrollLeft[idx])) this.stemTrackScrollLeft[idx] = 0;
+
+        let controls = wrap.querySelector('.stem-track-zoom-controls');
+        if (!controls) {
+          controls = document.createElement('div');
+          controls.className = 'stem-track-zoom-controls';
+          controls.title = 'Per-track waveform zoom';
+
+          const minus = document.createElement('button');
+          minus.type = 'button';
+          minus.className = 'stem-track-zoom-minus';
+          minus.textContent = '−';
+          minus.title = 'Zoom out';
+
+          const value = document.createElement('span');
+          value.className = 'stem-track-zoom-value';
+
+          const plus = document.createElement('button');
+          plus.type = 'button';
+          plus.className = 'stem-track-zoom-plus';
+          plus.textContent = '+';
+          plus.title = 'Zoom in';
+
+          const reset = document.createElement('button');
+          reset.type = 'button';
+          reset.className = 'stem-track-zoom-reset';
+          reset.textContent = '1:1';
+          reset.title = 'Reset track zoom to 100%';
+
+          controls.appendChild(minus);
+          controls.appendChild(value);
+          controls.appendChild(plus);
+          controls.appendChild(reset);
+          wrap.insertBefore(controls, wrap.firstChild);
+
+          [minus, plus, reset, controls].forEach(el => {
+            el.addEventListener('click', (ev) => {
+              ev.preventDefault();
+              ev.stopPropagation();
+            });
+            el.addEventListener('mousedown', (ev) => {
+              ev.stopPropagation();
+            });
+          });
+
+          minus.addEventListener('click', () => this.setStemTrackZoom(idx, this.stemTrackZoom[idx] - 0.25));
+          plus.addEventListener('click', () => this.setStemTrackZoom(idx, this.stemTrackZoom[idx] + 0.25));
+          reset.addEventListener('click', () => this.setStemTrackZoom(idx, 1));
+
+          wrap.addEventListener('scroll', () => {
+            this.stemTrackScrollLeft[idx] = wrap.scrollLeft;
+            controls.style.transform = `translate3d(${wrap.scrollLeft}px, 0, 0)`;
+            this._updateStemTrackPlayheadVisuals();
+          }, { passive: true });
+        }
+
+        const value = controls.querySelector('.stem-track-zoom-value');
+        if (value) value.textContent = Math.round(this.stemTrackZoom[idx] * 100) + '%';
+        controls.style.transform = `translate3d(${wrap.scrollLeft || 0}px, 0, 0)`;
+      });
+    }
+
+    _getStemTrackContentWidth(idx, wrap = null) {
+      wrap = wrap || document.querySelector(`.stem-track-card[data-track="${idx}"] .stem-track-waveform-wrap`);
+      if (!wrap) return 800;
+      const viewportWidth = Math.max(1, wrap.clientWidth || 800);
+      const zoom = Math.max(1, Math.min(8, Number(this.stemTrackZoom?.[idx]) || 1));
+      return Math.max(viewportWidth, Math.round(viewportWidth * zoom));
+    }
+
+    _makeImpulseResponse(ctx, duration, decay) {
+      const length = Math.max(1, Math.floor(ctx.sampleRate * duration));
+      const buffer = ctx.createBuffer(2, length, ctx.sampleRate);
+      for (let ch=0; ch<2; ch++) {
+        const data=buffer.getChannelData(ch);
+        for(let i=0;i<length;i++) data[i]=(Math.random()*2-1)*Math.pow(1-i/length,decay);
+      }
+      return buffer;
+    }
+
+    async _refreshStemFxPlayback() {
+      if (!this.stemIsPlaying || !this.stemAudioCtx) return;
+
+      const now = this.stemAudioCtx.currentTime;
+      const pos = Math.min(
+        this.stemDuration,
+        Math.max(0, (now - this.stemStartTime) * (this.stemSpeed || 1))
+      );
+
+      this.stemPauseTime = pos;
+      await this.stemPause();
+      this.stemPauseTime = pos;
+      await this.stemPlay();
+    }
+
+    _resetStemStateForNewSong() {
+      try { this.stemStop(); } catch (e) {}
+
+      if (this.vocalMediaStream) {
+        try { this.vocalMediaStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+        this.vocalMediaStream = null;
+      }
+      if (this.vocalMediaRecorder) {
+        try { if (this.vocalMediaRecorder.state !== 'inactive') this.vocalMediaRecorder.stop(); } catch (e) {}
+        this.vocalMediaRecorder = null;
+      }
+
+      // Remove only extra/recorded track cards. The five built-in tracks remain.
+      document.querySelectorAll('.stem-track-card').forEach(card => {
+        const idx = Number(card.dataset.track);
+        if (Number.isInteger(idx) && idx >= 5) card.remove();
+      });
+
+      this.tracks = [
+        { index: 0, name: 'Original Master', color: '#94a3b8', icon: 'fa-compact-disc' },
+        { index: 1, name: 'Vocals', color: '#06b6d4', icon: 'fa-microphone' },
+        { index: 2, name: 'Drums', color: '#c084fc', icon: 'fa-drum' },
+        { index: 3, name: 'Bass', color: '#34d399', icon: 'fa-guitar' },
+        { index: 4, name: 'Instruments', color: '#fbbf24', icon: 'fa-keyboard' }
+      ];
+
+      this.stemBuffers = [null, null, null, null, null];
+      this.stemSources = [null, null, null, null, null];
+      this.stemGainNodes = [null, null, null, null, null];
+      this.stemPanNodes = [null, null, null, null, null];
+      this.stemFxNodes = [null, null, null, null, null];
+      this.stemFx = Array.from({length: 5}, () => this._defaultStemFxState());
+      this.stemMuted = [false, false, false, false, false];
+      this.stemSoloed = [false, false, false, false, false];
+      this.stemGains = [1, 1, 1, 1, 1];
+      this.stemPans = [0, 0, 0, 0, 0];
+      this.stemFadeIn = [0, 0, 0, 0, 0];
+      this.stemFadeOut = [0, 0, 0, 0, 0];
+      this.stemClips = [[], [], [], [], []];
+      this.stemTrackZoom = [1, 1, 1, 1, 1];
+      this.stemTrackScrollLeft = [0, 0, 0, 0, 0];
+      this.selectedTrackIdx = 0;
+      this.selectedClipId = null;
+      this.undoStack = [];
+      this.redoStack = [];
+      this.stemPauseTime = 0;
+      this.stemStartTime = 0;
+      this.stemDuration = 0;
+      this.stemIsPlaying = false;
+      this.stemSpeed = 1;
+      this.stemMasterGainVal = 1;
+      this.masterFadeIn = 0;
+      this.masterFadeOut = 0;
+      this.vocalRecCounter = 0;
+
+      const addInput = document.getElementById('stemAddTrackFileInput');
+      if (addInput) addInput.value = '';
+
+      const playIcon = document.getElementById('stemPlayIcon');
+      if (playIcon) playIcon.className = 'fa-solid fa-play';
+
+      const consoleEl = document.getElementById('stemMultitrackConsole');
+      const dropZone = document.getElementById('stemDropZone');
+      if (consoleEl) {
+        consoleEl.querySelectorAll('.stem-track-card').forEach(card => {
+          const idx = Number(card.dataset.track);
+          if (Number.isInteger(idx) && idx >= 5) card.remove();
+        });
+      }
+      if (dropZone) dropZone.classList.add('hidden');
+    }
+
+    _syncStemFxUI(idx) {
+      const f = this._ensureStemFxState(idx);
+      const set = (id, value, label) => { const el=document.getElementById(id); if(el) el.checked=!!value; const l=document.getElementById(label); if(l) l.textContent=!!value?'ON':'OFF'; };
+      const val = (id, value) => { const el=document.getElementById(id); if(el) el.checked=!!value; };
+      set('fxEqOn',f.eq.enabled,'fxEqOnState'); set('fxCompOn',f.compressor.enabled,'fxCompOnState'); set('fxReverbOn',f.reverb.enabled,'fxReverbOnState'); set('fxDelayOn',f.delay.enabled,'fxDelayOnState'); set('fxDistortionOn',f.distortion.enabled,'fxDistortionOnState'); set('fxLimiterOn',f.limiter.enabled,'fxLimiterOnState');
+      [['fxEqLow',f.eq.low],['fxEqMid',f.eq.mid],['fxEqHigh',f.eq.high],['fxCompThreshold',f.compressor.threshold],['fxCompRatio',f.compressor.ratio],['fxCompAttack',f.compressor.attack],['fxCompRelease',f.compressor.release],['fxReverbMix',f.reverb.mix],['fxReverbDecay',f.reverb.decay],['fxDelayTime',f.delay.time],['fxDelayFeedback',f.delay.feedback],['fxDelayMix',f.delay.mix],['fxDistortionDrive',f.distortion.drive],['fxDistortionMix',f.distortion.mix],['fxLimiterThreshold',f.limiter.threshold]].forEach(([id,v])=>val(id,v));
+      const labels={fxEqLowVal:`${f.eq.low} dB`,fxEqMidVal:`${f.eq.mid} dB`,fxEqHighVal:`${f.eq.high} dB`,fxCompThresholdVal:`${f.compressor.threshold} dB`,fxCompRatioVal:`${f.compressor.ratio}:1`,fxCompAttackVal:`${Math.round(f.compressor.attack*1000)} ms`,fxCompReleaseVal:`${Math.round(f.compressor.release*1000)} ms`,fxReverbMixVal:`${Math.round(f.reverb.mix*100)}%`,fxReverbDecayVal:`${f.reverb.decay.toFixed(1)} s`,fxDelayTimeVal:`${Math.round(f.delay.time*1000)} ms`,fxDelayFeedbackVal:`${Math.round(f.delay.feedback*100)}%`,fxDelayMixVal:`${Math.round(f.delay.mix*100)}%`,fxDistortionDriveVal:`${Math.round(f.distortion.drive)}%`,fxDistortionMixVal:`${Math.round(f.distortion.mix*100)}%`,fxLimiterThresholdVal:`${f.limiter.threshold} dB`};
+      Object.entries(labels).forEach(([id,txt])=>{const el=document.getElementById(id);if(el)el.textContent=txt;});
+    }
+
+    _updateLiveStemFx(idx, type, key) {
+      const refs=this.stemFxNodes && this.stemFxNodes[idx];
+      if(!refs || !this.stemIsPlaying) return;
+      const f=this._ensureStemFxState(idx), now=this.stemAudioCtx.currentTime;
+      try {
+        if(type==='eq' && refs.eq){ refs.eq.low.gain.setValueAtTime(f.eq.low,now); refs.eq.mid.gain.setValueAtTime(f.eq.mid,now); refs.eq.high.gain.setValueAtTime(f.eq.high,now); }
+        if(type==='compressor' && refs.compressor){ refs.compressor.threshold.setValueAtTime(f.compressor.threshold,now); refs.compressor.ratio.setValueAtTime(f.compressor.ratio,now); refs.compressor.attack.setValueAtTime(f.compressor.attack,now); refs.compressor.release.setValueAtTime(f.compressor.release,now); }
+        if(type==='delay' && refs.delay){
+          if(key==='time') refs.delay.d.delayTime.setValueAtTime(f.delay.time,now);
+          if(key==='feedback') refs.delay.fb.gain.setValueAtTime(f.delay.feedback,now);
+          if(key==='mix' && refs.delay.wetDry){ refs.delay.wetDry.dry.gain.setValueAtTime(1-f.delay.mix,now); refs.delay.wetDry.wet.gain.setValueAtTime(f.delay.mix,now); }
+        }
+        if(type==='reverb' && refs.reverb){
+          if(key==='mix' && refs.reverb.wetDry){ refs.reverb.wetDry.dry.gain.setValueAtTime(1-f.reverb.mix,now); refs.reverb.wetDry.wet.gain.setValueAtTime(f.reverb.mix,now); }
+        }
+        if(type==='distortion' && refs.distortion){
+          if(key==='mix' && refs.distortion.wetDry){ refs.distortion.wetDry.dry.gain.setValueAtTime(1-f.distortion.mix,now); refs.distortion.wetDry.wet.gain.setValueAtTime(f.distortion.mix,now); }
+          if(key==='drive'){
+            const curve=new Float32Array(44100), amount=1+f.distortion.drive*0.08;
+            for(let i=0;i<curve.length;i++){const x=i*2/curve.length-1;curve[i]=Math.tanh(amount*x);}
+            refs.distortion.sh.curve=curve;
+          }
+        }
+        // Changing a bypass state or reverb decay requires rebuilding the chain.
+        if(key==='enabled' || (type==='reverb' && key==='decay')) this._refreshStemFxPlayback();
+      } catch(e) { console.warn('FX live update:',e); }
+    }
+
+    _updateStemTrackPlayheadVisuals(currentSec = null) {
+      if (!this.stemDuration) return;
+      if (currentSec === null || currentSec === undefined) {
+        if (this.stemIsPlaying && this.stemAudioCtx) {
+          const now = this.stemAudioCtx.currentTime;
+          currentSec = Math.min(this.stemDuration, Math.max(0, (now - this.stemStartTime) * (this.stemSpeed || 1.0)));
+        } else {
+          currentSec = this.stemPauseTime || 0;
+        }
+      }
+
+      const pct = Math.max(0, Math.min(1, currentSec / this.stemDuration));
+      const numTracks = this.tracks ? this.tracks.length : 5;
+      const activeTrack = (this.selectedTrackIdx !== undefined && this.selectedTrackIdx !== null) ? this.selectedTrackIdx : 1;
+
+      for (let i = 0; i < numTracks; i++) {
+        const localLine = document.getElementById(`stemLocalPlayhead_${i}`);
+        const card = document.querySelector(`.stem-track-card[data-track="${i}"]`);
+        const wrap = card ? card.querySelector('.stem-track-waveform-wrap') : null;
+        const isSelected = (i === activeTrack);
+
+        if (card) card.classList.toggle('selected-track', isSelected);
+        if (localLine && wrap) {
+          if (isSelected) {
+            const contentWidth = this._getStemTrackContentWidth(i, wrap);
+            const x = (pct * contentWidth) - wrap.scrollLeft;
+            localLine.style.display = 'block';
+            localLine.style.left = x + 'px';
+          } else {
+            localLine.style.display = 'none';
+          }
+        }
+      }
+    }
+
+    closeStemFx() {
+      const modal = document.getElementById('stemFxModal');
+      if (modal) modal.classList.remove('open');
+      document.querySelectorAll('.stem-fx-btn').forEach(b => b.classList.remove('active'));
+    }
+
+    openStemFx(idx) {
+      this.selectedTrackIdx = idx;
+      this._ensureStemFxState(idx);
+      const modal = document.getElementById('stemFxModal');
+      const nameEl = document.getElementById('stemFxTrackName');
+      if (nameEl) nameEl.textContent = (this.tracks && this.tracks[idx] ? this.tracks[idx].name : `Track ${idx + 1}`);
+      if (modal) modal.classList.add('open');
+      const btn = document.getElementById(`fxBtn_${idx}`);
+      if (btn) btn.classList.add('active');
+      this._syncStemFxUI(idx);
+    }
+
+    async resetStemFx() {
+      const idx = this.selectedTrackIdx || 0;
+      const wasPlaying = !!this.stemIsPlaying;
+      const previousPosition = wasPlaying && this.stemAudioCtx
+        ? Math.min(this.stemDuration, Math.max(0, (this.stemAudioCtx.currentTime - this.stemStartTime) * (this.stemSpeed || 1)))
+        : (this.stemPauseTime || 0);
+
+      this._pushUndoState('Reset Track FX');
+
+      // Reset this track to a completely dry/default FX state.
+      this.stemFx[idx] = this._defaultStemFxState();
+      this.selectedClipId = null;
+      this._syncStemFxUI(idx);
+
+      // Disconnect the old graph so delay/reverb feedback and tails cannot
+      // remain audible after Reset.
+      this._disconnectStemFxGraph(idx);
+
+      if (wasPlaying) {
+        this.stemPauseTime = previousPosition;
+        await this.stemPause();
+        this.stemPauseTime = previousPosition;
+        await this.stemPlay();
+      } else {
+        this.stemPauseTime = previousPosition;
+      }
+
+      this._syncStemFxUI(idx);
+    }
+
+    resetStemTrackZoom(idx) {
+      this.setStemTrackZoom(idx, 1);
+    }
+
+    async setStemFxEnabled(type, enabled) {
+      const idx = this.selectedTrackIdx || 0;
+      this._ensureStemFxState(idx)[type].enabled = !!enabled;
+
+      if (!enabled && !this.stemIsPlaying) {
+        this._disconnectStemFxGraph(idx);
+      }
+
+      await this._refreshStemFxPlayback();
+      this._syncStemFxUI(idx);
+    }
+
+    setStemFxParam(type, key, value) {
+      const idx = this.selectedTrackIdx || 0;
+      const fx = this._ensureStemFxState(idx);
+      if (!fx[type]) return;
+      fx[type][key] = parseFloat(value);
+      this._updateLiveStemFx(idx, type, key);
+      this._syncStemFxUI(idx);
+    }
+
+    setStemTrackZoom(idx, value) {
+      idx = parseInt(idx, 10);
+      if (!Number.isFinite(idx)) return;
+      value = Math.max(1, Math.min(8, parseFloat(value) || 1));
+      value = Math.round(value * 4) / 4;
+
+      const wrap = document.querySelector(`.stem-track-card[data-track="${idx}"] .stem-track-waveform-wrap`);
+      if (!wrap) {
+        if (!Array.isArray(this.stemTrackZoom)) this.stemTrackZoom = [];
+        this.stemTrackZoom[idx] = value;
+        return;
+      }
+
+      const oldZoom = Math.max(1, Number(this.stemTrackZoom?.[idx]) || 1);
+      const oldContentWidth = this._getStemTrackContentWidth(idx, wrap);
+      const viewportWidth = Math.max(1, wrap.clientWidth || 800);
+      const oldScroll = wrap.scrollLeft || 0;
+      const centerTimePct = this.stemDuration > 0
+        ? Math.max(0, Math.min(1, (oldScroll + viewportWidth / 2) / oldContentWidth))
+        : 0.5;
+
+      if (!Array.isArray(this.stemTrackZoom)) this.stemTrackZoom = [];
+      this.stemTrackZoom[idx] = value;
+      const newContentWidth = this._getStemTrackContentWidth(idx, wrap);
+
+      wrap.querySelectorAll('.stem-track-zoom-value').forEach(el => {
+        el.textContent = Math.round(value * 100) + '%';
+      });
+
+      const targetScroll = Math.max(0, Math.min(
+        Math.max(0, newContentWidth - viewportWidth),
+        Math.round(centerTimePct * newContentWidth - viewportWidth / 2)
+      ));
+      this.stemTrackScrollLeft[idx] = targetScroll;
+      this._renderAllStemCanvases({ preserveScroll: false });
+      requestAnimationFrame(() => {
+        const currentWrap = document.querySelector(`.stem-track-card[data-track="${idx}"] .stem-track-waveform-wrap`);
+        if (currentWrap) {
+          currentWrap.scrollLeft = targetScroll;
+          this.stemTrackScrollLeft[idx] = currentWrap.scrollLeft;
+          this._updateStemTrackPlayheadVisuals();
+        }
+      });
+    }
+
+    zoomInStemTrack(idx) {
+      this.setStemTrackZoom(idx, (this.stemTrackZoom?.[idx] || 1) + 0.25);
+    }
+
+    zoomOutStemTrack(idx) {
+      this.setStemTrackZoom(idx, (this.stemTrackZoom?.[idx] || 1) - 0.25);
+    }
+
+
   }
 
   // INITIALIZE APPLICATION GLOBALLY
