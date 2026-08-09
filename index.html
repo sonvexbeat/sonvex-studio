@@ -1482,7 +1482,7 @@
         <h2 class="text-xl md:text-2xl font-black tracking-wide text-indigo-50 light:text-indigo-950" data-i18n="brandStatementTitle">
           Your Sound. Your Workflow. One Studio.
         </h2>
-        <p class="mt-3 text-xs md:text-sm leading-7 text-indigo-300 light:text-indigo-700" data-i18n="brandStatementDesc">
+        <p class="mt-3 text-xs md:text-sm leading-7 text-indigo-300 light:text-indigo-700 max-w-5xl mx-auto" data-i18n="brandStatementDesc">
           Create, edit, refine, and prepare your music and audio — from lyrics and stems to mastering, trimming, analysis, and format conversion, all in one place.
         </p>
         <div class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 light:bg-emerald-50 border border-emerald-400/20 light:border-emerald-200 text-[10px] md:text-xs font-bold text-emerald-300 light:text-emerald-700">
@@ -2199,19 +2199,47 @@
     </div>
 </main>
   <footer class="max-w-5xl mx-auto px-5 pb-8 pt-2">
-    <div class="glass-panel rounded-2xl px-5 py-5 border border-indigo-500/10 light:border-indigo-200 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="text-center md:text-left">
-        <div class="text-xs font-bold text-indigo-100 light:text-indigo-950">SONVEX STUDIO</div>
-        <div class="text-[10px] text-indigo-400 light:text-indigo-700 mt-1" data-i18n="footerTagline">Free tools for creators, musicians, and audio enthusiasts.</div>
-      </div>
-      <nav class="flex items-center gap-4 text-[10px] font-semibold">
-        <a href="about.html" class="text-indigo-300 hover:text-cyan-300 light:text-indigo-700 light:hover:text-indigo-950 transition-colors" data-i18n="footerAbout">About Us</a>
-        <span class="text-indigo-700/50">•</span>
-        <a href="privacy.html" class="text-indigo-300 hover:text-cyan-300 light:text-indigo-700 light:hover:text-indigo-950 transition-colors" data-i18n="footerPrivacy">Privacy Policy</a>
-      </nav>
-      <div class="text-center md:text-right">
-        <div class="text-[9px] text-indigo-500 light:text-indigo-600" data-i18n="footerCopyright">SONVEX STUDIO — All rights reserved.</div>
-        <div class="text-[9px] text-indigo-400 light:text-indigo-600 mt-1" data-i18n="footerCreator">Created &amp; developed by Sonvex Beat Music Production.</div>
+    <div class="glass-panel rounded-2xl px-6 py-6 md:px-7 border border-indigo-500/10 light:border-indigo-200">
+      <div class="grid grid-cols-1 md:grid-cols-[1.4fr_auto_1.2fr] items-center gap-6 md:gap-8">
+
+        <div class="text-center md:text-left">
+          <div class="text-sm font-black tracking-wide text-indigo-100 light:text-indigo-950">SONVEX STUDIO</div>
+          <div class="text-[10px] leading-5 text-indigo-400 light:text-indigo-700 mt-1" data-i18n="footerTagline">
+            Free tools for creators, musicians, and audio enthusiasts.
+          </div>
+        </div>
+
+        <nav class="flex items-center justify-center gap-4 text-[10px] font-semibold whitespace-nowrap">
+          <a href="about.html" class="text-indigo-300 hover:text-cyan-300 light:text-indigo-700 light:hover:text-indigo-950 transition-colors" data-i18n="footerAbout">About Us</a>
+          <span class="text-indigo-700/50">•</span>
+          <a href="privacy.html" class="text-indigo-300 hover:text-cyan-300 light:text-indigo-700 light:hover:text-indigo-950 transition-colors" data-i18n="footerPrivacy">Privacy Policy</a>
+        </nav>
+
+        <div class="text-center md:text-right">
+          <div class="text-[10px] font-semibold text-indigo-300 light:text-indigo-700" data-i18n="footerCreator">
+            Created &amp; developed by Sonvex Beat Music Production.
+          </div>
+
+          <div class="flex items-center justify-center md:justify-end gap-2 mt-3">
+            <a href="https://sonvexbeat.com/" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-400/20 text-[9px] font-bold text-cyan-300 light:text-indigo-700 transition-colors"
+               data-i18n="footerVisitSonvex">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              Visit Sonvex Beat
+            </a>
+            <a href="https://www.youtube.com/@SONVEX.BEAT.OFFICIAL" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/5 hover:bg-red-500/10 border border-red-400/15 text-[9px] font-bold text-red-300 light:text-red-700 transition-colors"
+               data-i18n="footerYouTube">
+              <i class="fa-brands fa-youtube"></i>
+              YouTube
+            </a>
+          </div>
+
+          <div class="text-[9px] text-indigo-500 light:text-indigo-600 mt-3" data-i18n="footerCopyright">
+            SONVEX STUDIO — All rights reserved.
+          </div>
+        </div>
+
       </div>
     </div>
   </footer>
@@ -2864,7 +2892,7 @@
       chatWelcome: "Welcome to SONVEX STUDIO! Configure your genre, language, verse count, and vibe, then click Generate Original Lyrics Stream. You can also chat directly with me to refine rhymes.",
       brandStatementKicker: "SONVEX STUDIO",
       brandStatementTitle: "Your Sound. Your Workflow. One Studio.",
-      brandStatementDesc: "Create, edit, refine, and prepare your music and audio — from lyrics and stems to mastering, trimming, analysis, and format conversion, all in one place.",
+      brandStatementDesc: "Everything you need to create, edit, refine, and prepare your music and audio — all in one place.",
       brandStatementFree: "All SONVEX STUDIO tools are free to use — no subscriptions and no paid plans.",
       audioRemastererTitle: "Audio Remasterer",
       audioRemastererDesc: "Remaster your audio locally with high-pass filtering, 3-band parametric EQ, dynamics compression, and hard limiting.",
@@ -2955,7 +2983,9 @@
       footerAbout: "About Us",
       footerPrivacy: "Privacy Policy",
       footerCopyright: "SONVEX STUDIO — All rights reserved.",
-      footerCreator: "Created & developed by Sonvex Beat Music Production."
+      footerCreator: "Created & developed by Sonvex Beat Music Production.",
+      footerVisitSonvex: "Visit Sonvex Beat",
+      footerYouTube: "YouTube"
     },
     ar: {
       audioConverterTitle: "المحول الصوتي الشامل",
@@ -2992,7 +3022,7 @@
       chatWelcome: "مرحباً بك في SONVEX STUDIO! قم بضبط نوع الموسيقى، اللغة، وعدد الأبيات أعلاه ثم اضغط على توليد كلمات الأغنية. يمكنك أيضاً الدردشة معي مباشرة لتعديل القوافي والأبيات!",
       brandStatementKicker: "SONVEX STUDIO",
       brandStatementTitle: "صَوْتُكَ. أُسْلُوبُكَ. استوديو واحد.",
-      brandStatementDesc: "أنشئ، عدّل، حسّن، وجهّز موسيقاك وملفاتك الصوتية — من الكلمات والـStems إلى الماسترينج والقص والتحليل وتحويل الصيغ، كل ذلك في مكان واحد.",
+      brandStatementDesc: "كل ما تحتاجه لإنشاء موسيقاك وملفاتك الصوتية وتعديلها وتحسينها وتجهيزها — كل ذلك في مكان واحد.",
       brandStatementFree: "جميع أدوات SONVEX STUDIO مجانية للاستخدام — بدون اشتراكات وبدون خطط مدفوعة.",
       audioRemastererTitle: "محسن الصوت",
       audioRemastererDesc: "تحسين هندسة وجودة مقاطعك الصوتية محلياً عبر فلاتر الترددات، معالجة الديناميكيات، والـ Peak Limiter.",
@@ -3083,7 +3113,9 @@
       footerAbout: "من نحن",
       footerPrivacy: "سياسة الخصوصية",
       footerCopyright: "SONVEX STUDIO — جميع الحقوق محفوظة.",
-      footerCreator: "تم إنشاء وتطوير SONVEX STUDIO بواسطة Sonvex Beat Music Production."
+      footerCreator: "تم إنشاء وتطوير SONVEX STUDIO بواسطة Sonvex Beat Music Production.",
+      footerVisitSonvex: "زيارة Sonvex Beat",
+      footerYouTube: "يوتيوب"
     }
   };
 
