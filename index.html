@@ -7043,6 +7043,7 @@
           });
 
           recorder.start(250);
+          const renderStartedAt = performance.now();
 
           const loop=()=>{
             if(done)return;
@@ -7053,9 +7054,18 @@
             }
 
             this._videoShortsApplyExportSettings(settings);
+
+            // Drive the source time ourselves. This makes CanvasCaptureStream
+            // receive genuinely changing frames even when the browser throttles
+            // a hidden/offscreen video element during a long export.
+            const elapsed = Math.max(0, (performance.now() - renderStartedAt) / 1000);
+            const targetTime = Math.min(end, start + elapsed);
+            if (Math.abs(exportVideo.currentTime - targetTime) > 0.012) {
+              try { exportVideo.currentTime = targetTime; } catch(e) {}
+            }
             this.videoShortsRenderFrame(canvas, exportVideo);
 
-            const pct=Math.max(0,Math.min(1,(exportVideo.currentTime-start)/(end-start)));
+            const pct=Math.max(0,Math.min(1,(targetTime-start)/(end-start)));
             const fill=document.getElementById('videoExportProgressFill');
             if(fill){
               const scaled=this.videoShortsMp4Phase==='render'?pct*55:pct*100;
@@ -7066,7 +7076,7 @@
               status.textContent=`Rendering video… ${(pct*100).toFixed(0)}%`;
             }
 
-            if(exportVideo.currentTime>=end-.03){
+            if(targetTime>=end-.001){
               exportVideo.pause();
               if(recorder.state!=='inactive')recorder.stop();
               return;
@@ -7232,10 +7242,7 @@
           '-crf','23',
           '-pix_fmt','yuv420p',
           '-c:a','copy',
-          '-copyts',
-          '-start_at_zero',
           '-avoid_negative_ts','make_zero',
-          '-vsync','cfr',
           '-movflags','+faststart',
           '-shortest',
           outputName
