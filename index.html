@@ -957,8 +957,8 @@
       z-index: 10;
     }
     .stem-ruler-header {
-      width: 220px;
-      min-width: 220px;
+      width: 236px;
+      min-width: 236px;
       padding: 0 12px;
       font-size: 10px;
       font-weight: bold;
@@ -1958,6 +1958,18 @@
 .stem-local-playhead {
   display: none !important;
 }
+    .studio-processing-overlay{position:absolute;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;background:rgba(8,12,28,.34);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);border-radius:inherit}
+    .studio-processing-card{position:relative;z-index:100;min-width:280px;max-width:390px;padding:24px 26px 22px;border:1px solid rgba(103,232,249,.22);border-radius:18px;background:rgba(15,23,42,.76);box-shadow:0 18px 55px rgba(0,0,0,.28);text-align:center}
+    .studio-processing-spinner{width:34px;height:34px;margin:0 auto 12px;border:3px solid rgba(103,232,249,.18);border-top-color:#22d3ee;border-right-color:#6366f1;border-radius:50%;animation:studioProcessingSpin .9s linear infinite}
+    @keyframes studioProcessingSpin{to{transform:rotate(360deg)}}
+    .studio-processing-title{color:#eef2ff;font-size:14px;font-weight:800}
+    .studio-processing-subtitle{margin-top:5px;color:rgba(199,210,254,.72);font-size:10px;line-height:1.55}
+    .studio-processing-progress{height:5px;margin-top:17px;overflow:hidden;border-radius:999px;background:rgba(99,102,241,.14)}
+    #studioProcessingProgressBar{width:0%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#06b6d4,#6366f1);transition:width .18s ease}
+    .studio-processing-percent{margin-top:7px;color:rgba(165,243,252,.85);font:700 10px/1 monospace}
+
+    /* Lyric & Subtitle Studio is intentionally English/LTR regardless of site language. */
+    #lyricStudioView { direction: ltr; }
 </style>
 </head>
 
@@ -2064,7 +2076,7 @@
           Your Sound. Your Workflow. One Studio.
         </h2>
         <p class="mt-3 text-xs md:text-sm leading-7 text-indigo-300 light:text-indigo-700 max-w-6xl mx-auto" data-i18n="brandStatementDesc">
-          Create, edit, refine, and prepare your music and audio — from lyrics and stems to mastering, trimming, analysis, and format conversion, all in one place.
+          Create, edit, refine, and prepare your music and audio — from lyrics to mastering.
         </p>
         <div class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 light:bg-emerald-50 border border-emerald-400/20 light:border-emerald-200 text-[10px] md:text-xs font-bold text-emerald-300 light:text-emerald-700">
           <i class="fa-solid fa-circle-check"></i>
@@ -2091,7 +2103,7 @@
             <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-purple-500/30 font-bold tracking-wider" data-i18n="heroStemBadge">100% CLIENT-SIDE DAW</span>
           </div>
           <p class="text-xs text-indigo-300 light:text-indigo-880 leading-relaxed mb-6" data-i18n="heroStemDesc">
-            Separate audio into Vocals, Drums, Bass, and Instruments. Slice, edit, trim, record microphone vocals, and mix non-destructive multitrack audio locally in real time.
+            Separate audio into Vocals, Drums, Bass, and Instruments. Slice, edit, trim, record microphone vocals, and mix non-destructive multitrack audio in real time.
           </p>
         </div>
         <button onclick="app.openStemStudio()" class="w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/35 transition-all group-hover:scale-[1.01]">
@@ -2131,7 +2143,7 @@
         <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">100% Client-Side DSP</span>
       </div>
       <p class="text-xs text-indigo-300 light:text-indigo-880 mb-4" data-i18n="audioRemastererDesc">
-        Remaster your audio locally with high-pass filtering, 3-band parametric EQ, dynamics compression, and hard limiting.
+        Remaster your audio with high-pass filtering, 3-band parametric EQ, dynamics compression, and hard limiting.
       </p>
       <div class="space-y-4">
         <!-- Drag & Drop Zone -->
@@ -2174,60 +2186,35 @@
           </div>
 
 
- <!-- BEFORE / AFTER A/B COMPARISON CUSTOM PLAYERS -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            <!-- Left: Original Track (Before) - Custom UI Player -->
-            <div class="space-y-3 p-4 rounded-xl bg-indigo-950/20 border border-indigo-500/10 light:border-indigo-200 shadow-inner flex flex-col justify-between">
-              <label class="text-[10px] font-bold uppercase tracking-wider text-indigo-300 light:text-indigo-900" data-i18n="originalTrackLabel">Original Track</label>
-              
-              <!-- Hidden Native Audio -->
-              <audio id="remasterOriginalPlayer" class="hidden"></audio>
-              
-              <!-- Custom Control Row -->
-              <div class="flex items-center gap-3">
-                <!-- Play Button -->
-                <button onclick="app.toggleCustomPlay('orig')" class="w-8 h-8 rounded-lg bg-indigo-650 hover:bg-indigo-700 text-white flex items-center justify-center transition-all shrink-0">
-                  <i id="origPlayIcon" class="fa-solid fa-play text-xs"></i>
-                </button>
-                
-                <!-- Time counter -->
-                <span id="origTimeDisplay" class="text-[10px] font-mono text-indigo-300 light:text-indigo-950 shrink-0 select-none">0:00 / 0:00</span>
-                
-                <!-- Volume Controls -->
-                <div class="flex items-center gap-1.5 ml-auto">
-                  <button onclick="app.toggleCustomMute('orig')" class="text-indigo-300 hover:text-indigo-100 light:text-indigo-900 text-xs transition-all">
-                    <i id="origMuteIcon" class="fa-solid fa-volume-high"></i>
-                  </button>
-                  <input type="range" id="origVolumeSlider" min="0" max="1" step="0.05" value="0.8" oninput="app.setCustomVolume('orig', this.value)" class="w-16 h-1 rounded-lg bg-indigo-950 light:bg-indigo-200 accent-indigo-500 cursor-pointer">
-                </div>
-              </div>
-
-
- <!-- Custom Seek Bar -->
-              <div class="w-full flex items-center mt-1">
-                <input type="range" id="origSeekBar" min="0" max="100" value="0" oninput="app.seekCustomAudio('orig', this.value)" class="w-full h-1 rounded-lg bg-indigo-950 light:bg-indigo-200 accent-indigo-500 cursor-pointer">
-              </div>
-            </div>
-            
-            <!-- Right: Remastered Track (After) - Custom UI Player -->
+ <!-- SINGLE MASTER PREVIEW PLAYER -->
+          <div class="grid grid-cols-1 gap-4">
             <div id="remasteredPlayerContainer" class="space-y-3 p-4 rounded-xl bg-purple-950/10 border border-purple-500/10 light:border-purple-200 shadow-inner flex flex-col justify-between opacity-40 pointer-events-none transition-opacity duration-300">
-              <label class="text-[10px] font-bold uppercase tracking-wider text-purple-400 light:text-purple-755" data-i18n="remasteredTrackLabel">Remastered Track</label>
-              
-              <!-- Hidden Native Audio -->
+
+              <div class="flex items-center justify-between gap-3">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-purple-400 light:text-purple-755">
+                  Master Preview
+                </label>
+                <span class="text-[9px] uppercase font-mono text-indigo-300 light:text-indigo-900 select-none">
+                  Before / After
+                </span>
+              </div>
+
+              <!-- Hidden original source used by the A/B switch -->
+              <audio id="remasterOriginalPlayer" class="hidden"></audio>
+              <!-- Single visible audio source/player -->
               <audio id="remasterAudioPlayer" class="hidden"></audio>
-              
-              <!-- Custom Control Row -->
+
               <div class="flex items-center gap-3">
-                <!-- Play Button -->
                 <button onclick="app.toggleCustomPlay('rem')" class="w-8 h-8 rounded-lg bg-purple-650 hover:bg-purple-700 text-white flex items-center justify-center transition-all shrink-0">
                   <i id="remPlayIcon" class="fa-solid fa-play text-xs"></i>
                 </button>
-                
-                <!-- Time counter -->
+
+                <button id="remasterABBtn" onclick="app.toggleMasterAB()" disabled title="Toggle between original and remastered audio" class="h-8 px-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 disabled:opacity-40 disabled:cursor-not-allowed text-[9px] font-bold uppercase tracking-wider transition-all shrink-0">
+                  <i id="remasterABIcon" class="fa-solid fa-wand-magic-sparkles mr-1"></i><span id="remasterABText">MASTER ON</span>
+                </button>
+
                 <span id="remTimeDisplay" class="text-[10px] font-mono text-purple-300 light:text-purple-955 shrink-0 select-none">0:00 / 0:00</span>
-                
-                <!-- Volume Controls -->
+
                 <div class="flex items-center gap-1.5 ml-auto">
                   <button onclick="app.toggleCustomMute('rem')" class="text-purple-300 hover:text-purple-100 light:text-purple-900 text-xs transition-all">
                     <i id="remMuteIcon" class="fa-solid fa-volume-high"></i>
@@ -2236,8 +2223,6 @@
                 </div>
               </div>
 
-
-   <!-- Custom Seek Bar -->
               <div class="w-full flex items-center mt-1">
                 <input type="range" id="remSeekBar" min="0" max="100" value="0" oninput="app.seekCustomAudio('rem', this.value)" class="w-full h-1 rounded-lg bg-purple-950 light:bg-purple-200 accent-purple-550 cursor-pointer">
               </div>
@@ -2775,7 +2760,7 @@
         <span class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10 font-semibold">Client-Side Engine</span>
       </div>
       <p class="text-xs text-indigo-300 light:text-indigo-855 mb-4" data-i18n="audioConverterDesc">
-        Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly without server uploads.
+        Convert audio files between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, and AIFF formats instantly.
       </p>
       <div class="space-y-4">
         <!-- Drag & Drop Zone -->
@@ -3338,27 +3323,27 @@
     <!-- STUDIO HEADER -->
     <div class="studio-header">
       <!-- Back button -->
-      <button class="studio-btn" onclick="app.closeLyricStudio()" title="Back to Sonvex Studio">
-        <i class="fa-solid fa-arrow-left"></i>
-        <span data-i18n="backBtn">Back</span>
+      <button class="studio-btn" onclick="app.closeLyricStudio()" title="Exit Lyric & Subtitle Studio">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span>Exit</span>
       </button>
       <!-- Title -->
       <div class="flex items-center gap-2 flex-1">
         <i class="fa-solid fa-closed-captioning text-cyan-400"></i>
-        <span class="text-sm font-bold text-white light:text-indigo-900" data-i18n="lyricStudioTitle">Subtitle &amp; Lyric Studio</span>
-        <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono" data-i18n="lyricStudioBadge">SRT &amp; LRC Maker</span>
+        <span class="text-sm font-bold text-white light:text-indigo-900">Lyric &amp; Subtitle Studio</span>
+        <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">SRT &amp; LRC Maker</span>
       </div>
       <!-- Import / Export Actions -->
       <div class="flex items-center gap-2 ml-auto">
         <!-- Import / Export -->
         <label class="studio-btn cursor-pointer" title="Import existing .srt file">
           <i class="fa-solid fa-file-import"></i>
-          <span class="hidden md:inline" data-i18n="importSrt">Import SRT</span>
+          <span class="hidden md:inline">Import SRT</span>
           <input type="file" accept=".srt" class="hidden" onchange="app.handleSrtImport(this.files[0])">
         </label>
         <label class="studio-btn cursor-pointer" title="Import existing .lrc file">
           <i class="fa-solid fa-music"></i>
-          <span class="hidden md:inline" data-i18n="importLrc">Import LRC</span>
+          <span class="hidden md:inline">Import LRC</span>
           <input type="file" accept=".lrc" class="hidden" onchange="app.handleLrcImport(this.files[0])">
         </label>
 
@@ -3367,11 +3352,11 @@
   <div class="w-px h-5 bg-indigo-500/20 mx-1"></div>
         <button class="studio-btn emerald" onclick="app.exportLrc()" title="Export .lrc file">
           <i class="fa-solid fa-download"></i>
-          <span data-i18n="exportLrc">Export LRC</span>
+          <span>Export LRC</span>
         </button>
         <button class="studio-btn cyan" onclick="app.exportSrt()" title="Export .srt file">
           <i class="fa-solid fa-download"></i>
-          <span data-i18n="exportSrt">Export SRT</span>
+          <span>Export SRT</span>
         </button>
       </div>
     </div><!-- /.studio-header -->
@@ -3383,7 +3368,7 @@
         <!-- LEFT PANE: Lyric / Subtitle Table -->
         <div class="studio-pane pane-left">
           <div class="studio-pane-header">
-            <span><i class="fa-solid fa-list-ul mr-1"></i><span data-i18n="lyricLinesHeader">Lyric Lines</span></span>
+            <span><i class="fa-solid fa-list-ul mr-1"></i><span>Lyric Lines</span></span>
             <span id="studioLineCount" class="text-[10px] font-mono text-indigo-400">0 lines</span>
           </div>
           <!-- Table -->
@@ -3391,12 +3376,12 @@
             <table class="lyric-table">
               <thead>
                 <tr>
-                  <th data-i18n="thNum">#</th>
-                  <th data-i18n="thStart">Start</th>
-                  <th data-i18n="thEnd">End</th>
-                  <th data-i18n="thDuration">Duration</th>
-                  <th style="width:99%" data-i18n="thText">Lyric Text</th>
-                  <th data-i18n="thActions">Actions</th>
+                  <th>#</th>
+                  <th>Start</th>
+                  <th>End</th>
+                  <th>Duration</th>
+                  <th style="width:99%">Lyric Text</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="lyricTableBody">
@@ -3413,10 +3398,10 @@
           <!-- Table Footer Controls -->
           <div class="lyric-table-footer">
             <button class="studio-btn" onclick="app.addLyricLine()">
-              <i class="fa-solid fa-plus"></i> <span data-i18n="addLineBtnText">Add Line</span>
+              <i class="fa-solid fa-plus"></i> <span>Add Line</span>
             </button>
             <button class="studio-btn amber" onclick="app.clearAllLines()" title="Clear all lyric lines">
-              <i class="fa-solid fa-trash"></i> <span data-i18n="clearAllBtnText">Clear All</span>
+              <i class="fa-solid fa-trash"></i> <span>Clear All</span>
             </button>
             <div class="ml-auto text-[10px] text-indigo-400 font-mono" id="studioPlayheadLabel">Playhead: 00:00.000</div>
           </div>
@@ -3424,9 +3409,9 @@
         <!-- RIGHT PANE: Video / Audio Player -->
         <div class="studio-pane pane-right">
           <div class="studio-pane-header">
-            <span><i class="fa-solid fa-play-circle mr-1"></i><span data-i18n="mediaPlayerTitle">Media Player</span></span>
+            <span><i class="fa-solid fa-play-circle mr-1"></i><span>Media Player</span></span>
             <label class="studio-btn cyan cursor-pointer" style="font-size: 10px; padding: 3px 8px;">
-              <i class="fa-solid fa-folder-open"></i> <span data-i18n="loadFileBtnText">Load File</span>
+              <i class="fa-solid fa-folder-open"></i> <span>Load File</span>
               <input type="file" id="studioMediaFileInput" accept="video/*,audio/*,.mp4,.webm,.mp3,.wav,.ogg,.aac,.m4a,.flac" class="hidden" onchange="app.handleStudioMediaUpload(this.files[0])">
             </label>
           </div>
@@ -3440,12 +3425,21 @@
             
             <div id="studioPlaceholderContent" class="flex flex-col items-center justify-center cursor-pointer p-6" onclick="document.getElementById('studioMediaFileInput').click()">
               <i class="fa-solid fa-photo-film text-3xl text-cyan-500/40 mb-3"></i>
-              <p class="text-sm text-cyan-300/60 light:text-cyan-800 font-semibold" data-i18n="dropMediaText">Drop video or audio here or click to browse</p>
+              <p class="text-sm text-cyan-300/60 light:text-cyan-800 font-semibold">Drop video or audio here or click to browse</p>
               <p class="text-[11px] text-indigo-400/50 light:text-indigo-700 mt-1">MP4, WebM, MOV, MP3, WAV, OGG, AAC, FLAC</p>
             </div>
             <!-- Video element without native controls -->
             <video id="studioVideoEl" preload="auto" playsinline style="display:none; width:100%; height:100%; object-fit:contain; background:#000; position:absolute; inset:0; z-index:2;"></video>
-            <!-- Real-Time Subtitle Overlay Floating strictly ON TOP -->
+                  <div id="studioProcessingOverlay" class="studio-processing-overlay" style="display:none;">
+        <div class="studio-processing-card">
+          <div class="studio-processing-spinner"></div>
+          <div class="studio-processing-title">Preparing your media...</div>
+          <div class="studio-processing-subtitle">Preparing video and audio for lyric synchronization</div>
+          <div class="studio-processing-progress"><div id="studioProcessingProgressBar"></div></div>
+          <div class="studio-processing-percent" id="studioProcessingPercent">0%</div>
+        </div>
+      </div>
+<!-- Real-Time Subtitle Overlay Floating strictly ON TOP -->
             <div id="studioCcOverlay" class="studio-cc-overlay" style="display:none; z-index:10;"></div>
           </div>
           <!-- Playback time display -->
@@ -3464,7 +3458,7 @@
           <div class="active-text-box-wrap p-3 bg-indigo-950/60 border-t border-indigo-500/20">
             <div class="flex items-center justify-between mb-1.5">
               <label for="studioActiveTextInput" class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
-                <i class="fa-solid fa-pen-to-square text-indigo-400"></i> <span data-i18n="activeLineTitle">Active Line Text</span>
+                <i class="fa-solid fa-pen-to-square text-indigo-400"></i> <span>Active Line Text</span>
               </label>
               <span id="studioActiveLineLabel" class="text-[10px] font-mono text-indigo-400/60">No active line</span>
             </div>
@@ -3487,6 +3481,9 @@
           <button id="studioPlayPauseBtn" class="studio-btn cyan" onclick="app.studioTogglePlayback()" disabled>
             <i id="studioPlayPauseIcon" class="fa-solid fa-play"></i>
           </button>
+          <button id="studioStopBtn" class="studio-btn" onclick="app.studioStopPlayback()" title="Stop and return to start" disabled>
+            <i class="fa-solid fa-stop"></i>
+          </button>
           <button class="studio-btn" onclick="app.studioSkipBackward()" title="Skip back 5s" disabled id="studioSkipBackBtn">
             <i class="fa-solid fa-backward-step"></i> 5s
           </button>
@@ -3507,14 +3504,14 @@
             onclick="app.insertLineAtCurrentTime()"
             title="Pause playback and insert a new lyric line at the current playhead position (Spacebar)">
             <i class="fa-solid fa-circle-dot"></i>
-            <span style="font-weight:800; letter-spacing:0.04em;" data-i18n="insertLineBtnLabel">INSERT LINE</span>
+            <span style="font-weight:800; letter-spacing:0.04em;">INSERT LINE</span>
             <kbd style="font-size:9px; padding:1px 5px; border-radius:4px; background:rgba(16,185,129,0.25); border:1px solid rgba(52,211,153,0.4); color:#a7f3d0; font-weight:700;">Space</kbd>
           </button>
 
 
 <div class="ml-auto flex items-center gap-6">
-  <span class="text-[10px] text-indigo-400/60"><i class="fa-solid fa-hand-pointer mr-1"></i><span data-i18n="dragTipText">Drag regions to adjust timing</span></span>
-  <span class="text-[10px] text-cyan-400/70 font-mono" id="studioWaveStatus" data-i18n="noAudioText">No audio loaded</span>
+  <span class="text-[10px] text-indigo-400/60"><i class="fa-solid fa-hand-pointer mr-1"></i><span>Drag regions to adjust timing</span></span>
+  <span class="text-[10px] text-cyan-400/70 font-mono" id="studioWaveStatus">No audio loaded</span>
 </div>
 </div>
 <div id="studioWaveContainer">
@@ -3535,7 +3532,7 @@
   const translations = {
     en: {
       audioConverterTitle: "Universal Audio Converter",
-      audioConverterDesc: "Convert any audio file locally between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF formats instantly.",
+      audioConverterDesc: "Convert audio files between MP4, WAV, MP3, FLAC, AAC, OGG, M4A, and AIFF formats instantly.",
       dropAudioText: "Drag & Drop audio file here or click to browse",
       targetFormat: "Target Format:",
       convertBtn: "Convert & Download",
@@ -3571,7 +3568,7 @@
       brandStatementDesc: "Everything you need to create, edit, refine, and prepare your music and audio — all in one place.",
       brandStatementFree: "All SONVEX STUDIO tools are free to use — no subscriptions and no paid plans.",
       audioRemastererTitle: "Audio Remasterer",
-      audioRemastererDesc: "Remaster your audio locally with high-pass filtering, 3-band parametric EQ, dynamics compression, and hard limiting.",
+      audioRemastererDesc: "Remaster your audio with high-pass filtering, 3-band parametric EQ, dynamics compression, and hard limiting.",
       dropRemasterText: "Drag & Drop track to remaster or browse",
       remasterBtn: "Remaster Audio",
       remasteringStatus: "Remastering... Please wait (10-20 seconds)",
@@ -3606,7 +3603,7 @@
       awaitingFile: "Awaiting File...",
       heroStemTitle: "🎛️ Stem Studio DAW",
       heroStemBadge: "100% CLIENT-SIDE DAW",
-      heroStemDesc: "Separate audio into Vocals, Drums, Bass, and Instruments. Slice, edit, trim, record microphone vocals, and mix non-destructive multitrack audio locally in real time.",
+      heroStemDesc: "Separate audio into Vocals, Drums, Bass, and Instruments. Slice, edit, trim, record microphone vocals, and mix non-destructive multitrack audio in real time.",
       heroStemBtn: "Launch Stem Studio ➔",
       heroLyricTitle: "💬 Lyric & Subtitle Studio",
       heroLyricBadge: "MANUAL SYNC STUDIO",
@@ -3664,7 +3661,7 @@
     },
     ar: {
       audioConverterTitle: "المحول الصوتي الشامل",
-      audioConverterDesc: "تحويل صيغ الملفات الصوتية محلياً فورياً بين MP4, WAV, MP3, FLAC, AAC, OGG, M4A, AIFF.",
+      audioConverterDesc: "تحويل الملفات الصوتية بين صيغ MP4 وWAV وMP3 وFLAC وAAC وOGG وM4A وAIFF فورياً.",
       dropAudioText: "اسحب وأسقط الملف هنا أو تصفح",
       targetFormat: "الصيغة المستهدفة:",
       convertBtn: "تحويل وتحميل فوراً",
@@ -3697,10 +3694,10 @@
       chatWelcome: "مرحباً بك في SONVEX STUDIO! قم بضبط نوع الموسيقى، اللغة، وعدد الأبيات أعلاه ثم اضغط على توليد كلمات الأغنية. يمكنك أيضاً الدردشة معي مباشرة لتعديل القوافي والأبيات!",
       brandStatementKicker: "SONVEX STUDIO",
       brandStatementTitle: "صَوْتُكَ. أُسْلُوبُكَ. استوديو واحد.",
-      brandStatementDesc: "كل ما تحتاجه لإنشاء موسيقاك وملفاتك الصوتية وتعديلها وتحسينها وتجهيزها — كل ذلك في مكان واحد.",
+      brandStatementDesc: "أنشئ موسيقاك وصوتك، وحرّرهما وطوّرهما، من الكلمات إلى الماسترينغ.",
       brandStatementFree: "جميع أدوات SONVEX STUDIO مجانية للاستخدام — بدون اشتراكات وبدون خطط مدفوعة.",
       audioRemastererTitle: "محسن الصوت",
-      audioRemastererDesc: "تحسين هندسة وجودة مقاطعك الصوتية محلياً عبر فلاتر الترددات، معالجة الديناميكيات، والـ Peak Limiter.",
+      audioRemastererDesc: "تحسين هندسة وجودة مقاطعك الصوتية عبر فلاتر الترددات، معالجة الديناميكيات، والـ Peak Limiter.",
       dropRemasterText: "اسحب وأسقط الملف هنا لتحسين جودته أو تصفح",
       remasterBtn: "بدء معالجة وتحسين الصوت",
       remasteringStatus: "جاري المعالجة... يرجى الانتظار (10-20 ثانية)",
@@ -3708,7 +3705,7 @@
       originalTrackLabel: "المقطع الأصلي",
       remasteredTrackLabel: "المقطع المحسّن",
       trimmerTitle: "أداة قص وتجهيز عينات الصوت لوسائل التواصل",
-      trimmerDesc: "قص واقتطاع أجزاء من مقاطعك الصوتية محلياً فورياً. حدد المنطقة المطلوبة لصناعة عينات ونماذج تشويقية للشبكات الاجتماعية.",
+      trimmerDesc: "قص واقتطاع أجزاء من مقاطعك الصوتية فورياً. حدد المنطقة المطلوبة لصناعة عينات ونماذج تشويقية للشبكات الاجتماعية.",
       trimmerDropzone: "اسحب وأسقط الملف هنا للقص أو تصفح",
       trimmerStart: "وقت البدء",
       trimmerEnd: "وقت الانتهاء",
@@ -3735,7 +3732,7 @@
       awaitingFile: "في انتظار ملف...",
       heroStemTitle: "🎛️ ستوديو فصل المسارات (Stem DAW)",
       heroStemBadge: "محرك DAW محلي 100%",
-      heroStemDesc: "فصل الأغاني فورياً إلى مسارات منفصلة: الصوت (Vocals)، الدفوف (Drums)، الباص (Bass)، والآلات. قص، تعديل، تسجيل ميكروفون، ومكس متعدد المسارات محلياً.",
+      heroStemDesc: "فصل الأغاني فورياً إلى مسارات منفصلة: الصوت (Vocals)، الدفوف (Drums)، الباص (Bass)، والآلات. قص، تعديل، تسجيل ميكروفون، ومكس متعدد المسارات.",
       heroStemBtn: "تشغيل ستوديو فك المسارات ➔",
       heroLyricTitle: "💬 ستوديو الكلمات والترجمة",
       heroLyricBadge: "ستوديو المزامنة والتحرير",
@@ -3809,6 +3806,9 @@
   class SonvexStudioApp {
     constructor() {
       this.currentLang = 'en';
+      this.remasterABEnabled = true;
+      this.remasterOriginalUrl = '';
+      this.remasterProcessedUrl = '';
       window.app = this;
       this.selectedFile = null;
       this.audioBuffer = null;
@@ -3927,8 +3927,8 @@
       });
 
       const activeInput = document.getElementById('studioActiveTextInput');
-      if (activeInput && translations[this.currentLang].activeLinePlaceholder) {
-        activeInput.placeholder = translations[this.currentLang].activeLinePlaceholder;
+      if (activeInput) {
+        activeInput.placeholder = 'Click a line or playhead to edit text here…';
       }
       if (typeof this.renderLyricTable === 'function') {
         this.renderLyricTable();
@@ -4352,20 +4352,13 @@
     }
 
     setupCustomPlayers() {
-      const origPlayer = document.getElementById('remasterOriginalPlayer');
       const remPlayer = document.getElementById('remasterAudioPlayer');
-      if (origPlayer) {
-        origPlayer.addEventListener('timeupdate', () => this.updatePlayerUI('orig', origPlayer));
-        origPlayer.addEventListener('loadedmetadata', () => this.updatePlayerUI('orig', origPlayer));
-        origPlayer.addEventListener('ended', () => {
-          document.getElementById('origPlayIcon').className = 'fa-solid fa-play text-xs';
-        });
-      }
       if (remPlayer) {
         remPlayer.addEventListener('timeupdate', () => this.updatePlayerUI('rem', remPlayer));
         remPlayer.addEventListener('loadedmetadata', () => this.updatePlayerUI('rem', remPlayer));
         remPlayer.addEventListener('ended', () => {
-          document.getElementById('remPlayIcon').className = 'fa-solid fa-play text-xs';
+          const icon = document.getElementById('remPlayIcon');
+          if (icon) icon.className = 'fa-solid fa-play text-xs';
         });
       }
     }
@@ -4378,8 +4371,8 @@
     }
 
     updatePlayerUI(key, player) {
-      const timeDisplay = document.getElementById(`${key}TimeDisplay`);
-      const seekBar = document.getElementById(`${key}SeekBar`);
+      const timeDisplay = document.getElementById('remTimeDisplay');
+      const seekBar = document.getElementById('remSeekBar');
       if (timeDisplay) {
         timeDisplay.textContent = `${this.formatTime(player.currentTime)} / ${this.formatTime(player.duration)}`;
       }
@@ -4389,64 +4382,124 @@
     }
 
     toggleCustomPlay(key) {
-      const origPlayer = document.getElementById('remasterOriginalPlayer');
-      const remPlayer = document.getElementById('remasterAudioPlayer');
-      const activePlayer = key === 'orig' ? origPlayer : remPlayer;
-      const passivePlayer = key === 'orig' ? remPlayer : origPlayer;
-      
-      const activeIcon = document.getElementById(`${key}PlayIcon`);
-      const passiveKey = key === 'orig' ? 'rem' : 'orig';
-      const passiveIcon = document.getElementById(`${passiveKey}PlayIcon`);
-      if (!passivePlayer.paused) {
-        passivePlayer.pause();
-        passiveIcon.className = 'fa-solid fa-play text-xs';
-      }
-      if (activePlayer.paused) {
-        activePlayer.play();
-        activeIcon.className = 'fa-solid fa-pause text-xs';
+      const player = document.getElementById('remasterAudioPlayer');
+      const icon = document.getElementById('remPlayIcon');
+      if (!player || !player.src) return;
+
+      if (player.paused) {
+        const playResult = player.play();
+        if (playResult && typeof playResult.catch === 'function') playResult.catch(() => {});
+        if (icon) icon.className = 'fa-solid fa-pause text-xs';
       } else {
-        activePlayer.pause();
-        activeIcon.className = 'fa-solid fa-play text-xs';
+        player.pause();
+        if (icon) icon.className = 'fa-solid fa-play text-xs';
+      }
+    }
+
+    toggleMasterAB() {
+      const player = document.getElementById('remasterAudioPlayer');
+      const btn = document.getElementById('remasterABBtn');
+      const text = document.getElementById('remasterABText');
+      const icon = document.getElementById('remasterABIcon');
+
+      if (!player || !this.remasterOriginalUrl || !this.remasterProcessedUrl) {
+        return;
+      }
+
+      const nextIsMastered = !this.remasterABEnabled;
+      const nextSrc = nextIsMastered
+        ? this.remasterProcessedUrl
+        : this.remasterOriginalUrl;
+
+      const currentTime = Number.isFinite(player.currentTime) ? player.currentTime : 0;
+      const wasPlaying = !player.paused;
+      const volume = player.volume;
+      const muted = player.muted;
+
+      this.remasterABEnabled = nextIsMastered;
+
+      try { player.pause(); } catch (e) {}
+
+      player.src = nextSrc;
+      player.load();
+      player.volume = volume;
+      player.muted = muted;
+
+      const restore = () => {
+        try {
+          if (Number.isFinite(currentTime) && player.duration) {
+            player.currentTime = Math.min(currentTime, player.duration);
+          }
+        } catch (e) {}
+
+        if (wasPlaying) {
+          const playResult = player.play();
+          if (playResult && typeof playResult.catch === 'function') {
+            playResult.catch(() => {});
+          }
+        }
+
+        player.removeEventListener('loadedmetadata', restore);
+      };
+
+      player.addEventListener('loadedmetadata', restore, { once: true });
+
+      // In case the browser has the source metadata immediately available.
+      if (player.readyState >= 1) {
+        restore();
+      }
+
+      if (text) text.textContent = nextIsMastered ? 'MASTER ON' : 'MASTER OFF';
+      if (icon) {
+        icon.className = nextIsMastered
+          ? 'fa-solid fa-wand-magic-sparkles mr-1'
+          : 'fa-solid fa-sliders mr-1';
+      }
+
+      if (btn) {
+        btn.classList.toggle('bg-emerald-500/10', nextIsMastered);
+        btn.classList.toggle('text-emerald-300', nextIsMastered);
+        btn.classList.toggle('border-emerald-500/30', nextIsMastered);
+        btn.classList.toggle('bg-amber-500/10', !nextIsMastered);
+        btn.classList.toggle('text-amber-300', !nextIsMastered);
+        btn.classList.toggle('border-amber-500/30', !nextIsMastered);
       }
     }
 
     seekCustomAudio(key, pct) {
-      const player = key === 'orig' ? document.getElementById('remasterOriginalPlayer') : document.getElementById('remasterAudioPlayer');
+      const player = document.getElementById('remasterAudioPlayer');
       if (player && player.duration) {
         player.currentTime = (pct / 100) * player.duration;
       }
     }
 
     setCustomVolume(key, val) {
-      const player = key === 'orig' ? document.getElementById('remasterOriginalPlayer') : document.getElementById('remasterAudioPlayer');
-      const muteIcon = document.getElementById(`${key}MuteIcon`);
+      const player = document.getElementById('remasterAudioPlayer');
+      const muteIcon = document.getElementById('remMuteIcon');
       if (player) {
         player.volume = val;
         player.muted = false;
-        
-        if (val == 0) {
-          muteIcon.className = 'fa-solid fa-volume-xmark';
-        } else if (val < 0.4) {
-          muteIcon.className = 'fa-solid fa-volume-low';
-        } else {
-          muteIcon.className = 'fa-solid fa-volume-high';
+        if (muteIcon) {
+          if (val == 0) muteIcon.className = 'fa-solid fa-volume-xmark';
+          else if (val < 0.4) muteIcon.className = 'fa-solid fa-volume-low';
+          else muteIcon.className = 'fa-solid fa-volume-high';
         }
       }
     }
 
     toggleCustomMute(key) {
-      const player = key === 'orig' ? document.getElementById('remasterOriginalPlayer') : document.getElementById('remasterAudioPlayer');
-      const muteIcon = document.getElementById(`${key}MuteIcon`);
-      const slider = document.getElementById(`${key}VolumeSlider`);
+      const player = document.getElementById('remasterAudioPlayer');
+      const muteIcon = document.getElementById('remMuteIcon');
+      const slider = document.getElementById('remVolumeSlider');
       if (player) {
         if (player.muted) {
           player.muted = false;
-          slider.value = player.volume || 0.8;
-          muteIcon.className = player.volume < 0.4 ? 'fa-solid fa-volume-low' : 'fa-solid fa-volume-high';
+          if (slider) slider.value = player.volume || 0.8;
+          if (muteIcon) muteIcon.className = player.volume < 0.4 ? 'fa-solid fa-volume-low' : 'fa-solid fa-volume-high';
         } else {
           player.muted = true;
-          slider.value = 0;
-          muteIcon.className = 'fa-solid fa-volume-xmark';
+          if (slider) slider.value = 0;
+          if (muteIcon) muteIcon.className = 'fa-solid fa-volume-xmark';
         }
       }
     }
@@ -4463,17 +4516,24 @@
       document.getElementById('remasterFileSize').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
       document.getElementById('remasterFormatBadge').textContent = ext.toUpperCase();
       const originalUrl = URL.createObjectURL(file);
+      this.remasterOriginalUrl = originalUrl;
+      this.remasterProcessedUrl = '';
       const originalPlayer = document.getElementById('remasterOriginalPlayer');
       originalPlayer.src = originalUrl;
       
-      document.getElementById('origPlayIcon').className = 'fa-solid fa-play text-xs';
-      document.getElementById('origSeekBar').value = 0;
       
       const audioPlayer = document.getElementById('remasterAudioPlayer');
       audioPlayer.src = '';
       document.getElementById('remasteredPlayerContainer').classList.add('opacity-40', 'pointer-events-none');
       document.getElementById('remPlayIcon').className = 'fa-solid fa-play text-xs';
       document.getElementById('remSeekBar').value = 0;
+      this.remasterABEnabled = true;
+      const remasterABBtn = document.getElementById('remasterABBtn');
+      const remasterABText = document.getElementById('remasterABText');
+      const remasterABIcon = document.getElementById('remasterABIcon');
+      if (remasterABBtn) remasterABBtn.disabled = true;
+      if (remasterABText) remasterABText.textContent = 'MASTER ON';
+      if (remasterABIcon) remasterABIcon.className = 'fa-solid fa-wand-magic-sparkles mr-1';
       document.getElementById('remTimeDisplay').textContent = '0:00 / 0:00';
       document.getElementById('remasterDownloadBtn').classList.add('hidden');
       
@@ -4490,9 +4550,6 @@
       
       const originalPlayer = document.getElementById('remasterOriginalPlayer');
       originalPlayer.src = '';
-      document.getElementById('origPlayIcon').className = 'fa-solid fa-play text-xs';
-      document.getElementById('origSeekBar').value = 0;
-      document.getElementById('origTimeDisplay').textContent = '0:00 / 0:00';
       
       const audioPlayer = document.getElementById('remasterAudioPlayer');
       audioPlayer.src = '';
@@ -4501,6 +4558,14 @@
       document.getElementById('remTimeDisplay').textContent = '0:00 / 0:00';
       document.getElementById('remasteredPlayerContainer').classList.add('opacity-40', 'pointer-events-none');
       
+      this.remasterABEnabled = true;
+      const remasterABBtn = document.getElementById('remasterABBtn');
+      const remasterABText = document.getElementById('remasterABText');
+      const remasterABIcon = document.getElementById('remasterABIcon');
+      if (remasterABBtn) remasterABBtn.disabled = true;
+      if (remasterABText) remasterABText.textContent = 'MASTER ON';
+      if (remasterABIcon) remasterABIcon.className = 'fa-solid fa-wand-magic-sparkles mr-1';
+
       document.getElementById('remasterDownloadBtn').classList.add('hidden');
       this.resetTrimmerState();
     }
@@ -4579,10 +4644,21 @@
         const wavBlob = this.audioBufferToWavBlob(renderedBuffer);
         const fileUrl = URL.createObjectURL(wavBlob);
 
+        this.remasterProcessedUrl = fileUrl;
+        this.remasterABEnabled = true;
         audioPlayer.src = fileUrl;
         document.getElementById('remasteredPlayerContainer').classList.remove('opacity-40', 'pointer-events-none');
         document.getElementById('remPlayIcon').className = 'fa-solid fa-play text-xs';
         document.getElementById('remSeekBar').value = 0;
+
+        this.remasterABEnabled = true;
+        const remasterABBtn = document.getElementById('remasterABBtn');
+        const remasterABText = document.getElementById('remasterABText');
+        const remasterABIcon = document.getElementById('remasterABIcon');
+        if (remasterABBtn) remasterABBtn.disabled = false;
+        if (remasterABText) remasterABText.textContent = 'MASTER ON';
+        if (remasterABIcon) remasterABIcon.className = 'fa-solid fa-wand-magic-sparkles mr-1';
+
         downloadBtn.href = fileUrl;
         downloadBtn.download = `${file.name.replace(/\.[^/.]+$/, "")}_mastered.wav`;
         downloadBtn.classList.remove('hidden');
@@ -4694,11 +4770,49 @@
       });
 
       this.wavesurferRegions = this.wavesurferInstance.registerPlugin(WaveSurfer.Regions.create());
+      this.trimmerPreviewMode = 'selection';
+
       this.wavesurferRegions.on('region-updated', (region) => {
         this.updateTrimmerRegionDisplays(region);
       });
+
+      // If the selection is dragged all the way to either edge, treat that as
+      // dragging it out of the timeline and remove it instead of leaving it stuck.
+      this.wavesurferRegions.on('region-update-end', (region) => {
+        if (!this.wavesurferInstance || region !== this.activeTrimRegion) return;
+        const duration = this.wavesurferInstance.getDuration();
+        const edgeTolerance = 0.02;
+        if (region.start <= edgeTolerance || region.end >= duration - edgeTolerance) {
+          if (this.wavesurferInstance.isPlaying()) this.wavesurferInstance.pause();
+          region.remove();
+          this.activeTrimRegion = null;
+          this.trimmerPreviewMode = 'free';
+          this.isTrimmerPlaying = false;
+          const icon = document.getElementById('trimPlayIcon');
+          if (icon) icon.className = 'fa-solid fa-circle-play text-sm';
+          document.getElementById('trimStartDisplay').textContent = '00:00.00';
+          document.getElementById('trimEndDisplay').textContent = '00:00.00';
+          document.getElementById('trimDurationDisplay').textContent = '0.00s';
+          return;
+        }
+        this.updateTrimmerRegionDisplays(region);
+      });
+
+      // Clicking anywhere on the waveform seeks to that exact point and plays
+      // normally. This is intentionally independent from the selected region,
+      // so clicking after the selection never jumps back to the selection start.
+      this.wavesurferInstance.on('interaction', (newTime) => {
+        if (!this.wavesurferInstance) return;
+        this.trimmerPreviewMode = 'free';
+        this.wavesurferInstance.setTime(newTime);
+        this.wavesurferInstance.play();
+        this.isTrimmerPlaying = true;
+        const icon = document.getElementById('trimPlayIcon');
+        if (icon) icon.className = 'fa-solid fa-circle-pause text-sm';
+      });
+
       this.wavesurferInstance.on('audioprocess', () => {
-        if (this.wavesurferInstance.isPlaying() && this.activeTrimRegion) {
+        if (this.wavesurferInstance.isPlaying() && this.activeTrimRegion && this.trimmerPreviewMode === 'selection') {
           const current = this.wavesurferInstance.getCurrentTime();
           if (current >= this.activeTrimRegion.end) {
             this.wavesurferInstance.setTime(this.activeTrimRegion.start);
@@ -4808,12 +4922,12 @@
         const remPlayer = document.getElementById('remasterAudioPlayer');
         if (origPlayer && !origPlayer.paused) {
           origPlayer.pause();
-          document.getElementById('origPlayIcon').className = 'fa-solid fa-play text-xs';
         }
         if (remPlayer && !remPlayer.paused) {
           remPlayer.pause();
           document.getElementById('remPlayIcon').className = 'fa-solid fa-play text-xs';
         }
+        this.trimmerPreviewMode = 'selection';
         this.wavesurferInstance.setTime(this.activeTrimRegion.start);
         this.wavesurferInstance.play();
         this.isTrimmerPlaying = true;
@@ -5638,6 +5752,7 @@
     //  LYRIC STUDIO — CORE METHODS
     // ============================================================
     openLyricStudio() {
+      this.resetExternalWorkbench();
       const main = document.getElementById('mainView');
       const stem = document.getElementById('stemStudioView');
       const lyric = document.getElementById('lyricStudioView');
@@ -5669,7 +5784,70 @@
       });
     }
 
-    closeLyricStudio() {
+    async closeLyricStudio() {
+      const confirmed = await this.showConfirmDialog(
+        'Exit Lyric & Subtitle Studio',
+        'Are you sure you want to exit the editor? Current media playback will be stopped.',
+        {
+          danger: true,
+          icon: 'fa-solid fa-right-from-bracket',
+          confirmText: 'Exit'
+        }
+      );
+      if (!confirmed) return;
+
+      // Fully stop the Lyric Studio media engine before leaving.
+      this._studioProcessingStopped = true;
+      if (this._studioProcessingTimer) {
+        clearInterval(this._studioProcessingTimer);
+        this._studioProcessingTimer = null;
+      }
+
+      const vid = document.getElementById('studioVideoEl');
+      if (vid) {
+        try { vid.pause(); } catch (e) {}
+        try { vid.currentTime = 0; } catch (e) {}
+      }
+
+      // WaveSurfer can own an independent audio playback pipeline.
+      // Pause it and destroy the instance so no audio continues after Exit.
+      if (this.studioWavesurfer) {
+        try { this.studioWavesurfer.pause(); } catch (e) {}
+        try { this.studioWavesurfer.destroy(); } catch (e) {}
+        this.studioWavesurfer = null;
+        this.studioRegionsPlugin = null;
+      }
+
+      // Release the local media object URL and detach the media element.
+      if (this._studioMediaObjectUrl) {
+        try { URL.revokeObjectURL(this._studioMediaObjectUrl); } catch (e) {}
+        this._studioMediaObjectUrl = null;
+      }
+      if (vid) {
+        try {
+          vid.removeAttribute('src');
+          vid.load();
+        } catch (e) {}
+        vid.style.display = 'none';
+      }
+
+      // Reset the media UI so reopening starts cleanly.
+      const dropZone = document.getElementById('studioPlayerDropZone');
+      const placeholder = document.getElementById('studioPlaceholderContent');
+      const fileName = document.getElementById('studioFileName');
+      const statusEl = document.getElementById('studioWaveformStatus');
+      const overlay = document.getElementById('studioProcessingOverlay');
+      const ccEl = document.getElementById('studioCcOverlay');
+      if (dropZone) dropZone.classList.remove('has-media');
+      if (placeholder) placeholder.style.display = 'flex';
+      if (fileName) fileName.textContent = '';
+      if (statusEl) statusEl.textContent = 'Preparing Audio Waveform...';
+      if (overlay) overlay.style.display = 'none';
+      if (ccEl) {
+        ccEl.textContent = '';
+        ccEl.style.display = 'none';
+      }
+
       const main = document.getElementById('mainView');
       const stem = document.getElementById('stemStudioView');
       const lyric = document.getElementById('lyricStudioView');
@@ -5679,8 +5857,6 @@
       }
       if (stem) stem.style.display = 'none';
       if (main) main.style.display = 'block';
-      const vid = document.getElementById('studioVideoEl');
-      if (vid) vid.pause();
       this._updateStudioPlayPauseIcon(false);
     }
 
@@ -5711,8 +5887,53 @@
         });
         this.studioWavesurfer.on('seek', (progress) => {
           const vid = document.getElementById('studioVideoEl');
-          if (vid && vid.duration) {
-            vid.currentTime = progress * vid.duration;
+          const wasPlaying =
+            (this.studioWavesurfer && this.studioWavesurfer.isPlaying()) ||
+            (vid && !vid.paused);
+
+          const duration = vid && Number.isFinite(vid.duration) && vid.duration > 0
+            ? vid.duration
+            : (this.studioWavesurfer ? this.studioWavesurfer.getDuration() : 0);
+          const target = progress * duration;
+
+          if (!Number.isFinite(target)) return;
+
+          // The waveform is the precise seek source. Move the video to the
+          // same position, but use fastSeek when the browser supports it to
+          // avoid the long visible decode stall caused by a normal currentTime
+          // assignment during playback.
+          if (vid) {
+            try {
+              if (typeof vid.fastSeek === 'function') {
+                vid.fastSeek(target);
+              } else {
+                vid.currentTime = target;
+              }
+            } catch (e) {
+              try { vid.currentTime = target; } catch (_) {}
+            }
+          }
+
+          if (wasPlaying) {
+            // Restore playback after the seek without forcing a pause state.
+            const resume = () => {
+              const currentVid = document.getElementById('studioVideoEl');
+              if (this.studioWavesurfer && !this.studioWavesurfer.isPlaying()) {
+                try { this.studioWavesurfer.play(); } catch (e) {}
+              }
+              if (currentVid && currentVid.src && currentVid.paused) {
+                currentVid.play().catch(() => {});
+              }
+            };
+
+            if (vid) {
+              const onSeeked = () => {
+                vid.removeEventListener('seeked', onSeeked);
+                resume();
+              };
+              vid.addEventListener('seeked', onSeeked, { once: true });
+            }
+            setTimeout(resume, 80);
           }
         });
         if (this.studioRegionsPlugin) {
@@ -5747,8 +5968,14 @@
       const vid = document.getElementById('studioVideoEl');
       if (vid && vid.src && !vid.paused && this.studioWavesurfer && this.studioWavesurfer.isPlaying()) {
         const diff = Math.abs(vid.currentTime - ct);
-        if (diff > 0.3) {
-          vid.currentTime = ct;
+        if (diff > 0.75) {
+          try {
+            if (typeof vid.fastSeek === 'function') {
+              vid.fastSeek(ct);
+            } else {
+              vid.currentTime = ct;
+            }
+          } catch (e) {}
         }
       }
       const matchingLine = this.lyricLines.find(line => {
@@ -5784,16 +6011,16 @@
       const countEl = document.getElementById('studioLineCount');
       if (!tbody) return;
       if (this.lyricLines.length === 0) {
-        const emptyText = this.currentLang === 'ar' ? 'أضف أسطر ترجمة أدناه أو قم باستيراد ملف SRT / LRC' : 'Add lines below or import an SRT / LRC file';
+        const emptyText = 'Add lines below or import an SRT / LRC file';
         tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 24px; color: #4f46e5; opacity: 0.5; font-size: 12px;">
           <i class="fa-solid fa-arrow-right-to-bracket mr-2"></i>${emptyText}
         </td></tr>`;
-        if (countEl) countEl.textContent = this.currentLang === 'ar' ? '0 سطر' : '0 lines';
+        if (countEl) countEl.textContent = '0 lines';
         return;
       }
 
       if (countEl) {
-        countEl.textContent = this.currentLang === 'ar' ? `${this.lyricLines.length} سطر` : (this.lyricLines.length + ' line' + (this.lyricLines.length !== 1 ? 's' : ''));
+        countEl.textContent = this.lyricLines.length + ' line' + (this.lyricLines.length !== 1 ? 's' : '');
       }
       tbody.innerHTML = this.lyricLines.map((line, idx) => {
         const colorIdx = idx % this._studioRegionColors.length;
@@ -5843,8 +6070,18 @@
       this._sortAndReindexLyricLines();
     }
 
-    clearAllLines() {
-      if (!confirm('Clear all lyric lines?')) return;
+    async clearAllLines() {
+      const confirmed = await this.showConfirmDialog(
+        'Clear All Lyrics',
+        'Are you sure you want to remove all lyric lines?',
+        {
+          danger: true,
+          icon: 'fa-solid fa-trash-can',
+          confirmText: 'Clear All'
+        }
+      );
+      if (!confirmed) return;
+
       this.lyricLines = [];
       if (this.studioRegionsPlugin) {
         try { this.studioRegionsPlugin.clearRegions(); } catch(e) {}
@@ -6023,24 +6260,57 @@
 
     async handleStudioMediaUpload(file) {
       if (!file) return;
+
+      this._showStudioProcessingOverlay();
+
+      // Keep video playback local and immediate. The file is never uploaded.
       this.showToast(`Loading media into Lyric Studio: ${file.name}`, 'info');
+
       const dropZone = document.getElementById('studioPlayerDropZone');
       const placeholder = document.getElementById('studioPlaceholderContent');
-      const videoEl  = document.getElementById('studioVideoEl');
+      const videoEl = document.getElementById('studioVideoEl');
       const fileName = document.getElementById('studioFileName');
+
       if (fileName) fileName.textContent = file.name;
-      const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|mov|m4v|mkv)$/i.test(file.name);
+
+      const isVideo =
+        file.type.startsWith('video/') ||
+        /\.(mp4|webm|mov|m4v|mkv)$/i.test(file.name);
+
+      // Release the previous local media URL only when it is owned by this studio.
+      if (this._studioMediaObjectUrl) {
+        try { URL.revokeObjectURL(this._studioMediaObjectUrl); } catch (e) {}
+        this._studioMediaObjectUrl = null;
+      }
+
       const url = URL.createObjectURL(file);
+      this._studioMediaObjectUrl = url;
+
       if (videoEl) {
         videoEl.src = url;
         videoEl.muted = true;
+        videoEl.preload = 'metadata';
+        videoEl.playsInline = true;
+
         if (isVideo) {
           videoEl.style.display = 'block';
           if (placeholder) placeholder.style.display = 'none';
           if (dropZone) dropZone.classList.add('has-media');
+
+          // Do not force the browser to preload the whole video.
+          // Metadata is enough to make the player ready quickly.
           videoEl.load();
-          videoEl.currentTime = 0;
-          videoEl.pause();
+
+          videoEl.addEventListener('loadedmetadata', () => {
+            if (videoEl.src === url) {
+              videoEl.currentTime = 0;
+              videoEl.pause();
+
+              const dur = Number.isFinite(videoEl.duration) ? videoEl.duration : 0;
+              const durEl = document.getElementById('studioDuration');
+              if (durEl && dur > 0) durEl.textContent = this._secToTimeStr(dur);
+            }
+          }, { once: true });
         } else {
           videoEl.style.display = 'none';
           if (placeholder) placeholder.style.display = 'flex';
@@ -6049,48 +6319,160 @@
 
       const emptyMsg = document.getElementById('studioWaveEmptyMsg');
       if (emptyMsg) emptyMsg.style.display = 'none';
-      
+
       const statusEl = document.getElementById('studioWaveStatus');
-      if (statusEl) statusEl.textContent = 'Audio Waveform Loaded';
-      ['studioPlayPauseBtn', 'studioSkipBackBtn', 'studioSkipFwdBtn', 'studioInsertBtn'].forEach(id => {
+      if (statusEl) statusEl.textContent = 'Preparing Audio Waveform...';
+
+      ['studioPlayPauseBtn', 'studioStopBtn', 'studioSkipBackBtn', 'studioSkipFwdBtn', 'studioInsertBtn'].forEach(id => {
         const btn = document.getElementById(id);
         if (btn) btn.removeAttribute('disabled');
       });
+
       if (!this.studioWavesurfer) {
         this._initStudioWavesurfer();
       }
+
+      // The video is already usable above. Build the waveform separately so
+      // waveform decoding never blocks the visual video loading path.
       try {
+        await new Promise(requestAnimationFrame);
+
+        // Abort/ignore a stale waveform job if another file was selected.
+        if (this._studioMediaObjectUrl !== url) return;
+
         await this.studioWavesurfer.load(url);
+
+        if (this._studioMediaObjectUrl !== url) return;
+
         const dur = this.studioWavesurfer.getDuration();
         const durEl = document.getElementById('studioDuration');
-        if (durEl) durEl.textContent = this._secToTimeStr(dur);
+
+        if (durEl && Number.isFinite(dur) && dur > 0) {
+          durEl.textContent = this._secToTimeStr(dur);
+        }
+
+        if (statusEl) statusEl.textContent = 'Audio Waveform Loaded';
+        if (!this._studioProcessingStopped) this._hideStudioProcessingOverlay(true);
+
         this._syncTableToRegions();
-        this.showToast(`Media loaded! Click Play or Insert Line (${this._secToTimeStr(dur)})`, 'success');
-      } catch(e) {
+        this.showToast(
+          `Media loaded! Click Play or Insert Line (${this._secToTimeStr(dur)})`,
+          'success'
+        );
+      } catch (e) {
+        // Keep the video usable even if waveform decoding fails.
         console.warn('Wavesurfer media load warning:', e);
+        if (!this._studioProcessingStopped) this._hideStudioProcessingOverlay(false);
+        if (statusEl) statusEl.textContent = 'Video Loaded';
         this._syncTableToRegions();
-        this.showToast('Media loaded into player.', 'success');
+        this.showToast('Video loaded. Audio waveform could not be generated.', 'info');
       }
+    }
+
+    _showStudioProcessingOverlay() {
+      const overlay=document.getElementById('studioProcessingOverlay');
+      if(!overlay)return;
+      overlay.style.display='flex';
+
+      const bar=document.getElementById('studioProcessingProgressBar');
+      const pct=document.getElementById('studioProcessingPercent');
+      if(bar)bar.style.width='0%';
+      if(pct)pct.textContent='0%';
+      if(this._studioProcessingTimer)clearInterval(this._studioProcessingTimer);
+      this._studioProcessingStopped=false;
+      const started=performance.now();
+      this._studioProcessingTimer=setInterval(()=>{
+        const progress=Math.min(94,Math.round(((performance.now()-started)/15000)*94));
+        if(bar)bar.style.width=progress+'%';
+        if(pct)pct.textContent=progress+'%';
+      },120);
+    }
+
+    _hideStudioProcessingOverlay(success=true) {
+      if(this._studioProcessingTimer){clearInterval(this._studioProcessingTimer);this._studioProcessingTimer=null;}
+      const overlay=document.getElementById('studioProcessingOverlay');
+      const bar=document.getElementById('studioProcessingProgressBar');
+      const pct=document.getElementById('studioProcessingPercent');
+      if(success){if(bar)bar.style.width='100%';if(pct)pct.textContent='100%';}
+      if(overlay)overlay.style.display='none';
+      const floatStop=document.getElementById('studioProcessingStopFloat');
+      if(floatStop) floatStop.style.display='none';
+    }
+
+    studioStopPlayback() {
+      const vid = document.getElementById('studioVideoEl');
+
+      // Stop and return the waveform playhead to the very beginning.
+      if (this.studioWavesurfer) {
+        try { this.studioWavesurfer.pause(); } catch (e) {}
+        try { this.studioWavesurfer.setTime(0); } catch (e) {}
+      }
+
+      // Keep the video and waveform locked to 00:00.
+      if (vid) {
+        try { vid.pause(); } catch (e) {}
+        try { vid.currentTime = 0; } catch (e) {}
+      }
+
+      this._updateStudioPlayPauseIcon(false);
+
+      // Update the visible clock immediately even if WaveSurfer has not
+      // emitted its next timeupdate event yet.
+      const timeEl = document.getElementById('studioCurrentTime');
+      if (timeEl) timeEl.textContent = '00:00.000';
+
+      const playhead = document.getElementById('studioPlayheadLabel');
+      if (playhead) playhead.textContent = '00:00.000';
     }
 
     studioTogglePlayback() {
       const vid = document.getElementById('studioVideoEl');
+
       if (this.studioWavesurfer) {
         if (this.studioWavesurfer.isPlaying()) {
+          // Pause both engines together.
           this.studioWavesurfer.pause();
           if (vid) vid.pause();
           this._updateStudioPlayPauseIcon(false);
         } else {
-          this.studioWavesurfer.play();
-          if (vid) {
-            vid.currentTime = this.studioWavesurfer.getCurrentTime();
-            vid.play().catch(e => console.log(e));
+          const target = this.studioWavesurfer.getCurrentTime();
+
+          // Do NOT assign video.currentTime on every Play.
+          // That unnecessary seek is what can make the video freeze for a few
+          // seconds while WaveSurfer audio continues normally.
+          if (vid && vid.src && Number.isFinite(target)) {
+            const diff = Math.abs((vid.currentTime || 0) - target);
+            if (diff > 0.20) {
+              try {
+                if (typeof vid.fastSeek === 'function') {
+                  vid.fastSeek(target);
+                } else {
+                  vid.currentTime = target;
+                }
+              } catch (e) {
+                try { vid.currentTime = target; } catch (_) {}
+              }
+            }
           }
+
+          // Start both without waiting for a video seek when one is not needed.
+          const audioPlay = this.studioWavesurfer.play();
+          if (audioPlay && typeof audioPlay.catch === 'function') {
+            audioPlay.catch(e => console.warn('WaveSurfer play:', e));
+          }
+
+          if (vid && vid.src && vid.paused) {
+            const videoPlay = vid.play();
+            if (videoPlay && typeof videoPlay.catch === 'function') {
+              videoPlay.catch(e => console.warn('Video play:', e));
+            }
+          }
+
           this._updateStudioPlayPauseIcon(true);
         }
       } else if (vid && vid.src) {
         if (vid.paused) {
-          vid.play().catch(e => console.log(e));
+          vid.play().catch(e => console.warn('Video play:', e));
           this._updateStudioPlayPauseIcon(true);
         } else {
           vid.pause();
@@ -6302,7 +6684,61 @@
     // ============================================================
     //  STEM STUDIO — MULTITRACK DAW MIXER ENGINE
     // ============================================================
+
+    // ============================================================
+    // RESET EXTERNAL WORKBENCH BEFORE ENTERING A STUDIO
+    // The Studio gets a clean start. External modules (Remaster,
+    // Trimmer, etc.) are intentionally reset when the user leaves
+    // the main workbench for Stem/Lyric Studio.
+    // ============================================================
+    resetExternalWorkbench() {
+      // Leaving the main workbench for either Studio means the external
+      // modules are no longer needed. Fully reset their UI, file references,
+      // decoded buffers, players, and playback state so memory is released.
+
+      try { this.resetRemaster(); } catch (e) {}
+      try { this.resetTrimmerState(); } catch (e) {}
+      try { this.resetInspectorState(); } catch (e) {}
+      try { this.resetTransposerState(); } catch (e) {}
+      try { this.resetAudio(); } catch (e) {}
+
+      // Clear the external file inputs as well. This removes the browser's
+      // File reference so the uploaded file is not retained by the workbench.
+      [
+        'remasterTargetInput',
+        'inspectorFileInput',
+        'trimmerFileInput',
+        'transposerFileInput',
+        'audioFileInput'
+      ].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.value = '';
+      });
+
+      // Stop any remaining external playback source.
+      if (this.audioSourceNode) {
+        try { this.audioSourceNode.stop(); } catch (e) {}
+        try { this.audioSourceNode.disconnect(); } catch (e) {}
+        this.audioSourceNode = null;
+      }
+      this.isPlaying = false;
+      this.isTrimmerPlaying = false;
+      this.transposerIsPlaying = false;
+
+      // Reset the shared external state references.
+      this.selectedFile = null;
+      this.audioBuffer = null;
+      this.inspectorOriginalBuffer = null;
+      this.inspectorProcessedBuffer = null;
+      this.trimmerAudioBuffer = null;
+      this.transposerBuffer = null;
+      this.remasterOriginalUrl = '';
+      this.remasterProcessedUrl = '';
+      this.remasterABEnabled = true;
+    }
+
     openStemStudio() {
+      this.resetExternalWorkbench();
       const main = document.getElementById('mainView');
       const lyric = document.getElementById('lyricStudioView');
       const stem = document.getElementById('stemStudioView');
