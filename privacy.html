@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en" dir="ltr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Privacy Policy — SONVEX STUDIO</title><meta name="description" content="SONVEX STUDIO Privacy Policy."><style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 20% 10%,rgba(79,70,229,.12),transparent 30%),radial-gradient(circle at 80% 25%,rgba(6,182,212,.08),transparent 30%),#050718;color:#e8eaff}a{text-decoration:none;color:inherit}.container{width:min(980px,calc(100% - 32px));margin:auto}.top{padding:18px 0}.brand{font-weight:900;letter-spacing:.08em;font-size:18px}.panel{background:rgba(12,16,45,.72);border:1px solid rgba(99,102,241,.18);border-radius:20px;box-shadow:0 18px 60px rgba(0,0,0,.25);backdrop-filter:blur(14px)}.header{padding:28px 30px;margin-top:24px}.badge{display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.2);color:#67e8f9;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{font-size:clamp(28px,5vw,46px);margin:18px 0 10px;line-height:1.1}h2{font-size:18px;margin:28px 0 10px}p{color:#aeb8dd;line-height:1.9;font-size:14px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:10px;background:linear-gradient(90deg,#06b6d4,#2563eb);font-weight:800;font-size:12px}.btn.secondary{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2)}.content{padding:28px 30px;margin:16px 0 36px}.free{margin-top:22px;display:inline-flex;padding:9px 13px;border-radius:999px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.22);color:#6ee7b7;font-size:11px;font-weight:800}.footer{text-align:center;color:#59658f;font-size:10px;padding:0 0 30px}.ar{direction:rtl;text-align:right}@media(max-width:640px){.header,.content{padding:22px 20px}}
-</style></head><body class=""><div class="container top"><a class="brand" href="index.html">SONVEX STUDIO</a></div><main class="container"><section class="panel header"><span class="badge">SONVEX STUDIO</span><h1>Privacy Policy</h1><p>We designed SONVEX STUDIO with a local-first approach. This page explains the general privacy model of the studio.</p><div class="actions"><a class="btn" href="index.html">Back to Studio</a><a class="btn secondary" href="https://sonvexbeat.github.io/sonvex-studio/about.html">About Us</a></div></section><section class="panel content">
+</style></head><body class=""><div class="container top"><a class="brand" href="index.html">SONVEX STUDIO</a></div><main class="container"><section class="panel header"><span class="badge">SONVEX STUDIO</span><h1>Privacy Policy</h1><p>We designed SONVEX STUDIO with a local-first approach. This page explains the general privacy model of the studio.</p><div class="actions"><a class="btn" id="backToStudioBtn" href="index.html">Back to Studio</a><a class="btn secondary" href="https://sonvexbeat.github.io/sonvex-studio/about.html">About Us</a></div></section><section class="panel content">
 <h2>1. Your Files</h2>
 <p>You remain in control of the files you choose to use with SONVEX STUDIO. We do not claim ownership of your audio, music, lyrics, or other content.</p>
 <h2>2. Your Content</h2>
@@ -13,4 +13,25 @@
 <p>We take reasonable measures to protect the service and the information associated with it. However, no website or digital service can guarantee absolute security.</p>
 <h2>6. Changes to This Policy</h2>
 <p>This policy may be updated when the service or its features change. The latest version will always be published on this page.</p>
-</section></main><div class="container footer">SONVEX STUDIO — All rights reserved.</div></body></html>
+</section></main><div class="container footer">SONVEX STUDIO — All rights reserved.</div><script>
+(function () {
+  function backToPreviousWorkspace() {
+    try {
+      var ref = document.referrer ? new URL(document.referrer, location.href) : null;
+      if (ref && ref.origin === location.origin && history.length > 1) {
+        history.back();
+        return;
+      }
+    } catch (e) {}
+    location.href = 'index.html';
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('backToStudioBtn');
+    if (btn) btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      backToPreviousWorkspace();
+    });
+  });
+})();
+</script>
+</body></html>
