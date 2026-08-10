@@ -2809,6 +2809,30 @@
           </button>
         </div>
 
+        <!-- Metadata Editor: same standard fields used by Dynamic Track Inspector -->
+        <div id="converterMetadataEditor" class="hidden mt-4 pt-4 border-t border-indigo-500/10 light:border-indigo-200">
+          <div class="flex items-center justify-between gap-3 mb-3">
+            <div>
+              <div class="text-xs font-bold text-indigo-100 light:text-indigo-950" data-i18n="converterMetadataTitle">Metadata Editor</div>
+              <div class="text-[10px] text-indigo-300/70 light:text-indigo-700/70 mt-1" data-i18n="converterMetadataDesc">Edit standard tags for the converted audio file.</div>
+            </div>
+            <span id="converterMetadataFormatBadge" class="text-[9px] font-mono px-2 py-1 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-500/10">--</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input id="converterMetaEditTitle" class="w-full rounded-lg border border-indigo-500/15 bg-black/20 px-3 py-2 text-xs" placeholder="Title">
+            <input id="converterMetaEditArtist" class="w-full rounded-lg border border-indigo-500/15 bg-black/20 px-3 py-2 text-xs" placeholder="Artist">
+            <input id="converterMetaEditAlbum" class="w-full rounded-lg border border-indigo-500/15 bg-black/20 px-3 py-2 text-xs" placeholder="Album">
+            <input id="converterMetaEditGenre" class="w-full rounded-lg border border-indigo-500/15 bg-black/20 px-3 py-2 text-xs" placeholder="Genre">
+            <input id="converterMetaEditYear" class="w-full rounded-lg border border-indigo-500/15 bg-black/20 px-3 py-2 text-xs" placeholder="Year">
+            <input id="converterMetaEditComment" class="w-full rounded-lg border border-indigo-500/15 bg-black/20 px-3 py-2 text-xs" placeholder="Comment">
+          </div>
+          <div class="mt-3">
+            <div id="converterMetadataStatus" class="text-[10px] text-indigo-300/70 light:text-indigo-700/70">
+              Metadata will be embedded automatically when the output is WAV.
+            </div>
+          </div>
+        </div>
+
  <!-- Target Selector & Convert button -->
         <div id="converterActionsBar" class="hidden pt-2 border-t border-indigo-500/5 light:border-indigo-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full sm:w-auto">
@@ -3553,6 +3577,8 @@
       dropAudioText: "Drag & Drop audio file here or click to browse",
       targetFormat: "Target Format:",
       convertBtn: "Convert & Download",
+      converterMetadataTitle: "Metadata Editor",
+      converterMetadataDesc: "Edit standard tags for the converted audio file.",
       inspectorTitle: "Dynamic Track Inspector",
       inspectorNote: "Analyze loudness, peak level, BPM, and streaming impact, then fine-tune gain, filters, EQ, and limiting before exporting a processed master WAV.",
       uploadPrompt: "Upload audio to inspect waveform, Gain Peak dB & BPM",
@@ -3682,6 +3708,8 @@
       dropAudioText: "اسحب وأسقط الملف هنا أو تصفح",
       targetFormat: "الصيغة المستهدفة:",
       convertBtn: "تحويل وتحميل فوراً",
+      converterMetadataTitle: "محرر البيانات الوصفية",
+      converterMetadataDesc: "تعديل بيانات الملف الصوتي المحوّل.",
       inspectorTitle: "محلل الصوت والسرعة (BPM & dB)",
       inspectorNote: "تحليل مستوى الصوت، القمة الصوتية، سرعة الإيقاع BPM وتأثير المعالجة على منصات البث، ثم ضبط الكسب والفلاتر وEQ والـLimiter قبل تصدير ملف Master WAV.",
       uploadPrompt: "قم برفع مقطع صوتي لتحليل الموجة، الفروق الصوتية والسرعة BPM",
@@ -4112,6 +4140,7 @@
       document.getElementById('fileNameDisplay').textContent = file.name;
       document.getElementById('fileSizeDisplay').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
       document.getElementById('detectedFormatBadge').textContent = ext.toUpperCase();
+      await this.initConverterMetadataEditor(file);
       this.showToast(`File ready for conversion: ${file.name}`, 'success');
     }
 
@@ -4120,6 +4149,7 @@
       document.getElementById('dropZone').classList.remove('hidden');
       document.getElementById('fileLoadedCard').classList.add('hidden');
       document.getElementById('converterActionsBar').classList.add('hidden');
+      this.resetConverterMetadataEditor();
       this.updateFormatDropdown('');
     }
 
@@ -4402,6 +4432,61 @@
       });
     }
 
+    _getConverterMetadataInputs() {
+      return {
+        title: document.getElementById('converterMetaEditTitle')?.value || '',
+        artist: document.getElementById('converterMetaEditArtist')?.value || '',
+        album: document.getElementById('converterMetaEditAlbum')?.value || '',
+        genre: document.getElementById('converterMetaEditGenre')?.value || '',
+        year: document.getElementById('converterMetaEditYear')?.value || '',
+        comment: document.getElementById('converterMetaEditComment')?.value || ''
+      };
+    }
+
+    _setConverterMetadataInputs(meta = {}) {
+      const ids = {
+        title: 'converterMetaEditTitle', artist: 'converterMetaEditArtist',
+        album: 'converterMetaEditAlbum', genre: 'converterMetaEditGenre',
+        year: 'converterMetaEditYear', comment: 'converterMetaEditComment'
+      };
+      for (const [key, id] of Object.entries(ids)) {
+        const el = document.getElementById(id);
+        if (el) el.value = meta[key] || '';
+      }
+    }
+
+    async initConverterMetadataEditor(file) {
+      const editor = document.getElementById('converterMetadataEditor');
+      if (!editor || !file) return;
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      let meta = {};
+      try {
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        if (ext === 'mp3') meta = this._metadataReadId3v2(bytes);
+        else if (ext === 'wav') meta = this._metadataReadWav(bytes);
+      } catch (e) {
+        console.warn('Converter metadata read skipped:', e);
+      }
+      this._setConverterMetadataInputs(meta);
+      const badge = document.getElementById('converterMetadataFormatBadge');
+      if (badge) badge.textContent = ext ? ext.toUpperCase() : '--';
+      const status = document.getElementById('converterMetadataStatus');
+      if (status) status.textContent = ext === 'wav'
+        ? 'Metadata will be embedded automatically in the converted WAV.'
+        : 'Metadata fields are ready. WAV output supports embedded metadata.';
+      editor.classList.remove('hidden');
+    }
+
+    resetConverterMetadataEditor() {
+      const editor = document.getElementById('converterMetadataEditor');
+      if (editor) editor.classList.add('hidden');
+      this._setConverterMetadataInputs({});
+      const badge = document.getElementById('converterMetadataFormatBadge');
+      if (badge) badge.textContent = '--';
+      const status = document.getElementById('converterMetadataStatus');
+      if (status) status.textContent = 'Metadata will be embedded automatically when the output is WAV.';
+    }
+
     async processAudioConversion() {
       if (!this.selectedFile) {
         this.showToast('Please select an audio file first.', 'error');
@@ -4417,7 +4502,13 @@
         const decodedBuffer = await convCtx.decodeAudioData(arrayBuffer);
         await convCtx.close();
 
-        const wavBlob = this.audioBufferToWavBlob(decodedBuffer);
+        const baseWavBlob = this.audioBufferToWavBlob(decodedBuffer);
+        let wavBytes = new Uint8Array(await baseWavBlob.arrayBuffer());
+        const metadata = this._getConverterMetadataInputs();
+        if (this.hasMetadataForExport(metadata)) {
+          wavBytes = this._metadataWriteWav(wavBytes, metadata);
+        }
+        const wavBlob = new Blob([wavBytes], { type: 'audio/wav' });
         const filename = this.selectedFile.name.replace(/\.[^/.]+$/, '') + `_sonvex.${targetFormat}`;
         const url = URL.createObjectURL(wavBlob);
         const a = document.createElement('a');
