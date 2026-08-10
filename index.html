@@ -2161,6 +2161,288 @@
 }
 
 
+
+/* V54 — Arabic Home: translate text, but preserve the established visual composition. */
+html[dir="rtl"] body.rtl-home{
+  direction:rtl;
+}
+html[dir="rtl"] body.rtl-home #sonvexHomeView{
+  direction:rtl;
+}
+html[dir="rtl"] body.rtl-home .sonvex-home-hero,
+html[dir="rtl"] body.rtl-home .sonvex-hero-content{
+  direction:ltr!important;
+}
+html[dir="rtl"] body.rtl-home .sonvex-hero-copy{
+  direction:rtl!important;
+  text-align:right!important;
+}
+html[dir="rtl"] body.rtl-home .sonvex-hero-brand,
+html[dir="rtl"] body.rtl-home .sonvex-hero-tagline,
+html[dir="rtl"] body.rtl-home .sonvex-hero-desc,
+html[dir="rtl"] body.rtl-home .sonvex-hero-actions,
+html[dir="rtl"] body.rtl-home .sonvex-hero-pills{
+  text-align:right;
+}
+html[dir="rtl"] body.rtl-home .sonvex-hero-actions,
+html[dir="rtl"] body.rtl-home .sonvex-hero-pills{
+  direction:rtl;
+}
+html[dir="rtl"] body.rtl-home .sonvex-hero-float{
+  direction:ltr!important;
+}
+html[dir="rtl"] body.rtl-home .sonvex-workspaces,
+html[dir="rtl"] body.rtl-home .sonvex-audio-showcase{
+  direction:rtl;
+}
+html[dir="rtl"] body.rtl-home .sonvex-domain-content,
+html[dir="rtl"] body.rtl-home .sonvex-audio-showcase-copy{
+  text-align:right;
+}
+html[dir="rtl"] body.rtl-home .sonvex-domain-btn{
+  direction:rtl;
+}
+
+
+/* ============================================================
+   V55 — HOME POLISH
+   Visual hierarchy only. No workspace internals are changed.
+   ============================================================ */
+#sonvexHomeView .sonvex-home-wrap{
+  max-width:1440px;
+  padding:20px 28px 84px;
+}
+#sonvexHomeView .sonvex-home-hero{
+  min-height:620px;
+  border-radius:28px;
+}
+#sonvexHomeView .sonvex-hero-content{
+  min-height:620px;
+  padding:76px 7.5% 64px;
+}
+#sonvexHomeView .sonvex-hero-copy{
+  max-width:700px;
+}
+#sonvexHomeView .sonvex-hero-tagline{
+  letter-spacing:.22em;
+}
+#sonvexHomeView .sonvex-hero-desc{
+  max-width:620px;
+  font-size:15px;
+  line-height:1.9;
+}
+#sonvexHomeView .sonvex-hero-actions{
+  margin-top:30px;
+}
+#sonvexHomeView .sonvex-hero-pills{
+  margin-top:30px;
+}
+#sonvexHomeView #sonvexWorkspaces{
+  margin-top:42px!important;
+}
+#sonvexHomeView #sonvexWorkspaces::before{
+  content:"";
+  display:block;
+  width:74px;
+  height:3px;
+  margin:0 0 18px;
+  border-radius:999px;
+  background:linear-gradient(90deg,#8b5cf6,#22d3ee);
+}
+.light #sonvexHomeView #sonvexWorkspaces::before{
+  background:linear-gradient(90deg,#6d28d9,#0891b2)!important;
+  box-shadow:0 0 0 1px rgba(79,70,229,.08),0 4px 14px rgba(79,70,229,.14);
+}
+
+#sonvexHomeView .sonvex-workspaces{
+  gap:20px;
+}
+#sonvexHomeView .sonvex-domain-card{
+  min-height:360px;
+  border-radius:22px;
+  overflow:hidden;
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+#sonvexHomeView .sonvex-domain-card:hover{
+  transform:translateY(-4px);
+}
+#sonvexHomeView .sonvex-domain-content{
+  padding:24px 24px 26px;
+}
+#sonvexHomeView .sonvex-domain-content h4{
+  font-size:17px;
+  letter-spacing:.03em;
+}
+#sonvexHomeView .sonvex-domain-content p{
+  max-width:430px;
+  line-height:1.8;
+}
+
+/* V60 — Home workspace cards: readable descriptions in Light Mode */
+.light #sonvexHomeView .sonvex-domain-card p{
+  color:#334155!important;
+  text-shadow:0 1px 2px rgba(255,255,255,.55);
+}
+.light #sonvexHomeView .sonvex-domain-card h4{
+  color:#0f172a!important;
+  text-shadow:0 1px 2px rgba(255,255,255,.35);
+}
+
+#sonvexHomeView .sonvex-audio-showcase{
+  margin-top:42px!important;
+  border-radius:24px;
+}
+#sonvexHomeView .sonvex-audio-showcase-copy{
+  padding:34px!important;
+}
+#sonvexHomeView .sonvex-audio-showcase-copy h3{
+  font-size:clamp(1.8rem,3vw,2.7rem);
+  line-height:1.08;
+}
+#sonvexHomeView .sonvex-audio-showcase-copy>p{
+  max-width:650px;
+  line-height:1.8;
+}
+#sonvexHomeView .sonvex-audio-tools{
+  margin-top:24px;
+}
+#sonvexHomeView .sonvex-audio-tool{
+  min-height:48px;
+}
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-home-hero,
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-hero-content{
+  direction:ltr!important;
+}
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-domain-content,
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-audio-showcase-copy{
+  text-align:right!important;
+}
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-hero-copy{
+  text-align:right!important;
+}
+
+
+/* V61 — Home Light Mode: card text contrast + fixed centered brand */
+.light #sonvexHomeView .sonvex-domain-art::after{
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,.06) 0%,
+    rgba(255,255,255,.08) 38%,
+    rgba(248,250,255,.62) 66%,
+    rgba(248,250,255,.94) 100%
+  )!important;
+}
+.light #sonvexHomeView .sonvex-domain-content h4{
+  color:#0b102d!important;
+  text-shadow:0 1px 2px rgba(255,255,255,.55)!important;
+}
+.light #sonvexHomeView .sonvex-domain-content p{
+  color:#172554!important;
+  opacity:1!important;
+  text-shadow:0 1px 2px rgba(255,255,255,.72)!important;
+}
+
+/* Keep the global SONVEX STUDIO header branding physically centered
+   regardless of the site's LTR/RTL language direction. */
+header > .max-w-7xl{
+  position:relative!important;
+}
+header > .max-w-7xl > div:nth-child(2){
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  direction:ltr!important;
+  unicode-bidi:isolate!important;
+  white-space:nowrap!important;
+  margin:0!important;
+}
+header > .max-w-7xl > div:nth-child(2) h1{
+  direction:ltr!important;
+  unicode-bidi:isolate!important;
+  margin:0!important;
+}
+
+
+/* V62 — Landing Hero is language-independent and position-locked.
+   The entire hero composition stays English, LTR, and in the exact same
+   physical position in both English and Arabic modes. */
+#sonvexHomeView .sonvex-home-hero,
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-content,
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-copy,
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-actions,
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-pills{
+  direction:ltr!important;
+}
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-copy{
+  text-align:left!important;
+}
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-actions,
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-pills{
+  justify-content:flex-start!important;
+  text-align:left!important;
+}
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-float{
+  right:5.5%!important;
+  left:auto!important;
+  direction:ltr!important;
+}
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-home-hero,
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-home-hero .sonvex-hero-content,
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-home-hero .sonvex-hero-copy,
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-home-hero .sonvex-hero-actions,
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-home-hero .sonvex-hero-pills{
+  direction:ltr!important;
+  text-align:left!important;
+}
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-home-hero .sonvex-hero-actions,
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-home-hero .sonvex-hero-pills{
+  justify-content:flex-start!important;
+}
+html[dir="rtl"] body.rtl-home #sonvexHomeView .sonvex-home-hero .sonvex-hero-float{
+  right:5.5%!important;
+  left:auto!important;
+  direction:ltr!important;
+}
+
+
+/* V63 — Hero copy: keep the English composition left-anchored in RTL too */
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-content{
+  direction:ltr!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:flex-start!important;
+}
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-copy{
+  direction:ltr!important;
+  text-align:left!important;
+  align-items:flex-start!important;
+  justify-content:flex-start!important;
+  margin-left:0!important;
+  margin-right:auto!important;
+}
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-copy > *{
+  direction:ltr!important;
+  text-align:left!important;
+}
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-title,
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-copy h1,
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-copy h2,
+#sonvexHomeView .sonvex-home-hero .sonvex-hero-copy p{
+  margin-left:0!important;
+  margin-right:0!important;
+}
+html[dir="rtl"] #sonvexHomeView .sonvex-home-hero .sonvex-hero-content{
+  direction:ltr!important;
+  justify-content:flex-start!important;
+}
+html[dir="rtl"] #sonvexHomeView .sonvex-home-hero .sonvex-hero-copy{
+  direction:ltr!important;
+  text-align:left!important;
+  margin-left:0!important;
+  margin-right:auto!important;
+}
+
 </style>
 </head>
 <body class="min-h-screen font-sans transition-colors duration-300 selection:bg-indigo-200 selection:text-black">
@@ -2255,26 +2537,31 @@
 <div class="sonvex-hero-content">
 <div class="sonvex-hero-copy">
 <div class="sonvex-hero-brand">SONVEX <span>STUDIO</span></div>
-<div class="sonvex-hero-tagline" data-i18n="homeTitle">DEFINE YOUR SOUND</div>
-<p class="sonvex-hero-desc" data-i18n="homeDesc">A professional creative workspace for audio, video subtitles, and visual content — all in one place.</p>
+<div class="sonvex-hero-tagline">DEFINE YOUR SOUND</div>
+<p class="sonvex-hero-desc">A professional creative workspace for audio, video subtitles, and visual content — all in one place.</p>
 <div class="sonvex-hero-actions">
-<button class="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-black text-xs uppercase tracking-[.12em] bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-xl shadow-purple-500/25 transition-all" onclick="document.getElementById('sonvexWorkspaces').scrollIntoView({behavior:'smooth'})"><span data-i18n="homeExplore">Explore Workspaces</span><i class="fa-solid fa-arrow-right"></i></button>
-<button class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-[.1em] bg-white/5 hover:bg-white/10 border border-white/15 text-white transition-all" onclick="app.openAudioStudio()"><i class="fa-solid fa-play text-[10px]"></i><span data-i18n="homeCta">Enter Audio Studio</span></button>
+<button class="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-black text-xs uppercase tracking-[.12em] bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-xl shadow-purple-500/25 transition-all" onclick="document.getElementById('sonvexWorkspaces').scrollIntoView({behavior:'smooth'})"><span>Explore Workspaces</span><i class="fa-solid fa-arrow-right"></i></button>
+<button class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-black text-xs uppercase tracking-[.1em] bg-white/5 hover:bg-white/10 border border-white/15 text-white transition-all" onclick="app.openAudioStudio()"><i class="fa-solid fa-play text-[10px]"></i><span>Enter Audio Studio</span></button>
 </div>
 <div class="sonvex-hero-pills">
 <span class="sonvex-hero-pill"><i class="fa-solid fa-gem"></i><span>Professional Quality</span></span>
 <span class="sonvex-hero-pill"><i class="fa-solid fa-layer-group"></i><span>All in One Studio</span></span>
-<span class="sonvex-hero-pill"><i class="fa-solid fa-gift"></i><span data-i18n="homeBrowserBadge">Free Creative Tools</span></span>
+<span class="sonvex-hero-pill"><i class="fa-solid fa-gift"></i><span>Free Creative Tools</span></span>
 </div>
 </div>
 <div class="sonvex-hero-float hidden md:block">
 <img alt="Artist in a recording studio" loading="eager" src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&amp;fit=crop&amp;w=1000&amp;q=90"/>
 <div class="sonvex-hero-float-caption">
-<div class="text-[9px] uppercase tracking-[.22em] text-cyan-300 font-black" data-i18n="homeHeroLabel">ONE CREATIVE WORKSPACE</div>
-<div class="mt-1 text-sm font-black text-white" data-i18n="homeHeroSub">Create. Refine. Release.</div>
+<div class="text-[9px] uppercase tracking-[.22em] text-cyan-300 font-black">ONE CREATIVE WORKSPACE</div>
+<div class="mt-1 text-sm font-black text-white">Create. Refine. Release.</div>
 </div>
 </div>
 </div>
+</section>
+<section class="mt-5 sonvex-home-section-intro">
+<div class="text-[10px] uppercase tracking-[.22em] text-purple-300 font-black" data-i18n="homeWorkspacesTitle">Choose Your Workspace</div>
+<h2 class="mt-2 text-2xl md:text-3xl font-black text-white" data-i18n="homeWorkspacesTitle">Choose Your Workspace</h2>
+<p class="mt-2 text-sm text-slate-300 max-w-2xl" data-i18n="homeWorkspacesDesc">Everything is organized by what you want to create or process.</p>
 </section>
 <section class="mt-5" id="sonvexWorkspaces">
 <div class="sonvex-workspaces">
@@ -2282,52 +2569,52 @@
 <div class="sonvex-domain-art"><img alt="Stem recording workspace" loading="lazy" src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&amp;fit=crop&amp;w=1200&amp;q=90"/></div>
 <div class="sonvex-domain-content">
 <div class="sonvex-domain-icon"><i class="fa-solid fa-sliders"></i></div>
-<h4 class="mt-4 text-white font-black">STEM STUDIO</h4>
-<p class="mt-2 text-xs leading-6">Separate, edit, arrange, and mix your tracks in the main multitrack workspace.</p>
-<button class="sonvex-domain-btn sonvex-audio-btn text-white" onclick="app.openStemStudio()"><span>Enter Stem Studio</span><i class="fa-solid fa-arrow-right"></i></button>
+<h4 class="mt-4 text-white font-black" data-i18n="homeStemTitle">STEM STUDIO</h4>
+<p class="mt-2 text-xs leading-6" data-i18n="homeStemDesc2">Separate, edit, arrange, and mix your tracks in the main multitrack workspace.</p>
+<button class="sonvex-domain-btn sonvex-audio-btn text-white" onclick="app.openStemStudio()"><span data-i18n="homeEnterStem">Enter Stem Studio</span><i class="fa-solid fa-arrow-right"></i></button>
 </div>
 </article>
 <article class="sonvex-domain-card video">
 <div class="sonvex-domain-art"><img alt="Video editing and subtitles" loading="lazy" src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&amp;fit=crop&amp;w=1200&amp;q=90"/></div>
 <div class="sonvex-domain-content">
 <div class="sonvex-domain-icon"><i class="fa-solid fa-clapperboard"></i></div>
-<h4 class="mt-4 text-white font-black" data-i18n="homeVideoTitle">VIDEO &amp; SUBTITLES</h4>
-<p class="mt-2 text-xs leading-6" data-i18n="homeVideoDesc">Create, edit, and sync lyrics and subtitles with audio and video.</p>
-<button class="sonvex-domain-btn sonvex-video-btn text-white" onclick="app.openLyricStudio()"><span data-i18n="homeEnterVideo">Enter Video &amp; Subtitles</span><i class="fa-solid fa-arrow-right"></i></button>
+<h4 class="mt-4 text-white font-black" data-i18n="homeVideoKicker">VIDEO &amp; SUBTITLES</h4>
+<p class="mt-2 text-xs leading-6" data-i18n="homeVideoDesc2">Create, edit, and sync lyrics and subtitles with audio and video.</p>
+<button class="sonvex-domain-btn sonvex-video-btn text-white" onclick="app.openLyricStudio()"><span data-i18n="homeEnterVideo2">Enter Video &amp; Subtitles</span><i class="fa-solid fa-arrow-right"></i></button>
 </div>
 </article>
 <article class="sonvex-domain-card image">
 <div class="sonvex-domain-art"><img alt="Creative image design" loading="lazy" src="https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?auto=format&amp;fit=crop&amp;w=1200&amp;q=90"/></div>
 <div class="sonvex-domain-content">
 <div class="sonvex-domain-icon"><i class="fa-solid fa-image"></i></div>
-<h4 class="mt-4 text-white font-black" data-i18n="homeImageTitle">IMAGE STUDIO</h4>
-<p class="mt-2 text-xs leading-6" data-i18n="homeImageDesc">Enhance, upscale, edit, design, compress, and prepare your images.</p>
-<button class="sonvex-domain-btn sonvex-image-btn text-white" onclick="app.openImageStudio()"><span data-i18n="homeEnterImage">Enter Image Studio</span><i class="fa-solid fa-arrow-right"></i></button>
+<h4 class="mt-4 text-white font-black" data-i18n="homeImageKicker2">IMAGE STUDIO</h4>
+<p class="mt-2 text-xs leading-6" data-i18n="homeImageDesc2">Enhance, upscale, edit, design, compress, and prepare your images.</p>
+<button class="sonvex-domain-btn sonvex-image-btn text-white" onclick="app.openImageStudio()"><span data-i18n="homeEnterImage2">Enter Image Studio</span><i class="fa-solid fa-arrow-right"></i></button>
 </div>
 </article>
 </div>
 </section>
 <section class="sonvex-feature-strip">
-<div class="sonvex-feature"><i class="fa-solid fa-gem text-purple-400"></i><div class="feature-title" data-i18n="homeFeature1">Professional Workspaces</div><div class="feature-sub">Professional results</div></div>
-<div class="sonvex-feature"><i class="fa-solid fa-bolt text-cyan-400"></i><div class="feature-title" data-i18n="homeFeature2">Powerful Creative Tools</div><div class="feature-sub">Simple and intuitive</div></div>
-<div class="sonvex-feature"><i class="fa-solid fa-layer-group text-blue-400"></i><div class="feature-title">All in One Place</div><div class="feature-sub">Everything you need</div></div>
-<div class="sonvex-feature"><i class="fa-solid fa-wand-magic-sparkles text-fuchsia-400"></i><div class="feature-title" data-i18n="homeFeature4">Built for Creators</div><div class="feature-sub">Made for your workflow</div></div>
-<div class="sonvex-feature"><i class="fa-solid fa-gift text-violet-400"></i><div class="feature-title" data-i18n="homeBrowserBadge">Free Creative Tools</div><div class="feature-sub">Free to use</div></div>
+<div class="sonvex-feature"><i class="fa-solid fa-gem text-purple-400"></i><div class="feature-title" data-i18n="homeFeature1">Professional Workspaces</div><div class="feature-sub" data-i18n="homeProfessionalResults">Professional results</div></div>
+<div class="sonvex-feature"><i class="fa-solid fa-bolt text-cyan-400"></i><div class="feature-title" data-i18n="homeFeature2">Powerful Creative Tools</div><div class="feature-sub" data-i18n="homeSimpleIntuitive">Simple and intuitive</div></div>
+<div class="sonvex-feature"><i class="fa-solid fa-layer-group text-blue-400"></i><div class="feature-title" data-i18n="homeAllInOnePlace">All in One Place</div><div class="feature-sub" data-i18n="homeEverythingYouNeed">Everything you need</div></div>
+<div class="sonvex-feature"><i class="fa-solid fa-wand-magic-sparkles text-fuchsia-400"></i><div class="feature-title" data-i18n="homeBuiltForCreators">Built for Creators</div><div class="feature-sub" data-i18n="homeMadeForWorkflow">Made for your workflow</div></div>
+<div class="sonvex-feature"><i class="fa-solid fa-gift text-violet-400"></i><div class="feature-title" data-i18n="homeBrowserBadge">Free Creative Tools</div><div class="feature-sub" data-i18n="homeFreeToUse">Free to use</div></div>
 </section>
 <section class="sonvex-audio-showcase">
 <div class="sonvex-audio-showcase-grid">
 <div class="sonvex-audio-showcase-copy">
-<div class="text-[10px] uppercase tracking-[.22em] text-purple-300 font-black">AUDIO TOOLS</div>
+<div class="text-[10px] uppercase tracking-[.22em] text-purple-300 font-black" data-i18n="homeAudioKicker">AUDIO TOOLS</div>
 <h3 class="mt-2" data-i18n="homeMarketingTitle1">Master. Analyze. Process.</h3>
-<p data-i18n="homeMarketingDesc1">Explore the focused audio tools for mastering, analysis, comparison, processing, and conversion.</p>
+<p data-i18n="homeAudioDesc2">Explore the focused audio tools for mastering, analysis, comparison, processing, and conversion.</p>
 <div class="sonvex-audio-tools">
-<div class="sonvex-audio-tool"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Remaster</span></div>
-<div class="sonvex-audio-tool"><i class="fa-solid fa-sliders"></i><span>Mix &amp; Process</span></div>
-<div class="sonvex-audio-tool"><i class="fa-solid fa-chart-line"></i><span>Analyze</span></div>
-<div class="sonvex-audio-tool"><i class="fa-solid fa-compact-disc"></i><span>Master</span></div>
-<div class="sonvex-audio-tool"><i class="fa-solid fa-right-left"></i><span>Convert</span></div>
+<div class="sonvex-audio-tool"><i class="fa-solid fa-wand-magic-sparkles"></i><span data-i18n="homeRemaster">Remaster</span></div>
+<div class="sonvex-audio-tool"><i class="fa-solid fa-sliders"></i><span data-i18n="homeMixProcess">Mix &amp; Process</span></div>
+<div class="sonvex-audio-tool"><i class="fa-solid fa-chart-line"></i><span data-i18n="homeAnalyze">Analyze</span></div>
+<div class="sonvex-audio-tool"><i class="fa-solid fa-compact-disc"></i><span data-i18n="homeMaster">Master</span></div>
+<div class="sonvex-audio-tool"><i class="fa-solid fa-right-left"></i><span data-i18n="homeConvert">Convert</span></div>
 </div>
-<button class="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[11px] font-black uppercase tracking-[.08em] shadow-lg shadow-purple-500/20" onclick="app.openAudioStudio()"><span>Explore Audio Tools</span><i class="fa-solid fa-arrow-right"></i></button>
+<button class="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[11px] font-black uppercase tracking-[.08em] shadow-lg shadow-purple-500/20" onclick="app.openAudioStudio()"><span data-i18n="homeExploreAudio">Explore Audio Tools</span><i class="fa-solid fa-arrow-right"></i></button>
 </div>
 <div aria-hidden="true" class="sonvex-wave"><span style="height:46%"></span><span style="height:68%"></span><span style="height:32%"></span><span style="height:82%"></span><span style="height:54%"></span><span style="height:38%"></span><span style="height:76%"></span><span style="height:94%"></span><span style="height:50%"></span><span style="height:70%"></span><span style="height:28%"></span><span style="height:58%"></span><span style="height:88%"></span><span style="height:44%"></span><span style="height:72%"></span><span style="height:36%"></span><span style="height:64%"></span><span style="height:96%"></span><span style="height:48%"></span><span style="height:80%"></span><span style="height:34%"></span><span style="height:62%"></span><span style="height:90%"></span><span style="height:40%"></span><span style="height:74%"></span><span style="height:52%"></span><span style="height:30%"></span><span style="height:68%"></span><span style="height:86%"></span><span style="height:46%"></span><span style="height:60%"></span><span style="height:78%"></span><span style="height:38%"></span><span style="height:92%"></span><span style="height:54%"></span><span style="height:70%"></span><span style="height:42%"></span><span style="height:84%"></span><span style="height:58%"></span><span style="height:76%"></span><span style="height:34%"></span><span style="height:66%"></span><span style="height:88%"></span><span style="height:50%"></span><span style="height:72%"></span><span style="height:40%"></span><span style="height:94%"></span><span style="height:56%"></span><span style="height:78%"></span><span style="height:32%"></span><span style="height:64%"></span><span style="height:86%"></span><span style="height:46%"></span><span style="height:70%"></span><span style="height:90%"></span><span style="height:52%"></span><span style="height:74%"></span><span style="height:38%"></span><span style="height:82%"></span><span style="height:60%"></span><span style="height:44%"></span><span style="height:96%"></span><span style="height:58%"></span><span style="height:72%"></span><span style="height:36%"></span><span style="height:88%"></span><span style="height:50%"></span></div>
 </div>
@@ -3912,6 +4199,9 @@
       footerTagline: "Free tools for creators, musicians, and audio enthusiasts.",
       footerAbout: "About Us",
       footerPrivacy: "Privacy Policy",
+      footerQuickLinks: "Quick Links",
+      footerStayCreative: "Stay Creative",
+      footerStayCreativeCopy: "Keep creating, refining, and shaping your work with SONVEX STUDIO.",
       footerCopyright: "© 2026 SONVEX STUDIO — All Rights Reserved",
       footerCreator: "Powered by SONVEX BEAT",
       footerVisitSonvex: "Visit Sonvex Beat",
@@ -3963,6 +4253,46 @@
       imgPresetsTitle: "Music & Social Presets", imgPresetsDesc: "Prepare artwork for covers, YouTube, Instagram, TikTok, and more.",
       imgBatchTitle: "Batch Processing", imgBatchDesc: "Apply the same image operation to multiple files.",
       toolComing: "Tool Workspace",
+      homeStemKicker: "From Stems to Master",
+      homeStemTitle: "STEM STUDIO",
+      homeVideoKicker: "VIDEO & SUBTITLES",
+      homeImageKicker2: "IMAGE STUDIO",
+      homeBuiltForCreators: "Built for Creators",
+      homeMadeForWorkflow: "Made for your workflow",
+      homeFreeTools: "Free Creative Tools",
+      homeFreeToUse: "Free to use",
+      homeSectionIntro: "Choose a workspace and start creating.",
+      homeAudioSectionTitle: "Audio Tools",
+      homeAudioSectionDesc: "Focused tools for mastering, analysis, processing, comparison, and conversion.",
+      homeWorkspacesTitle: "Choose Your Workspace",
+      homeWorkspacesDesc: "Everything is organized by what you want to create or process.",
+
+      homeBrowserBadge: "Free Creative Tools",
+      homeExplore: "Explore Workspaces",
+      homeMarketingTitle1: "From Stems to Master",
+      homeProfessionalResults: "Professional results",
+      homeSimpleIntuitive: "Simple and intuitive",
+      homeAllInOnePlace: "All in One Place",
+      homeEverythingYouNeed: "Everything you need",
+      homeProfessionalQuality: "Professional Quality",
+      homeAllInOne: "All in One Studio",
+      homeOneWorkspace: "ONE CREATIVE WORKSPACE",
+      homeCreateRefineRelease: "Create. Refine. Release.",
+      homeAudioKicker: "AUDIO TOOLS",
+      homeAudioDesc2: "Focused tools for mastering, analysis, comparison, processing, and conversion.",
+      homeRemaster: "Remaster",
+      homeMixProcess: "Mix & Process",
+      homeAnalyze: "Analyze",
+      homeMaster: "Master",
+      homeConvert: "Convert",
+      homeExploreAudio: "Explore Audio Tools",
+      homeEnterStem: "Enter Stem Studio",
+      homeStemDesc2: "Separate, edit, arrange, and mix your tracks in the main multitrack workspace.",
+      homeEnterImage2: "Enter Image Studio",
+      homeImageDesc2: "Enhance, upscale, edit, design, compress, and prepare your images.",
+      homeEnterVideo2: "Enter Video & Subtitles",
+      homeVideoDesc2: "Create, edit, and sync lyrics and subtitles with audio and video.",
+
     },
     ar: {
       audioConverterTitle: "المحول الصوتي الشامل",
@@ -4125,6 +4455,9 @@
       footerTagline: "أدوات مجانية لصنّاع المحتوى والموسيقيين وكل من يهتم بالصوت.",
       footerAbout: "من نحن",
       footerPrivacy: "سياسة الخصوصية",
+      footerQuickLinks: "روابط سريعة",
+      footerStayCreative: "واصل الإبداع",
+      footerStayCreativeCopy: "واصل إنشاء أعمالك وتطويرها وصقلها مع SONVEX STUDIO.",
       footerCopyright: "© 2026 SONVEX STUDIO — All Rights Reserved",
       footerCreator: "بدعم من SONVEX BEAT",
       footerVisitSonvex: "زيارة Sonvex Beat",
@@ -4163,6 +4496,76 @@
       imgPresetsTitle: "قَوَالِبُ الْمُوسِيقَى وَالْمَنَصَّات", imgPresetsDesc: "تَجْهِيزُ الْأَعْمَالِ لِلْأَغْلِفَةِ وَيُوتْيُوب وَإِنْسْتَغْرَام وَتِيكْتُوك وَغَيْرِهَا.",
       imgBatchTitle: "مُعَالَجَةٌ جَمَاعِيَّة", imgBatchDesc: "تَطْبِيقُ نَفْسِ عَمَلِيَّةِ الصُّوَرِ عَلَى عِدَّةِ مِلَفَّاتٍ.",
       toolComing: "وَرْشَةُ الأَدَاة",
+      homeStemKicker: "مِنَ الْمَسَارَاتِ الْمُنْفَصِلَةِ إِلَى الْمَاسْتَر",
+      homeStemTitle: "اِسْتُودْيُو فَصْلِ الْمَسَارَاتِ",
+      homeVideoKicker: "الْفِيدْيُو وَالتَّرْجَمَات",
+      homeImageKicker2: "اِسْتُودْيُو الصُّوَرِ",
+      homeBuiltForCreators: "مُصَمَّمٌ لِلْمُبْدِعِينَ",
+      homeMadeForWorkflow: "مُصَمَّمٌ لِسَيْرِ عَمَلِكَ",
+      homeFreeTools: "أَدَوَاتٌ إِبْدَاعِيَّةٌ مَجَّانِيَّة",
+      homeFreeToUse: "مَجَّانِيَّةٌ لِلِاسْتِخْدَام",
+
+      homeBrowserBadge: "أَدَوَاتٌ إِبْدَاعِيَّةٌ مَجَّانِيَّة",
+      homeExplore: "اِسْتَكْشِفْ مَسَاحَاتِ الْعَمَلِ",
+      homeMarketingTitle1: "مِنَ الْمَسَارَاتِ الْمُنْفَصِلَةِ إِلَى الْمَاسْتَر",
+      homeProfessionalResults: "نَتَائِجُ احْتِرَافِيَّة",
+      homeSimpleIntuitive: "بَسِيطَةٌ وَسَهْلَةُ الِاسْتِخْدَام",
+      homeAllInOnePlace: "كُلُّ شَيْءٍ فِي مَكَانٍ وَاحِد",
+      homeEverythingYouNeed: "كُلُّ مَا تَحْتَاجُ إِلَيْهِ",
+      homeProfessionalQuality: "جَوْدَةٌ احْتِرَافِيَّة",
+      homeAllInOne: "اِسْتُودْيُو مُتَكَامِل",
+      homeOneWorkspace: "مَسَاحَةٌ إِبْدَاعِيَّةٌ وَاحِدَة",
+      homeCreateRefineRelease: "أَنْشِئْ. طَوِّرْ. أَطْلِقْ.",
+      homeAudioKicker: "أَدَوَاتُ الصَّوْتِ",
+      homeAudioDesc2: "أَدَوَاتٌ مُتَخَصِّصَةٌ لِلْمَاسْتَرِينْغِ وَالتَّحْلِيلِ وَالْمُقَارَنَةِ وَالْمُعَالَجَةِ وَالتَّحْوِيلِ.",
+      homeRemaster: "تَحْسِينُ الصَّوْتِ",
+      homeMixProcess: "الْمُعَالَجَةُ",
+      homeAnalyze: "التَّحْلِيلُ",
+      homeMaster: "الْمَاسْتَرِينْغُ",
+      homeConvert: "التَّحْوِيلُ",
+      homeExploreAudio: "اِسْتَكْشِفْ أَدَوَاتِ الصَّوْتِ",
+      homeEnterStem: "دُخُولُ اِسْتُودْيُو فَصْلِ الْمَسَارَاتِ",
+      homeStemDesc2: "فَصْلُ مَسَارَاتِكَ وَتَحْرِيرُهَا وَتَرْتِيبُهَا وَمَزْجُهَا فِي مَسَاحَةِ الْعَمَلِ مُتَعَدِّدَةِ الْمَسَارَاتِ.",
+      homeEnterImage2: "دُخُولُ اِسْتُودْيُو الصُّوَرِ",
+      homeImageDesc2: "تَحْسِينُ صُوَرِكَ وَتَكْبِيرُهَا وَتَحْرِيرُهَا وَتَصْمِيمُهَا وَضَغْطُهَا وَتَجْهِيزُهَا.",
+      homeEnterVideo2: "دُخُولُ الْفِيدْيُو وَالتَّرْجَمَاتِ",
+      homeVideoDesc2: "إِنْشَاءُ الْكَلِمَاتِ وَالتَّرْجَمَاتِ وَتَحْرِيرُهَا وَمُزَامَنَتُهَا مَعَ الصَّوْتِ وَالْفِيدْيُو.",
+      homeSectionIntro: "اِخْتَرْ مَسَاحَةَ الْعَمَلِ وَابْدَأْ إِبْدَاعَكَ.",
+      homeAudioSectionTitle: "أَدَوَاتُ الصَّوْتِ",
+      homeAudioSectionDesc: "أَدَوَاتٌ مُتَخَصِّصَةٌ لِلْمَاسْتَرِينْغِ وَالتَّحْلِيلِ وَالْمُعَالَجَةِ وَالْمُقَارَنَةِ وَالتَّحْوِيلِ.",
+      homeWorkspacesTitle: "اِخْتَرْ مَسَاحَةَ عَمَلِكَ",
+      homeWorkspacesDesc: "كُلُّ شَيْءٍ مُرَتَّبٌ حَسَبَ مَا تُرِيدُ إِنْشَاءَهُ أَوْ مُعَالَجَتَهُ.",
+
+      homeProfessionalQuality: "جودة احترافية",
+      homeAllInOne: "استوديو متكامل",
+      homeCreators: "مصمم للمبدعين",
+      homeOneWorkspace: "مساحة إبداعية واحدة",
+      homeCreateRefineRelease: "أنشئ. طوّر. أطلق.",
+      homeAudioKicker: "أدوات الصوت",
+      homeAudioDesc2: "أدوات متخصصة للماسترينغ والتحليل والمقارنة والمعالجة والتحويل.",
+      homeRemaster: "تحسين الصوت",
+      homeMixProcess: "المعالجة",
+      homeAnalyze: "التحليل",
+      homeMaster: "الماسترينغ",
+      homeConvert: "التحويل",
+      homeExploreAudio: "استكشف أدوات الصوت",
+      homeStemTitle2: "اِسْتُودْيُو فَصْلِ الْمَسَارَاتِ",
+      homeStemDesc2: "فصل المسارات وتحريرها وترتيبها ومزجها داخل مساحة العمل الرئيسية.",
+      homeEnterStem: "دخول Stem Studio",
+      homeImageKicker: "IMAGE STUDIO",
+      homeImageDesc2: "تحسين الصور وتكبيرها وتحريرها وتصميمها وضغطها وتجهيزها.",
+      homeEnterImage2: "دخول Image Studio",
+      homeAudioStudioTitle: "AUDIO STUDIO",
+      homeAudioStudioDesc: "مساحة متكاملة لأدوات الصوت من التحليل والمعالجة إلى الماسترينغ والتحويل.",
+      homeEnterAudioTools: "دُخُولُ أَدَوَاتِ الصَّوْتِ",
+      homeVideoKicker: "الْفِيدْيُو وَالتَّرْجَمَات",
+      homeVideoDesc2: "إنشاء وتحرير ومزامنة الكلمات والترجمات مع الصوت والفيديو.",
+      homeEnterVideo2: "دُخُولُ الْفِيدْيُو وَالتَّرْجَمَاتِ",
+      homeFooterDescription: "أدوات مجانية لصنّاع المحتوى والموسيقيين وكل من يهتم بالصوت.",
+      homeBuiltForCreators: "مصمم للمبدعين",
+      homeMadeForWorkflow: "مصمم لسير عملك",
+      homeFreeTools: "أدوات إبداعية مجانية",
+      homeFreeToUse: "مجانية للاستخدام"
     }
   };
 
@@ -4323,6 +4726,7 @@
       this.currentLang = this.currentLang === 'en' ? 'ar' : 'en';
       document.documentElement.dir = this.currentLang === 'ar' ? 'rtl' : 'ltr';
       document.documentElement.lang = this.currentLang;
+      document.body.classList.toggle('rtl-home', this.currentLang === 'ar');
       document.getElementById('langText').textContent = this.currentLang.toUpperCase();
       
       document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -11979,15 +12383,15 @@
 </div>
 </div>
 <div class="sonvex-footer-col">
-<div class="sonvex-footer-heading">Quick Links</div>
+<div class="sonvex-footer-heading" data-i18n="footerQuickLinks">Quick Links</div>
 <div class="sonvex-footer-links">
-<a data-i18n="footerAbout" href="https://sonvexbeat.github.io/sonvex-studio/about.html">About Us</a>
-<a data-i18n="footerPrivacy" href="https://sonvexbeat.github.io/sonvex-studio/privacy.html">Privacy Policy</a>
+<a data-i18n="footerAbout" href="about.html">About Us</a>
+<a data-i18n="footerPrivacy" href="privacy.html">Privacy Policy</a>
 </div>
 </div>
 <div class="sonvex-footer-col">
-<div class="sonvex-footer-heading">Stay Creative</div>
-<div class="sonvex-footer-copy">Keep creating, refining, and shaping your work with SONVEX STUDIO.</div>
+<div class="sonvex-footer-heading" data-i18n="footerStayCreative">Stay Creative</div>
+<div class="sonvex-footer-copy" data-i18n="footerStayCreativeCopy">Keep creating, refining, and shaping your work with SONVEX STUDIO.</div>
 </div>
 </div>
 <div class="sonvex-footer-divider">© 2026 SONVEX STUDIO — All Rights Reserved</div>
