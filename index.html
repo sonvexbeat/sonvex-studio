@@ -1970,6 +1970,14 @@
 
     /* Lyric & Subtitle Studio is intentionally English/LTR regardless of site language. */
     #lyricStudioView { direction: ltr; }
+
+    /* ===== SONVEX STUDIO V39 — VISIT SONVEX BEAT LIGHT MODE TEXT ===== */
+    .light .sonvex-visit-beat-link {
+      color: #334155 !important;
+    }
+    .light .sonvex-visit-beat-link:hover {
+      color: #0f172a !important;
+    }
 </style>
 </head>
 
@@ -2282,10 +2290,19 @@
           <!-- Waveform Canvas Display -->
           <div class="relative w-full h-24 bg-[#04040f] rounded-xl overflow-hidden border border-indigo-500/15 light:border-indigo-200 mb-6 flex items-center justify-center group shadow-inner">
             <canvas id="waveformCanvas" class="w-full h-full"></canvas>
+            <!-- Dynamic Track Inspector playhead: same visual language as Pitch & Tempo. -->
+            <div id="inspectorPlayhead" class="absolute top-0 bottom-0 w-[2px] bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)] -translate-x-1/2 pointer-events-auto cursor-col-resize" style="left:0%;display:none;z-index:4">
+              <div class="absolute -top-0.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_8px_rgba(103,232,249,1)]"></div>
+            </div>
             
-            <!-- Playback Toggle Overlay -->
-            <button id="playAudioBtn" onclick="app.toggleAudioPlayback()" class="hidden absolute w-9 h-9 rounded-full bg-white text-indigo-955 flex items-center justify-center font-bold shadow-lg hover:scale-105 transition-all">
+          </div>
+
+          <!-- Dynamic Inspector Playback Controls: kept outside the waveform so
+               play/pause clicks can never interfere with waveform seeking/dragging. -->
+          <div id="inspectorPlaybackControls" class="hidden flex items-center justify-center gap-2 mt-2">
+            <button id="playAudioBtn" type="button" onclick="app.toggleAudioPlayback(event)" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center gap-2 font-bold shadow-lg transition-all">
               <i id="playIcon" class="fa-solid fa-play text-xs ml-0.5"></i>
+              <span id="playAudioLabel">Play</span>
             </button>
           </div>
 
@@ -2814,11 +2831,11 @@
     <!-- Sonvex Beat creator block -->
     <div class="glass-panel rounded-2xl px-5 py-5 mb-4 border border-indigo-500/10 light:border-indigo-200 text-center">
       <div class="text-[11px] font-semibold text-indigo-200 light:text-indigo-800" data-i18n="footerCreator">
-        Created &amp; developed by Sonvex Beat Music Production.
+        Powered by SONVEX BEAT
       </div>
       <div class="flex items-center justify-center mt-3">
         <a href="https://sonvexbeat.com/" target="_blank" rel="noopener noreferrer"
-           class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-400/20 text-[10px] font-semibold text-cyan-300 light:text-slate-800 transition-colors"
+           class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-400/20 text-[10px] font-semibold text-cyan-300 light:bg-indigo-100/90 light:border-indigo-300/60 light:text-slate-700 light:hover:bg-indigo-200/90 transition-colors sonvex-visit-beat-link"
            data-i18n="footerVisitSonvex">
           <i class="fa-solid fa-arrow-up-right-from-square"></i>
           Visit Sonvex Beat
@@ -2833,8 +2850,8 @@
       <div class="text-[10px] leading-5 text-indigo-400 light:text-indigo-700 mt-2" data-i18n="footerTagline">
         Free tools for creators, musicians, and audio enthusiasts.
       </div>
-      <div class="text-[9px] text-indigo-500 light:text-indigo-600 mt-4" data-i18n="footerCopyright">
-        SONVEX STUDIO — All rights reserved.
+      <div id="footerCopyrightFixed" class="text-[9px] text-indigo-500 light:text-indigo-600 mt-4">
+        © 2026 SONVEX STUDIO — All Rights Reserved
       </div>
 
       <div class="flex flex-col items-center justify-center gap-2 mt-3 text-[10px] font-semibold">
@@ -2852,9 +2869,9 @@
   <div id="stemStudioView" dir="ltr" class="lang-en">
     <!-- STEM HEADER -->
     <div class="stem-header">
-      <button class="studio-btn" onclick="app.closeStemStudio()" title="Back to Sonvex Workbench">
-        <i class="fa-solid fa-arrow-left"></i>
-        <span>Back</span>
+      <button class="studio-btn" onclick="app.closeStemStudio()" title="Exit Stem Studio">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span>Exit</span>
       </button>
       <div class="flex items-center gap-2 flex-1">
         <i class="fa-solid fa-sliders text-purple-400 text-lg"></i>
@@ -3425,7 +3442,7 @@
             
             <div id="studioPlaceholderContent" class="flex flex-col items-center justify-center cursor-pointer p-6" onclick="document.getElementById('studioMediaFileInput').click()">
               <i class="fa-solid fa-photo-film text-3xl text-cyan-500/40 mb-3"></i>
-              <p class="text-sm text-cyan-300/60 light:text-cyan-800 font-semibold">Drop video or audio here or click to browse</p>
+              <p class="text-sm text-cyan-300/60 light:text-slate-700 font-semibold">Drop video or audio here or click to browse</p>
               <p class="text-[11px] text-indigo-400/50 light:text-indigo-700 mt-1">MP4, WebM, MOV, MP3, WAV, OGG, AAC, FLAC</p>
             </div>
             <!-- Video element without native controls -->
@@ -3655,8 +3672,8 @@
       footerTagline: "Free tools for creators, musicians, and audio enthusiasts.",
       footerAbout: "About Us",
       footerPrivacy: "Privacy Policy",
-      footerCopyright: "SONVEX STUDIO — All rights reserved.",
-      footerCreator: "Created & developed by Sonvex Beat Music Production.",
+      footerCopyright: "© 2026 SONVEX STUDIO — All Rights Reserved",
+      footerCreator: "Powered by SONVEX BEAT",
       footerVisitSonvex: "Visit Sonvex Beat",
     },
     ar: {
@@ -3718,7 +3735,7 @@
           removeBtn: "إزالة",
       inspectorDropzone: "اسحب وأسقط الملف الصوتي هنا للتحليل أو تصفح",
       transposerTitle: "ضابط طبقة الصوت والإيقاع",
-      transposerDesc: "اضبط طبقة الصوت (بالنغمات) وسرعة الإيقاع باستقلالية تامة. استمع للنتيجة فورياً وصدّر الملف المعدّل بصيغة WAV — معالجة 100% محلية.",
+      transposerDesc: "اضبط طبقة الصوت (بالنغمات) وسرعة الإيقاع باستقلالية تامة. استمع للنتيجة فورياً وصدّر الملف المعدّل بصيغة WAV.",
       transposerDropzone: "اسحب وأسقط الملف هنا لضبط طبقته أو تصفح",
       transposerLinkLabel: "استقلالية الطبقة / الإيقاع",
       transposerLinkDesc: "إيقاف = ربط فينيل (الطبقة تتبع السرعة) · تشغيل = تمديد مستقل حقيقي",
@@ -3731,7 +3748,7 @@
       transposerDownload: "تحميل WAV",
       awaitingFile: "في انتظار ملف...",
       heroStemTitle: "🎛️ ستوديو فصل المسارات (Stem DAW)",
-      heroStemBadge: "محرك DAW محلي 100%",
+      heroStemBadge: "محرك DAW 100%",
       heroStemDesc: "فصل الأغاني فورياً إلى مسارات منفصلة: الصوت (Vocals)، الدفوف (Drums)، الباص (Bass)، والآلات. قص، تعديل، تسجيل ميكروفون، ومكس متعدد المسارات.",
       heroStemBtn: "تشغيل ستوديو فك المسارات ➔",
       heroLyricTitle: "💬 ستوديو الكلمات والترجمة",
@@ -3764,7 +3781,7 @@
       noAudioText: "لم يتم تحميل ميديا",
       audioLoadedText: "تم تحميل موجة الصوت",
       stemStudioTitle: "ستوديو فصل المسارات الهندسية",
-      stemStudioBadge: "DAW محلي متعدد المسارات",
+      stemStudioBadge: "DAW متعدد المسارات",
       loadProjectBtn: "فتح مشروع",
       saveProjectBtn: "حفظ المشروع",
       loadSongBtn: "تحميل أغنية",
@@ -3784,8 +3801,8 @@
       footerTagline: "أدوات مجانية لصنّاع المحتوى والموسيقيين وكل من يهتم بالصوت.",
       footerAbout: "من نحن",
       footerPrivacy: "سياسة الخصوصية",
-      footerCopyright: "SONVEX STUDIO — جميع الحقوق محفوظة.",
-      footerCreator: "تم إنشاء وتطوير SONVEX STUDIO بواسطة Sonvex Beat Music Production.",
+      footerCopyright: "© 2026 SONVEX STUDIO — All Rights Reserved",
+      footerCreator: "بدعم من SONVEX BEAT",
       footerVisitSonvex: "زيارة Sonvex Beat",
     }
   };
@@ -3800,6 +3817,7 @@
       this.isSilenced = isSilenced;
       this.bufferOffset = bufferOffset || 0;
       this.maxDuration = maxDuration || (audioBuffer ? audioBuffer.duration : duration);
+      this.fx = null;
     }
   }
 
@@ -3829,6 +3847,11 @@
       this.transposerPauseOffset = 0;
       this.transposerAnimFrame = null;
       this.transposerWaveDragging = false;
+
+      // Dynamic Track Inspector playhead state
+      this.inspectorPlaybackStartedAt = 0;
+      this.inspectorPlaybackOffset = 0;
+      this.inspectorPlayheadAnimFrame = null;
 
       // Lyric Studio state
       this.lyricLines = [];
@@ -3868,6 +3891,7 @@
       this.stemClips = [[], [], [], [], []];
       this.selectedTrackIdx = 0;
       this.selectedClipId = null;
+      this.fxTargetClipId = null;
       this.undoStack = [];
       this.redoStack = [];
       this.stemSpeed = 1.0;
@@ -3911,6 +3935,7 @@
       this.updateFormatDropdown('');
       this.setupCustomPlayers();
       this.initBgMusicNotes();
+      this.setupInspectorPlayheadControl();
     }
 
     toggleLanguage() {
@@ -3925,6 +3950,10 @@
           el.textContent = translations[this.currentLang][key];
         }
       });
+
+      // Copyright is intentionally language-independent and must remain identical in both modes.
+      const fixedCopyright = document.getElementById('footerCopyrightFixed');
+      if (fixedCopyright) fixedCopyright.textContent = '© 2026 SONVEX STUDIO — All Rights Reserved';
 
       const activeInput = document.getElementById('studioActiveTextInput');
       if (activeInput) {
@@ -4146,25 +4175,134 @@
       }
     }
 
-    toggleAudioPlayback() {
+    setupInspectorPlayheadControl() {
+      const canvas = document.getElementById('waveformCanvas');
+      if (!canvas || canvas.dataset.playheadControlBound === '1') return;
+      canvas.dataset.playheadControlBound = '1';
+      this.inspectorWaveDragging = false;
+      const seekFromPointer = (event, shouldPlay = false) => {
+        if (!this.audioBuffer) return;
+        const rect = canvas.getBoundingClientRect();
+        if (!rect.width) return;
+        const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+        const ratio = x / rect.width;
+        const time = ratio * Math.max(0, this.audioBuffer.duration || 0);
+        this.seekInspectorPlayhead(time, shouldPlay);
+      };
+      canvas.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        this.inspectorWaveDragging = true;
+        try { canvas.setPointerCapture(event.pointerId); } catch (e) {}
+        seekFromPointer(event, false);
+      });
+      canvas.addEventListener('pointermove', (event) => {
+        if (!this.inspectorWaveDragging) return;
+        seekFromPointer(event, false);
+      });
+      const endDrag = (event) => {
+        if (!this.inspectorWaveDragging) return;
+        this.inspectorWaveDragging = false;
+        try { canvas.releasePointerCapture(event.pointerId); } catch (e) {}
+      };
+      canvas.addEventListener('pointerup', endDrag);
+      canvas.addEventListener('pointercancel', endDrag);
+    }
+
+    seekInspectorPlayhead(time, keepPlaying = false) {
+      if (!this.audioBuffer) return;
+      const duration = Math.max(0.001, this.audioBuffer.duration || 0);
+      const target = Math.max(0, Math.min(duration, Number(time) || 0));
+
+      // Seeking is pause-only. Pointer events must NEVER create another
+      // BufferSource. Playback is controlled exclusively by the Play button.
+      if (this.audioSourceNode) {
+        try { this.audioSourceNode.onended = null; } catch (e) {}
+        try { this.audioSourceNode.stop(0); } catch (e) {}
+        try { this.audioSourceNode.disconnect(); } catch (e) {}
+        this.audioSourceNode = null;
+      }
+      this.isPlaying = false;
+      if (this.inspectorPlayheadAnimFrame) {
+        cancelAnimationFrame(this.inspectorPlayheadAnimFrame);
+        this.inspectorPlayheadAnimFrame = null;
+      }
+      this.inspectorPlaybackOffset = target;
+      this.inspectorPlaybackStartedAt = performance.now();
+      const playhead = document.getElementById('inspectorPlayhead');
+      if (playhead) {
+        playhead.style.display = 'block';
+        playhead.style.left = Math.min(100, (target / duration) * 100) + '%';
+      }
+      const icon = document.getElementById('playIcon');
+      const label = document.getElementById('playAudioLabel');
+      if (icon) icon.className = 'fa-solid fa-play text-xs ml-0.5';
+      if (label) label.textContent = 'Play';
+    }
+
+    toggleAudioPlayback(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       if (!this.audioBuffer || !this.audioContext) return;
       const icon = document.getElementById('playIcon');
+      const playhead = document.getElementById('inspectorPlayhead');
+      const duration = Math.max(0.001, this.audioBuffer.duration || 0);
+
       if (this.isPlaying) {
-        if (this.audioSourceNode) this.audioSourceNode.stop();
+        const elapsed = Math.min(duration, Math.max(0, (performance.now() - this.inspectorPlaybackStartedAt) / 1000));
+        this.inspectorPlaybackOffset = Math.min(duration, this.inspectorPlaybackOffset + elapsed);
+        if (this.audioSourceNode) {
+          try { this.audioSourceNode.onended = null; } catch (e) {}
+          try { this.audioSourceNode.stop(0); } catch (e) {}
+          try { this.audioSourceNode.disconnect(); } catch (e) {}
+          this.audioSourceNode = null;
+        }
         this.isPlaying = false;
-        icon.className = 'fa-solid fa-play text-xs ml-0.5';
-      } else {
-        this.audioSourceNode = this.audioContext.createBufferSource();
-        this.audioSourceNode.buffer = this.audioBuffer;
-        this.audioSourceNode.connect(this.audioContext.destination);
-        this.audioSourceNode.onended = () => {
-          this.isPlaying = false;
-          icon.className = 'fa-solid fa-play text-xs ml-0.5';
-        };
-        this.audioSourceNode.start(0);
-        this.isPlaying = true;
-        icon.className = 'fa-solid fa-pause text-xs';
+        if (this.inspectorPlayheadAnimFrame) { cancelAnimationFrame(this.inspectorPlayheadAnimFrame); this.inspectorPlayheadAnimFrame = null; }
+        if (playhead) { playhead.style.display = 'block'; playhead.style.left = Math.min(100, (this.inspectorPlaybackOffset / duration) * 100) + '%'; }
+        if (icon) icon.className = 'fa-solid fa-play text-xs ml-0.5';
+        const label = document.getElementById('playAudioLabel');
+        if (label) label.textContent = 'Play';
+        return;
       }
+
+      let startOffset = Math.max(0, Math.min(duration, Number(this.inspectorPlaybackOffset) || 0));
+      if (startOffset >= duration - 0.001) startOffset = 0;
+      try { if (this.audioContext.state === 'suspended') this.audioContext.resume(); } catch (e) {}
+      this.audioSourceNode = this.audioContext.createBufferSource();
+      this.audioSourceNode.buffer = this.audioBuffer;
+      this.audioSourceNode.connect(this.audioContext.destination);
+      this.inspectorPlaybackStartedAt = performance.now();
+      this.inspectorPlaybackOffset = startOffset;
+      this.isPlaying = true;
+      if (playhead) { playhead.style.display = 'block'; playhead.style.left = Math.min(100, (startOffset / duration) * 100) + '%'; }
+      if (icon) icon.className = 'fa-solid fa-pause text-xs';
+      const label = document.getElementById('playAudioLabel');
+      if (label) label.textContent = 'Pause';
+
+      const animatePlayhead = (now) => {
+        if (!this.isPlaying || !this.audioBuffer) return;
+        const elapsed = Math.min(duration - startOffset, Math.max(0, (now - this.inspectorPlaybackStartedAt) / 1000));
+        const current = Math.min(duration, startOffset + elapsed);
+        if (playhead) playhead.style.left = Math.min(100, (current / duration) * 100) + '%';
+        if (elapsed < duration - startOffset) this.inspectorPlayheadAnimFrame = requestAnimationFrame(animatePlayhead);
+      };
+      this.inspectorPlayheadAnimFrame = requestAnimationFrame(animatePlayhead);
+
+      const sourceNode = this.audioSourceNode;
+      sourceNode.onended = () => {
+        if (this.audioSourceNode !== sourceNode || !this.isPlaying) return;
+        this.isPlaying = false;
+        this.inspectorPlaybackOffset = duration;
+        if (this.inspectorPlayheadAnimFrame) { cancelAnimationFrame(this.inspectorPlayheadAnimFrame); this.inspectorPlayheadAnimFrame = null; }
+        if (playhead) playhead.style.left = '100%';
+        if (icon) icon.className = 'fa-solid fa-play text-xs ml-0.5';
+        const label = document.getElementById('playAudioLabel');
+        if (label) label.textContent = 'Play';
+        this.audioSourceNode = null;
+      };
+      this.audioSourceNode.start(0, startOffset);
     }
 
     analyzeAudioMetrics(buffer) {
@@ -5022,6 +5160,11 @@
         this.audioContext = this.inspectorAudioCtx;
         this.inspectorOriginalBuffer = this.audioBuffer;
         this.inspectorProcessedBuffer = null;
+        this.inspectorPlaybackOffset = 0;
+        if (this.inspectorPlayheadAnimFrame) { cancelAnimationFrame(this.inspectorPlayheadAnimFrame); this.inspectorPlayheadAnimFrame = null; }
+        this.isPlaying = false;
+        const inspectorPlayhead = document.getElementById('inspectorPlayhead');
+        if (inspectorPlayhead) { inspectorPlayhead.style.display = 'block'; inspectorPlayhead.style.left = '0%'; }
       this.metadataEditorState = { supported: false, bytes: null, type: "", name: "" };
         document.getElementById('inspectorPlaceholder').classList.add('hidden');
         document.getElementById('inspectorContent').classList.remove('hidden');
@@ -5032,8 +5175,8 @@
           if (b) b.disabled = false;
         });
         this.drawWaveform(this.audioBuffer);
-        const playBtn = document.getElementById('playAudioBtn');
-        if (playBtn) playBtn.classList.remove('hidden');
+        const playbackControls = document.getElementById('inspectorPlaybackControls');
+        if (playbackControls) playbackControls.classList.remove('hidden');
         this.analyzeAudioMetrics(this.audioBuffer);
 
         const durationSec = this.audioBuffer.duration;
@@ -5070,13 +5213,35 @@
       this.metadataEditorState = { supported: false, bytes: null, type: "", name: "" };
       const metadataEditor = document.getElementById('metadataEditor');
       if (metadataEditor) metadataEditor.classList.add('hidden');
-      if (this.isPlaying && this.audioSourceNode) {
-        this.audioSourceNode.stop();
-        this.isPlaying = false;
+      // Hard-stop every inspector source, even if isPlaying is already false.
+      // This prevents orphaned audio from continuing after Remove.
+      if (this.audioSourceNode) {
+        try { this.audioSourceNode.onended = null; } catch (e) {}
+        try { this.audioSourceNode.stop(0); } catch (e) {}
+        try { this.audioSourceNode.disconnect(); } catch (e) {}
+        this.audioSourceNode = null;
       }
+      this.isPlaying = false;
+      if (this.inspectorPlayheadAnimFrame) { cancelAnimationFrame(this.inspectorPlayheadAnimFrame); this.inspectorPlayheadAnimFrame = null; }
+      this.inspectorPlaybackStartedAt = 0;
+      this.inspectorPlaybackOffset = 0;
+      if (this.inspectorAudioCtx) {
+        try { this.inspectorAudioCtx.close(); } catch (e) {}
+        this.inspectorAudioCtx = null;
+      }
+      this.audioContext = null;
+      const inspectorPlayhead = document.getElementById('inspectorPlayhead');
+      if (inspectorPlayhead) { inspectorPlayhead.style.display = 'none'; inspectorPlayhead.style.left = '0%'; }
       document.getElementById('inspectorPlaceholder').classList.remove('hidden');
       document.getElementById('inspectorContent').classList.add('hidden');
-      document.getElementById('playAudioBtn').classList.add('hidden');
+      const playbackControls = document.getElementById('inspectorPlaybackControls');
+      if (playbackControls) playbackControls.classList.add('hidden');
+      const playBtn = document.getElementById('playAudioBtn');
+      if (playBtn) playBtn.classList.remove('hidden');
+      const playIcon = document.getElementById('playIcon');
+      if (playIcon) playIcon.className = 'fa-solid fa-play text-xs ml-0.5';
+      const playLabel = document.getElementById('playAudioLabel');
+      if (playLabel) playLabel.textContent = 'Play';
       document.getElementById('gainValueDisplay').textContent = '-- dB';
       document.getElementById('lufsValueDisplay').textContent = '-- LUFS';
       document.getElementById('bpmValueDisplay').textContent = '-- BPM';
@@ -5237,22 +5402,210 @@
       body[0]=3;body.set(text,1);f.set(new TextEncoder().encode(id),0);const n=body.length;f[4]=(n>>>24)&255;f[5]=(n>>>16)&255;f[6]=(n>>>8)&255;f[7]=n&255;f.set(body,10);return f;
     }
     _metadataBuildMp3(bytes,meta){
-      const frames=[this._metadataFrame('TIT2',meta.title),this._metadataFrame('TPE1',meta.artist),this._metadataFrame('TALB',meta.album),this._metadataFrame('TCON',meta.genre),this._metadataFrame('TDRC',meta.year)].filter(Boolean);
+      const frames=[this._metadataFrame('TIT2',meta.title),this._metadataFrame('TPE1',meta.artist),...(String(meta.album || '').length && albumIsWindowsSafe(meta.album) ? [this._metadataFrame('TALB',meta.album)] : []),this._metadataFrame('TCON',meta.genre),this._metadataFrame('TDRC',meta.year)].filter(Boolean);
       const payload=frames.reduce((n,f)=>n+f.length,0),header=new Uint8Array(10);header.set(new TextEncoder().encode('ID3'),0);header[3]=4;header.set(this._metadataSynchsafe(payload),6);
       const oldEnd=(bytes[0]===73&&bytes[1]===68&&bytes[2]===51)?10+(((bytes[6]&127)<<21)|((bytes[7]&127)<<14)|((bytes[8]&127)<<7)|(bytes[9]&127)):0;
       const out=new Uint8Array(10+payload+bytes.length-oldEnd);let p=0;out.set(header,p);p+=10;for(const f of frames){out.set(f,p);p+=f.length;}out.set(bytes.slice(oldEnd),p);return out;
     }
+    _metadataDecodeWavInfoText(bytes) {
+      if (!bytes || !bytes.length) return '';
+      const raw = bytes.slice(0).filter((b, i, a) => !(b === 0 && i === a.length - 1));
+
+      // RIFF INFO is an 8-bit text container. Dynamic WAV exports declare
+      // Windows-1256 in the CSET chunk, so decode Arabic bytes accordingly.
+      const cp1256 = {
+        0xC1:'ء',0xC2:'آ',0xC3:'أ',0xC4:'ؤ',0xC5:'إ',0xC6:'ئ',
+        0xC7:'ا',0xC8:'ب',0xC9:'ة',0xCA:'ت',0xCB:'ث',0xCC:'ج',
+        0xCD:'ح',0xCE:'خ',0xCF:'د',0xD0:'ذ',0xD1:'ر',0xD2:'ز',
+        0xD3:'س',0xD4:'ش',0xD5:'ص',0xD6:'ض',0xD8:'ط',0xD9:'ظ',
+        0xDA:'ع',0xDB:'غ',0xDC:'ـ',0xDD:'ف',0xDE:'ق',0xDF:'ك',
+        0xE1:'ل',0xE3:'م',0xE4:'ن',0xE5:'ه',0xE6:'و',0xE7:'ى',
+        0xED:'ي',0xFE:'؟',0xA1:'،',0xBA:'؛'
+      };
+
+      if (raw.some(b => cp1256[b] !== undefined)) {
+        return Array.from(raw, b => cp1256[b] ?? (b < 0x80 ? String.fromCharCode(b) : '�')).join('').replace(/\0+$/g,'');
+      }
+
+      return new TextDecoder('utf-8', { fatal: false }).decode(raw).replace(/\0+$/g,'');
+    }
+
+    _metadataEncodeWavInfoText(value) {
+      const s = String(value ?? '');
+      const cp1256 = {
+        'ء':0xC1,'آ':0xC2,'أ':0xC3,'ؤ':0xC4,'إ':0xC5,'ئ':0xC6,
+        'ا':0xC7,'ب':0xC8,'ة':0xC9,'ت':0xCA,'ث':0xCB,'ج':0xCC,
+        'ح':0xCD,'خ':0xCE,'د':0xCF,'ذ':0xD0,'ر':0xD1,'ز':0xD2,
+        'س':0xD3,'ش':0xD4,'ص':0xD5,'ض':0xD6,'ط':0xD8,'ظ':0xD9,
+        'ع':0xDA,'غ':0xDB,'ـ':0xDC,'ف':0xDD,'ق':0xDE,'ك':0xDF,
+        'ل':0xE1,'م':0xE3,'ن':0xE4,'ه':0xE5,'و':0xE6,'ى':0xE7,
+        'ي':0xED,'؟':0xFE,'،':0xA1,'؛':0xBA
+      };
+      const bytes = [];
+      for (const ch of s) {
+        const code = ch.codePointAt(0);
+        if (cp1256[ch] !== undefined) bytes.push(cp1256[ch]);
+        else if (code <= 0x7F) bytes.push(code);
+        else {
+          // Keep Latin-1 characters when representable; otherwise use ?.
+          // Arabic text is encoded through the CP1256 map above.
+          bytes.push(code <= 0xFF ? code : 0x3F);
+        }
+      }
+      bytes.push(0);
+      return new Uint8Array(bytes);
+    }
+
     _metadataReadWav(bytes){
-      const out={};if(bytes.length<12||String.fromCharCode(...bytes.slice(0,4))!=='RIFF'||String.fromCharCode(...bytes.slice(8,12))!=='WAVE')return out;let p=12;
-      while(p+8<=bytes.length){const id=String.fromCharCode(...bytes.slice(p,p+4)),size=(bytes[p+4]|(bytes[p+5]<<8)|(bytes[p+6]<<16)|(bytes[p+7]<<24))>>>0,total=8+size+(size&1);if(id==='LIST'&&size>=4&&String.fromCharCode(...bytes.slice(p+8,p+12))==='INFO'){let q=p+12,end=Math.min(bytes.length,p+8+size);const ids={INAM:'title',IART:'artist',IPRD:'album',IGNR:'genre',ICRD:'year',ICMT:'comment'};while(q+8<=end){const sid=String.fromCharCode(...bytes.slice(q,q+4)),ss=(bytes[q+4]|(bytes[q+5]<<8)|(bytes[q+6]<<16)|(bytes[q+7]<<24))>>>0;if(ids[sid])out[ids[sid]]=new TextDecoder().decode(bytes.slice(q+8,q+8+ss)).replace(/\0+$/g,'');q+=8+ss+(ss&1);}}if(total<=8)break;p+=total;}return out;
+      const out={};
+      if(bytes.length<12||String.fromCharCode(...bytes.slice(0,4))!=='RIFF'||String.fromCharCode(...bytes.slice(8,12))!=='WAVE')return out;
+      let p=12;
+      while(p+8<=bytes.length){
+        const id=String.fromCharCode(...bytes.slice(p,p+4));
+        const size=(bytes[p+4]|(bytes[p+5]<<8)|(bytes[p+6]<<16)|(bytes[p+7]<<24))>>>0;
+        const total=8+size+(size&1);
+        if(id==='LIST'&&size>=4&&String.fromCharCode(...bytes.slice(p+8,p+12))==='INFO'){
+          let q=p+12,end=Math.min(bytes.length,p+8+size);
+          const ids={INAM:'title',IART:'artist',IPRD:'album',IGNR:'genre',ICRD:'year',ICMT:'comment'};
+          while(q+8<=end){
+            const sid=String.fromCharCode(...bytes.slice(q,q+4));
+            const ss=(bytes[q+4]|(bytes[q+5]<<8)|(bytes[q+6]<<16)|(bytes[q+7]<<24))>>>0;
+            if(ids[sid] && q+8+ss<=end) out[ids[sid]]=this._metadataDecodeWavInfoText(bytes.slice(q+8,q+8+ss));
+            q+=8+ss+(ss&1);
+          }
+        }
+        if(total<=8)break;
+        p+=total;
+      }
+      return out;
     }
+
     _metadataWriteWav(bytes,meta){
-      const enc=new TextEncoder(),entries=[['INAM',meta.title],['IART',meta.artist],['IPRD',meta.album],['IGNR',meta.genre],['ICRD',meta.year],['ICMT',meta.comment]].filter(([,v])=>v),chunks=[];let infoSize=4;
-      for(const [id,val] of entries){const b=enc.encode(String(val)+'\0'),sz=b.length,c=new Uint8Array(8+sz+(sz&1));c.set(enc.encode(id),0);c[4]=sz&255;c[5]=(sz>>>8)&255;c[6]=(sz>>>16)&255;c[7]=(sz>>>24)&255;c.set(b,8);chunks.push(c);infoSize+=c.length;}
-      const list=new Uint8Array(8+infoSize);list.set(enc.encode('LIST'),0);list[4]=infoSize&255;list[5]=(infoSize>>>8)&255;list[6]=(infoSize>>>16)&255;list[7]=(infoSize>>>24)&255;list.set(enc.encode('INFO'),8);let lp=12;for(const c of chunks){list.set(c,lp);lp+=c.length;}
-      const kept=[];let p=12;while(p+8<=bytes.length){const id=String.fromCharCode(...bytes.slice(p,p+4)),size=(bytes[p+4]|(bytes[p+5]<<8)|(bytes[p+6]<<16)|(bytes[p+7]<<24))>>>0,total=8+size+(size&1);if(total<=8||p+total>bytes.length)break;if(!(id==='LIST'&&size>=4&&String.fromCharCode(...bytes.slice(p+8,p+12))==='INFO'))kept.push(bytes.slice(p,p+total));p+=total;}
-      const tail=kept.reduce((n,b)=>n+b.length,0),riffSize=4+list.length+tail,out=new Uint8Array(12+list.length+tail);out.set(bytes.slice(0,12),0);out[4]=riffSize&255;out[5]=(riffSize>>>8)&255;out[6]=(riffSize>>>16)&255;out[7]=(riffSize>>>24)&255;let op=12;out.set(list,op);op+=list.length;for(const b of kept){out.set(b,op);op+=b.length;}return out;
+      // Keep the audio payload untouched. For WAV compatibility we write:
+      // 1) RIFF INFO using Windows-1256 for Arabic text
+      // 2) a CSET chunk declaring CP1256 + Arabic
+      // 3) an ID3v2.3 tag in an "id3 " RIFF chunk, matching the approach
+      //    used by Audacity for WAV metadata.
+      const idEnc=s=>new TextEncoder().encode(s);
+      const albumIsWindowsSafe = v => /^[\x00-\x7F]*$/.test(String(v || ''));
+      const entries=[
+        ['INAM',meta.title],['IART',meta.artist],
+        ...(String(meta.album || '').length && albumIsWindowsSafe(meta.album) ? [['IPRD',meta.album]] : []),
+        ['IGNR',meta.genre],['ICRD',meta.year],['ICMT',meta.comment]
+      ].filter(([,v])=>String(v||'').length>0);
+
+      const chunks=[];
+      let infoSize=4;
+
+      for(const [id,val] of entries){
+        const b=this._metadataEncodeWavInfoText(val);
+        const sz=b.length;
+        const c=new Uint8Array(8+sz+(sz&1));
+        c.set(idEnc(id),0);
+        c[4]=sz&255;c[5]=(sz>>>8)&255;c[6]=(sz>>>16)&255;c[7]=(sz>>>24)&255;
+        c.set(b,8);
+        chunks.push(c);
+        infoSize+=c.length;
+      }
+
+      const list=new Uint8Array(8+infoSize);
+      list.set(idEnc('LIST'),0);
+      list[4]=infoSize&255;list[5]=(infoSize>>>8)&255;list[6]=(infoSize>>>16)&255;list[7]=(infoSize>>>24)&255;
+      list.set(idEnc('INFO'),8);
+      let lp=12;
+      for(const c of chunks){list.set(c,lp);lp+=c.length;}
+
+      // RIFF CSET: code page 1256 (Arabic Windows code page),
+      // country 000 (not specified), language 1 / dialect 1 (Arabic).
+      const cset=new Uint8Array(16);
+      cset.set(idEnc('CSET'),0);
+      cset[4]=8;cset[5]=0;cset[6]=0;cset[7]=0;
+      cset[8]=0xE4;cset[9]=0x04; // 1256 LE
+      cset[10]=0;cset[11]=0;      // country
+      cset[12]=1;cset[13]=0;      // Arabic
+      cset[14]=1;cset[15]=0;      // Arabic dialect
+
+      // Build an ID3v2.3 tag with UTF-16LE+BOM frames for Unicode-safe metadata.
+      const utf16Frame=(id,value)=>{
+        if(!value)return null;
+        const s=String(value);
+        const text=new Uint8Array(2+s.length*2);
+        text[0]=0xFF;text[1]=0xFE;
+        let tp=2;
+        for(let i=0;i<s.length;i++){
+          const code=s.charCodeAt(i);
+          text[tp++]=code&255;text[tp++]=(code>>>8)&255;
+        }
+        // UTF-16 text should end in a double NUL terminator.
+        const body=new Uint8Array(1+text.length+2);
+        body[0]=1;
+        body.set(text,1);
+        body[body.length-2]=0;
+        body[body.length-1]=0;
+
+        const f=new Uint8Array(10+body.length);
+        f.set(idEnc(id),0);
+        const n=body.length;
+        f[4]=(n>>>24)&255;f[5]=(n>>>16)&255;f[6]=(n>>>8)&255;f[7]=n&255;
+        f.set(body,10);
+        return f;
+      };
+
+      const frames=[
+        utf16Frame('TIT2',meta.title),
+        utf16Frame('TPE1',meta.artist),
+        utf16Frame('TCON',meta.genre),
+        utf16Frame('TYER',meta.year),
+        utf16Frame('COMM',meta.comment)
+      ].filter(Boolean);
+
+      const id3Payload=frames.reduce((n,f)=>n+f.length,0);
+      const id3=new Uint8Array(10+id3Payload);
+      id3.set(idEnc('ID3'),0);
+      id3[3]=3; // ID3v2.3
+      id3.set(this._metadataSynchsafe(id3Payload),6);
+      let ip=10;
+      for(const f of frames){id3.set(f,ip);ip+=f.length;}
+
+      const id3Chunk=new Uint8Array(8+id3.length+(id3.length&1));
+      id3Chunk.set(idEnc('id3 '),0);
+      const id3Size=id3.length;
+      id3Chunk[4]=id3Size&255;id3Chunk[5]=(id3Size>>>8)&255;id3Chunk[6]=(id3Size>>>16)&255;id3Chunk[7]=(id3Size>>>24)&255;
+      id3Chunk.set(id3,8);
+
+      // Preserve all non-metadata chunks. Remove old INFO/CSET/id3 so repeated
+      // metadata export never leaves duplicate/conflicting metadata.
+      const kept=[];
+      let p=12;
+      while(p+8<=bytes.length){
+        const id=String.fromCharCode(...bytes.slice(p,p+4));
+        const size=(bytes[p+4]|(bytes[p+5]<<8)|(bytes[p+6]<<16)|(bytes[p+7]<<24))>>>0;
+        const total=8+size+(size&1);
+        if(total<=8||p+total>bytes.length)break;
+        const isInfo=(id==='LIST'&&size>=4&&String.fromCharCode(...bytes.slice(p+8,p+12))==='INFO');
+        const isCset=id==='CSET';
+        const isId3=id==='id3 ';
+        if(!isInfo&&!isCset&&!isId3) kept.push(bytes.slice(p,p+total));
+        p+=total;
+      }
+
+      const tail=kept.reduce((n,b)=>n+b.length,0);
+      const metadataBytes=cset.length+list.length+id3Chunk.length;
+      const riffSize=4+metadataBytes+tail;
+      const out=new Uint8Array(12+metadataBytes+tail);
+
+      out.set(bytes.slice(0,12),0);
+      out[4]=riffSize&255;out[5]=(riffSize>>>8)&255;out[6]=(riffSize>>>16)&255;out[7]=(riffSize>>>24)&255;
+
+      let op=12;
+      out.set(cset,op);op+=cset.length;
+      out.set(list,op);op+=list.length;
+      out.set(id3Chunk,op);op+=id3Chunk.length;
+      for(const b of kept){out.set(b,op);op+=b.length;}
+
+      return out;
     }
+
     async initMetadataEditor(file){
       const editor=document.getElementById('metadataEditor');if(!editor)return;const ext=(file.name.split('.').pop()||'').toLowerCase();if(ext!=='mp3'&&ext!=='wav'){editor.classList.add('hidden');return;}
       try{const bytes=new Uint8Array(await file.arrayBuffer());this.metadataEditorState={supported:true,bytes,type:ext,name:file.name};this.metadataEditedBytes=null;this._metadataSetInputs(ext==='mp3'?this._metadataReadId3v2(bytes):this._metadataReadWav(bytes));const badge=document.getElementById('metadataFormatBadge');if(badge)badge.textContent=ext.toUpperCase();const status=document.getElementById('metadataEditorStatus');if(status)status.textContent='';editor.classList.remove('hidden');}catch(e){console.error('Metadata editor load failed:',e);editor.classList.add('hidden');}
@@ -5753,6 +6106,7 @@
     // ============================================================
     openLyricStudio() {
       this.resetExternalWorkbench();
+      this._studioProcessingStopped = false;
       const main = document.getElementById('mainView');
       const stem = document.getElementById('stemStudioView');
       const lyric = document.getElementById('lyricStudioView');
@@ -5847,6 +6201,21 @@
         ccEl.textContent = '';
         ccEl.style.display = 'none';
       }
+
+      // Exit means a completely fresh Lyric & Subtitle Studio session.
+      this.lyricLines = [];
+      this.lyricLineCounter = 0;
+      this.activeLyricLineId = null;
+      this.studioMediaEl = null;
+      this._studioProcessingStopped = true;
+      this._syncTableToRegions();
+      this.renderLyricTable();
+      const mediaInput = document.getElementById('studioMediaFileInput');
+      if (mediaInput) mediaInput.value = '';
+      const activeInput = document.getElementById('studioActiveTextInput');
+      const activeLabel = document.getElementById('studioActiveLineLabel');
+      if (activeInput) { activeInput.value = ''; activeInput.placeholder = 'Click a line or playhead to edit text here...'; }
+      if (activeLabel) activeLabel.textContent = 'No active line';
 
       const main = document.getElementById('mainView');
       const stem = document.getElementById('stemStudioView');
@@ -6765,11 +7134,40 @@
       }
     }
 
-    closeStemStudio() {
-      this.stemStop();
+    async closeStemStudio() {
+      const confirmed = await this.showConfirmDialog(
+        'Exit Stem Studio',
+        'Are you sure you want to exit the editor? All current Stem Studio changes will be cleared.',
+        {
+          danger: true,
+          icon: 'fa-solid fa-right-from-bracket',
+          confirmText: 'Exit'
+        }
+      );
+      if (!confirmed) return;
+
+      // Stop playback/recording before releasing the Stem Studio session.
+      try { this.stemStop(); } catch (e) {}
+
+      // Fully reset the Stem Studio session so reopening starts clean.
+      try { this._resetStemStateForNewSong(); } catch (e) {}
+
+      // Exit means a completely fresh Stem Studio on the next visit.
+      const exitDropZone = document.getElementById('stemDropZone');
+      const exitConsole = document.getElementById('stemMultitrackConsole');
+      if (exitDropZone) exitDropZone.classList.remove('hidden');
+      if (exitConsole) exitConsole.classList.add('hidden');
+
+      // Release the Web Audio context used by Stem Studio.
+      if (this.stemAudioCtx) {
+        try { await this.stemAudioCtx.close(); } catch (e) {}
+        this.stemAudioCtx = null;
+      }
+
       const main = document.getElementById('mainView');
       const lyric = document.getElementById('lyricStudioView');
       const stem = document.getElementById('stemStudioView');
+
       if (stem) stem.style.display = 'none';
       if (lyric) {
         lyric.style.display = 'none';
@@ -6777,7 +7175,6 @@
       }
       if (main) main.style.display = 'block';
     }
-
 
     async handleStemFileUpload(file) {
       if (!file) return;
@@ -7889,7 +8286,14 @@
           const src = this.stemAudioCtx.createBufferSource();
           src.buffer = clip.audioBuffer;
           src.playbackRate.value = this.stemSpeed || 1.0;
-          src.connect(fxInput);
+          if (clip.fx) {
+            const clipFxInput = this.stemAudioCtx.createGain();
+            clipFxInput.gain.value = 1;
+            this._buildStemFxChain(this.stemAudioCtx, i, clipFxInput, fxInput, clip.fx);
+            src.connect(clipFxInput);
+          } else {
+            src.connect(fxInput);
+          }
           src.start(now + startDelay, bufferOffset, playDuration);
           this.stemSources[i].push(src);
         });
@@ -7945,7 +8349,11 @@
       if (!this.undoStack) this.undoStack = [];
       const currentClips = (this.stemClips || []).map(trackClips => {
         if (!trackClips) return [];
-        return trackClips.map(clip => new AudioClip(clip.id, clip.trackIdx !== undefined ? clip.trackIdx : clip.trackId, clip.startTime, clip.duration, clip.audioBuffer, clip.isSilenced, clip.bufferOffset));
+        return trackClips.map(clip => {
+          const copy = new AudioClip(clip.id, clip.trackIdx !== undefined ? clip.trackIdx : clip.trackId, clip.startTime, clip.duration, clip.audioBuffer, clip.isSilenced, clip.bufferOffset);
+          copy.fx = clip.fx ? JSON.parse(JSON.stringify(clip.fx)) : null;
+          return copy;
+        });
       });
 
       const stateSnapshot = {
@@ -8067,7 +8475,11 @@
 
       const currentClips = (this.stemClips || []).map(trackClips => {
         if (!trackClips) return [];
-        return trackClips.map(clip => new AudioClip(clip.id, clip.trackIdx !== undefined ? clip.trackIdx : clip.trackId, clip.startTime, clip.duration, clip.audioBuffer, clip.isSilenced, clip.bufferOffset));
+        return trackClips.map(clip => {
+          const copy = new AudioClip(clip.id, clip.trackIdx !== undefined ? clip.trackIdx : clip.trackId, clip.startTime, clip.duration, clip.audioBuffer, clip.isSilenced, clip.bufferOffset);
+          copy.fx = clip.fx ? JSON.parse(JSON.stringify(clip.fx)) : null;
+          return copy;
+        });
       });
 
       if (!this.redoStack) this.redoStack = [];
@@ -8165,7 +8577,11 @@
 
       const currentClips = (this.stemClips || []).map(trackClips => {
         if (!trackClips) return [];
-        return trackClips.map(clip => new AudioClip(clip.id, clip.trackIdx !== undefined ? clip.trackIdx : clip.trackId, clip.startTime, clip.duration, clip.audioBuffer, clip.isSilenced, clip.bufferOffset));
+        return trackClips.map(clip => {
+          const copy = new AudioClip(clip.id, clip.trackIdx !== undefined ? clip.trackIdx : clip.trackId, clip.startTime, clip.duration, clip.audioBuffer, clip.isSilenced, clip.bufferOffset);
+          copy.fx = clip.fx ? JSON.parse(JSON.stringify(clip.fx)) : null;
+          return copy;
+        });
       });
 
       this.undoStack.push({
@@ -8382,6 +8798,8 @@
       const [buf1, buf2] = this._sliceAudioBuffer(this.stemAudioCtx, targetClip.audioBuffer, localSplitSec);
       const clip1 = new AudioClip('clip_' + Date.now() + '_' + targetTrackIdx + '_a', targetTrackIdx, targetClip.startTime, localSplitSec, buf1, targetClip.isSilenced);
       const clip2 = new AudioClip('clip_' + Date.now() + '_' + targetTrackIdx + '_b', targetTrackIdx, playheadTime, targetClip.duration - localSplitSec, buf2, targetClip.isSilenced);
+      clip1.fx = null;
+      clip2.fx = null;
       clips.splice(targetIdx, 1, clip1, clip2);
       this.selectedClipId = clip2.id;
       this.selectedTrackIdx = targetTrackIdx;
@@ -9532,8 +9950,8 @@
       if(fadeOut>0){const s=Math.max(0,trackDur-fadeOut); if(s>fadeIn) gainNode.gain.setValueAtTime(targetGain,s/speed); gainNode.gain.linearRampToValueAtTime(0,trackDur/speed);}
     }
 
-    _buildStemFxChain(ctx, idx, input, output) {
-      const f=this._ensureStemFxState(idx);
+    _buildStemFxChain(ctx, idx, input, output, stateOverride = null) {
+      const f=stateOverride || this._ensureStemFxState(idx);
       const refs={};
       let current=input;
       // EQ: three BiquadFilterNodes, always safe and native.
@@ -10011,17 +10429,45 @@
 
       const consoleEl = document.getElementById('stemMultitrackConsole');
       const dropZone = document.getElementById('stemDropZone');
+      const progressOverlay = document.getElementById('stemProgressOverlay');
+
       if (consoleEl) {
         consoleEl.querySelectorAll('.stem-track-card').forEach(card => {
           const idx = Number(card.dataset.track);
           if (Number.isInteger(idx) && idx >= 5) card.remove();
         });
+        consoleEl.classList.add('hidden');
       }
+
+      // Internal song reset: hide the upload zone while the caller is
+      // loading/processing a new song. Exit logic separately restores it.
       if (dropZone) dropZone.classList.add('hidden');
+      if (progressOverlay) {
+        progressOverlay.classList.add('hidden');
+        progressOverlay.classList.remove('flex');
+      }
+
+      // Reset/disable Stem transport controls until a new song is loaded.
+      ['stemPlayBtn','stemStopBtn','stemRewindBtn','stemRecordBtn'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = true;
+      });
+      const pauseRec = document.getElementById('stemPauseRecBtn');
+      if (pauseRec) pauseRec.classList.add('hidden');
+
+      const durationEl = document.getElementById('stemDurationTime');
+      const currentEl = document.getElementById('stemCurrentTime');
+      if (durationEl) durationEl.textContent = '00:00:00';
+      if (currentEl) currentEl.textContent = '00:00:00';
+
+      const projectName = document.getElementById('stemProjectName');
+      if (projectName) projectName.value = 'Untitled Project';
+
+      this._syncStemFxUI(0);
     }
 
-    _syncStemFxUI(idx) {
-      const f = this._ensureStemFxState(idx);
+    _syncStemFxUI(idx, stateOverride = null) {
+      const f = stateOverride || this._ensureStemFxState(idx);
       const set = (id, value, label) => { const el=document.getElementById(id); if(el) el.checked=!!value; const l=document.getElementById(label); if(l) l.textContent=!!value?'ON':'OFF'; };
       const val = (id, value) => { const el=document.getElementById(id); if(el) el.checked=!!value; };
       set('fxEqOn',f.eq.enabled,'fxEqOnState'); set('fxCompOn',f.compressor.enabled,'fxCompOnState'); set('fxReverbOn',f.reverb.enabled,'fxReverbOnState'); set('fxDelayOn',f.delay.enabled,'fxDelayOnState'); set('fxDistortionOn',f.distortion.enabled,'fxDistortionOnState'); set('fxLimiterOn',f.limiter.enabled,'fxLimiterOnState');
@@ -10124,79 +10570,95 @@
       }
     }
 
+    _getStemFxTarget(idx = this.selectedTrackIdx || 0) {
+      const clipId = this.fxTargetClipId;
+      if (clipId && Array.isArray(this.stemClips?.[idx])) {
+        const clip = this.stemClips[idx].find(c => c && c.id === clipId);
+        if (clip) {
+          if (!clip.fx) clip.fx = this._defaultStemFxState();
+          return { type: 'clip', clip, state: clip.fx };
+        }
+      }
+      return { type: 'track', clip: null, state: this._ensureStemFxState(idx) };
+    }
+
     closeStemFx() {
       const modal = document.getElementById('stemFxModal');
       if (modal) modal.classList.remove('open');
       document.querySelectorAll('.stem-fx-btn').forEach(b => b.classList.remove('active'));
+      this.fxTargetClipId = null;
     }
 
     openStemFx(idx) {
       this.selectedTrackIdx = idx;
-      this._ensureStemFxState(idx);
+      this.fxTargetClipId = null;
+      if (this.selectedClipId && Array.isArray(this.stemClips?.[idx])) {
+        const selectedClip = this.stemClips[idx].find(c => c && c.id === this.selectedClipId);
+        if (selectedClip) {
+          if (!selectedClip.fx) selectedClip.fx = this._defaultStemFxState();
+          this.fxTargetClipId = selectedClip.id;
+        }
+      }
+      const target = this._getStemFxTarget(idx);
       const modal = document.getElementById('stemFxModal');
       const nameEl = document.getElementById('stemFxTrackName');
-      if (nameEl) nameEl.textContent = (this.tracks && this.tracks[idx] ? this.tracks[idx].name : `Track ${idx + 1}`);
+      const trackName = (this.tracks && this.tracks[idx] ? this.tracks[idx].name : `Track ${idx + 1}`);
+      if (nameEl) nameEl.textContent = target.type === 'clip' ? `${trackName} • Selected Clip FX` : trackName;
+      const titleEl = modal ? modal.querySelector('.text-sm.font-black') : null;
+      if (titleEl) titleEl.innerHTML = target.type === 'clip' ? '<i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i> Clip FX Rack' : '<i class="fa-solid fa-sliders text-cyan-400"></i> Track FX Rack';
       if (modal) modal.classList.add('open');
       const btn = document.getElementById(`fxBtn_${idx}`);
       if (btn) btn.classList.add('active');
-      this._syncStemFxUI(idx);
+      this._syncStemFxUI(idx, target.state);
     }
 
     async resetStemFx() {
       const idx = this.selectedTrackIdx || 0;
+      const target = this._getStemFxTarget(idx);
       const wasPlaying = !!this.stemIsPlaying;
-      const previousPosition = wasPlaying && this.stemAudioCtx
-        ? Math.min(this.stemDuration, Math.max(0, (this.stemAudioCtx.currentTime - this.stemStartTime) * (this.stemSpeed || 1)))
-        : (this.stemPauseTime || 0);
-
-      this._pushUndoState('Reset Track FX');
-
-      // Reset this track to a completely dry/default FX state.
-      this.stemFx[idx] = this._defaultStemFxState();
-      this.selectedClipId = null;
-      this._syncStemFxUI(idx);
-
-      // Disconnect the old graph so delay/reverb feedback and tails cannot
-      // remain audible after Reset.
-      this._disconnectStemFxGraph(idx);
-
-      if (wasPlaying) {
-        this.stemPauseTime = previousPosition;
-        await this.stemPause();
-        this.stemPauseTime = previousPosition;
-        await this.stemPlay();
-      } else {
-        this.stemPauseTime = previousPosition;
-      }
-
-      this._syncStemFxUI(idx);
-    }
-
-    resetStemTrackZoom(idx) {
-      this.setStemTrackZoom(idx, 1);
+      const previousPosition = wasPlaying && this.stemAudioCtx ? Math.min(this.stemDuration, Math.max(0, (this.stemAudioCtx.currentTime - this.stemStartTime) * (this.stemSpeed || 1))) : (this.stemPauseTime || 0);
+      this._pushUndoState(target.type === 'clip' ? 'Reset Clip FX' : 'Reset Track FX');
+      if (target.type === 'clip') target.clip.fx = this._defaultStemFxState();
+      else { this.stemFx[idx] = this._defaultStemFxState(); this._disconnectStemFxGraph(idx); }
+      this._syncStemFxUI(idx, target.type === 'clip' ? target.clip.fx : this.stemFx[idx]);
+      if (wasPlaying) { this.stemPauseTime = previousPosition; await this.stemPause(); this.stemPauseTime = previousPosition; await this.stemPlay(); }
+      else this.stemPauseTime = previousPosition;
     }
 
     async setStemFxEnabled(type, enabled) {
       const idx = this.selectedTrackIdx || 0;
-      this._pushUndoState('Toggle FX');
-      this._ensureStemFxState(idx)[type].enabled = !!enabled;
-
-      if (!enabled && !this.stemIsPlaying) {
-        this._disconnectStemFxGraph(idx);
+      const target = this._getStemFxTarget(idx);
+      this._pushUndoState(target.type === 'clip' ? 'Toggle Clip FX' : 'Toggle FX');
+      if (!target.state[type]) return;
+      target.state[type].enabled = !!enabled;
+      if (target.type === 'clip') {
+        this._syncStemFxUI(idx, target.state);
+        if (this.stemIsPlaying) await this._refreshStemFxPlayback();
+        return;
       }
-
+      if (!enabled && !this.stemIsPlaying) this._disconnectStemFxGraph(idx);
       await this._refreshStemFxPlayback();
-      this._syncStemFxUI(idx);
+      this._syncStemFxUI(idx, target.state);
     }
 
     setStemFxParam(type, key, value) {
       const idx = this.selectedTrackIdx || 0;
-      this._pushUndoGesture(`fx_${idx}_${type}`, 'Adjust FX');
-      const fx = this._ensureStemFxState(idx);
+      const target = this._getStemFxTarget(idx);
+      this._pushUndoGesture(`fx_${target.type}_${target.type === 'clip' ? target.clip.id : idx}_${type}`, target.type === 'clip' ? 'Adjust Clip FX' : 'Adjust FX');
+      const fx = target.state;
       if (!fx[type]) return;
       fx[type][key] = parseFloat(value);
+      if (target.type === 'clip') {
+        this._syncStemFxUI(idx, fx);
+        if (this.stemIsPlaying) this._refreshStemFxPlayback();
+        return;
+      }
       this._updateLiveStemFx(idx, type, key);
-      this._syncStemFxUI(idx);
+      this._syncStemFxUI(idx, fx);
+    }
+
+    resetStemTrackZoom(idx) {
+      this.setStemTrackZoom(idx, 1);
     }
 
     setStemTrackZoom(idx, value) {
