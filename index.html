@@ -8362,6 +8362,70 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
       if (status) status.textContent = 'Metadata will be embedded automatically when the output is WAV.';
     }
 
+    async _ensureMp3Encoder() {
+      if (window.lamejs) return window.lamejs;
+      if (this._mp3EncoderPromise) return this._mp3EncoderPromise;
+      this._mp3EncoderPromise = new Promise((resolve, reject) => {
+        const existing = document.querySelector('script[data-sonvex-lamejs]');
+        if (existing) {
+          existing.addEventListener('load', () => window.lamejs ? resolve(window.lamejs) : reject(new Error('MP3 encoder failed to initialize.')), { once: true });
+          existing.addEventListener('error', () => reject(new Error('Could not load the MP3 encoder.')), { once: true });
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js';
+        script.async = true;
+        script.dataset.sonvexLamejs = '1';
+        script.onload = () => window.lamejs ? resolve(window.lamejs) : reject(new Error('MP3 encoder failed to initialize.'));
+        script.onerror = () => reject(new Error('Could not load the MP3 encoder.'));
+        document.head.appendChild(script);
+      });
+      try { return await this._mp3EncoderPromise; }
+      catch (e) { this._mp3EncoderPromise = null; throw e; }
+    }
+
+    async _audioBufferToMp3Blob(buffer) {
+      const lamejs = await this._ensureMp3Encoder();
+      // MP3 supports up to 48 kHz. Use 48 kHz for the highest standard MP3 rate.
+      const supportedRates = [8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000];
+      const targetRate = supportedRates.reduce((best, rate) => Math.abs(rate - buffer.sampleRate) < Math.abs(best - buffer.sampleRate) ? rate : best, supportedRates[0]);
+      let renderBuffer = buffer;
+      if (buffer.sampleRate !== targetRate || buffer.numberOfChannels > 2) {
+        const channels = Math.min(2, buffer.numberOfChannels);
+        const frames = Math.ceil(buffer.duration * targetRate);
+        const ctx = new OfflineAudioContext(channels, frames, targetRate);
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        src.connect(ctx.destination);
+        src.start(0);
+        renderBuffer = await ctx.startRendering();
+      }
+      const channels = Math.min(2, renderBuffer.numberOfChannels);
+      const left = renderBuffer.getChannelData(0);
+      const right = channels > 1 ? renderBuffer.getChannelData(1) : null;
+      const encoder = new lamejs.Mp3Encoder(channels, targetRate, 320);
+      const block = 1152;
+      const chunks = [];
+      const toInt16 = (src, start, end) => {
+        const out = new Int16Array(end - start);
+        for (let i = start, j = 0; i < end; i++, j++) {
+          const x = Math.max(-1, Math.min(1, src[i] || 0));
+          out[j] = x < 0 ? x * 32768 : x * 32767;
+        }
+        return out;
+      };
+      for (let i = 0; i < left.length; i += block) {
+        const end = Math.min(left.length, i + block);
+        const l = toInt16(left, i, end);
+        const r = right ? toInt16(right, i, end) : undefined;
+        const encoded = encoder.encodeBuffer(l, r);
+        if (encoded.length) chunks.push(encoded);
+      }
+      const flushed = encoder.flush();
+      if (flushed.length) chunks.push(flushed);
+      return new Blob(chunks, { type: 'audio/mpeg' });
+    }
+
     async processAudioConversion() {
       if (!this.selectedFile) {
         this.showToast('Please select an audio file first.', 'error');
@@ -8377,15 +8441,19 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
         const decodedBuffer = await convCtx.decodeAudioData(arrayBuffer);
         await convCtx.close();
 
-        const baseWavBlob = this.audioBufferToWavBlob(decodedBuffer);
-        let wavBytes = new Uint8Array(await baseWavBlob.arrayBuffer());
-        const metadata = this._getConverterMetadataInputs();
-        if (this.hasMetadataForExport(metadata)) {
-          wavBytes = this._metadataWriteWav(wavBytes, metadata);
+        let blob;
+        if (targetFormat === 'mp3') {
+          blob = await this._audioBufferToMp3Blob(decodedBuffer);
+        } else if (targetFormat === 'wav') {
+          let wavBytes = new Uint8Array(await this.audioBufferToWavBlob(decodedBuffer).arrayBuffer());
+          const metadata = this._getConverterMetadataInputs();
+          if (this.hasMetadataForExport(metadata)) wavBytes = this._metadataWriteWav(wavBytes, metadata);
+          blob = new Blob([wavBytes], { type: 'audio/wav' });
+        } else {
+          throw new Error(`Direct ${targetFormat.toUpperCase()} encoding is not available in the browser build. Use WAV or MP3 for a real encoded output.`);
         }
-        const wavBlob = new Blob([wavBytes], { type: 'audio/wav' });
         const filename = this.selectedFile.name.replace(/\.[^/.]+$/, '') + `_sonvex.${targetFormat}`;
-        const url = URL.createObjectURL(wavBlob);
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
@@ -8403,53 +8471,33 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
     }
 
     audioBufferToWavBlob(buffer) {
-      const numOfChan = buffer.numberOfChannels;
-      const length = buffer.length * numOfChan * 2 + 44;
+      const numOfChan = Math.max(1, Math.min(2, buffer.numberOfChannels));
+      const bytesPerSample = 3;
+      const length = buffer.length * numOfChan * bytesPerSample + 44;
       const outBuffer = new ArrayBuffer(length);
       const view = new DataView(outBuffer);
       const channels = [];
-      let sample = 0;
       let offset = 0;
       let pos = 0;
-
-      function writeString(str) {
-        for (let i = 0; i < str.length; i++) {
-          view.setUint8(pos++, str.charCodeAt(i));
-        }
-      }
-
-      function setUint16(data) {
-        view.setUint16(pos, data, true);
-        pos += 2;
-      }
-      function setUint32(data) {
-        view.setUint32(pos, data, true);
-        pos += 4;
-      }
-      writeString('RIFF');
-      setUint32(length - 8);
-      writeString('WAVE');
-      writeString('fmt ');
-      setUint32(16);
-      setUint16(1);
-      setUint16(numOfChan);
-      setUint32(buffer.sampleRate);
-      setUint32(buffer.sampleRate * 2 * numOfChan);
-      setUint16(numOfChan * 2);
-      setUint16(16);
-      writeString('data');
-      setUint32(length - pos - 4);
-
-      for (let i = 0; i < buffer.numberOfChannels; i++) {
-        channels.push(buffer.getChannelData(i));
-      }
+      const writeString = str => { for (let i = 0; i < str.length; i++) view.setUint8(pos++, str.charCodeAt(i)); };
+      const setUint16 = data => { view.setUint16(pos, data, true); pos += 2; };
+      const setUint32 = data => { view.setUint32(pos, data, true); pos += 4; };
+      const write24 = sample => {
+        const x = Math.max(-1, Math.min(1, sample || 0));
+        let q = x < 0 ? Math.round(x * 8388608) : Math.round(x * 8388607);
+        if (q < 0) q += 0x1000000;
+        view.setUint8(pos++, q & 255);
+        view.setUint8(pos++, (q >>> 8) & 255);
+        view.setUint8(pos++, (q >>> 16) & 255);
+      };
+      writeString('RIFF'); setUint32(length - 8); writeString('WAVE');
+      writeString('fmt '); setUint32(16); setUint16(1); setUint16(numOfChan);
+      setUint32(buffer.sampleRate); setUint32(buffer.sampleRate * bytesPerSample * numOfChan);
+      setUint16(numOfChan * bytesPerSample); setUint16(24);
+      writeString('data'); setUint32(length - pos - 4);
+      for (let i = 0; i < numOfChan; i++) channels.push(buffer.getChannelData(i));
       while (offset < buffer.length) {
-        for (let i = 0; i < numOfChan; i++) {
-          sample = Math.max(-1, Math.min(1, channels[i][offset]));
-          sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
-          view.setInt16(pos, sample, true);
-          pos += 2;
-        }
+        for (let i = 0; i < numOfChan; i++) write24(channels[i][offset]);
         offset++;
       }
       return new Blob([outBuffer], { type: 'audio/wav' });
@@ -14648,33 +14696,24 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
     }
 
     _stereoPcmToWav(left, right, sampleRate) {
-      const numSamples = left.length;
-      const buffer = new ArrayBuffer(44 + numSamples * 4);
+      const numSamples = Math.min(left.length, right.length);
+      const bps = 3;
+      const buffer = new ArrayBuffer(44 + numSamples * 2 * bps);
       const view = new DataView(buffer);
-      const writeStr = (offset, str) => {
-        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+      const writeStr = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
+      const write24At = (offset, sample) => {
+        const x = Math.max(-1, Math.min(1, sample || 0));
+        let q = x < 0 ? Math.round(x * 8388608) : Math.round(x * 8388607);
+        if (q < 0) q += 0x1000000;
+        view.setUint8(offset, q & 255); view.setUint8(offset + 1, (q >>> 8) & 255); view.setUint8(offset + 2, (q >>> 16) & 255);
       };
-      writeStr(0, 'RIFF');
-      view.setUint32(4, 36 + numSamples * 4, true);
-      writeStr(8, 'WAVE');
-      writeStr(12, 'fmt ');
-      view.setUint32(16, 16, true);
-      view.setUint16(20, 1, true);
-      view.setUint16(22, 2, true);
-      view.setUint32(24, sampleRate, true);
-      view.setUint32(28, sampleRate * 4, true);
-      view.setUint16(34, 16, true);
-      writeStr(36, 'data');
-      view.setUint32(40, numSamples * 4, true);
-
+      writeStr(0, 'RIFF'); view.setUint32(4, 36 + numSamples * 2 * bps, true);
+      writeStr(8, 'WAVE'); writeStr(12, 'fmt '); view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true); view.setUint16(22, 2, true); view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2 * bps, true); view.setUint16(32, 2 * bps, true); view.setUint16(34, 24, true);
+      writeStr(36, 'data'); view.setUint32(40, numSamples * 2 * bps, true);
       let offset = 44;
-      for (let i = 0; i < numSamples; i++) {
-        const l = Math.max(-1, Math.min(1, left[i]));
-        const r = Math.max(-1, Math.min(1, right[i]));
-        view.setInt16(offset, l < 0 ? l * 0x8000 : l * 0x7FFF, true);
-        view.setInt16(offset + 2, r < 0 ? r * 0x8000 : r * 0x7FFF, true);
-        offset += 4;
-      }
+      for (let i = 0; i < numSamples; i++) { write24At(offset, left[i]); offset += 3; write24At(offset, right[i]); offset += 3; }
       return new Blob([buffer], { type: 'audio/wav' });
     }    _applyRampsForTrackOffline(ctx,i,gainNode,targetGain,trackDur,speed){
       const fadeIn=Math.max(this.stemFadeIn[i]||0,this.masterFadeIn||0), fadeOut=Math.max(this.stemFadeOut[i]||0,this.masterFadeOut||0);
@@ -16919,7 +16958,7 @@ html[dir="rtl"] .sonvex-image-tool-launch-arrow i{
       const base=(state.file?.name||"artwork").replace(/\.[^.]+$/,"");
       a.href=URL.createObjectURL(blob);a.download=base+"-"+state.preset+"."+ext;a.click();
       setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-    },mime,state.format==="png"?undefined:state.quality);
+    },mime,state.format==="png"?undefined:1);
   }
 
   document.querySelectorAll("[data-preset]").forEach(card=>card.addEventListener("click",()=>{
@@ -18541,11 +18580,12 @@ html[lang="ar"] header [class*=" fa-"]{
   }
 
   function makeWav(stereo,sr=44100){
-    const n=Math.min(stereo.left.length,stereo.right.length),buf=new ArrayBuffer(44+n*4),v=new DataView(buf);
+    const n=Math.min(stereo.left.length,stereo.right.length),bps=3,buf=new ArrayBuffer(44+n*2*bps),v=new DataView(buf);
     const w=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i))};
-    w(0,"RIFF");v.setUint32(4,36+n*4,true);w(8,"WAVE");w(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,2,true);v.setUint32(24,sr,true);v.setUint32(28,sr*4,true);v.setUint16(32,4,true);v.setUint16(34,16,true);w(36,"data");v.setUint32(40,n*4,true);
+    const w24=(o,x)=>{x=Math.max(-1,Math.min(1,x||0));let q=x<0?Math.round(x*8388608):Math.round(x*8388607);if(q<0)q+=0x1000000;v.setUint8(o,q&255);v.setUint8(o+1,(q>>>8)&255);v.setUint8(o+2,(q>>>16)&255)};
+    w(0,"RIFF");v.setUint32(4,36+n*2*bps,true);w(8,"WAVE");w(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,2,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2*bps,true);v.setUint16(32,2*bps,true);v.setUint16(34,24,true);w(36,"data");v.setUint32(40,n*2*bps,true);
     let peak=0;for(let i=0;i<n;i++)peak=Math.max(peak,Math.abs(stereo.left[i]),Math.abs(stereo.right[i]));const g=peak>.999?.999/peak:1;
-    let o=44;for(let i=0;i<n;i++){const l=Math.max(-1,Math.min(1,stereo.left[i]*g)),r=Math.max(-1,Math.min(1,stereo.right[i]*g));v.setInt16(o,l<0?l*32768:l*32767,true);o+=2;v.setInt16(o,r<0?r*32768:r*32767,true);o+=2}
+    let o=44;for(let i=0;i<n;i++){w24(o,stereo.left[i]*g);o+=3;w24(o,stereo.right[i]*g);o+=3}
     return new Blob([buf],{type:"audio/wav"});
   }
 
