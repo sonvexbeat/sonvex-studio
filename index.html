@@ -13579,8 +13579,8 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
       const [buf1, buf2] = this._sliceAudioBuffer(this.stemAudioCtx, targetClip.audioBuffer, localSplitSec);
       const clip1 = new AudioClip('clip_' + Date.now() + '_' + targetTrackIdx + '_a', targetTrackIdx, targetClip.startTime, localSplitSec, buf1, targetClip.isSilenced);
       const clip2 = new AudioClip('clip_' + Date.now() + '_' + targetTrackIdx + '_b', targetTrackIdx, playheadTime, targetClip.duration - localSplitSec, buf2, targetClip.isSilenced);
-      clip1.fx = null;
-      clip2.fx = null;
+      clip1.fx = targetClip.fx ? JSON.parse(JSON.stringify(targetClip.fx)) : null;
+      clip2.fx = targetClip.fx ? JSON.parse(JSON.stringify(targetClip.fx)) : null;
       clips.splice(targetIdx, 1, clip1, clip2);
       this.selectedClipId = clip2.id;
       this.selectedTrackIdx = targetTrackIdx;
@@ -13661,6 +13661,8 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
             buf2,
             targetClip.isSilenced
           );
+          clip1.fx = targetClip.fx ? JSON.parse(JSON.stringify(targetClip.fx)) : null;
+          clip2.fx = targetClip.fx ? JSON.parse(JSON.stringify(targetClip.fx)) : null;
 
           const idx = clips.indexOf(targetClip);
           if (idx >= 0) {
@@ -14666,7 +14668,15 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
           if(!c||c.isSilenced||!c.audioBuffer||c.duration<=0) return;
           const start=Math.max(0,c.startTime), end=Math.min(duration,c.startTime+c.duration); if(end<=start)return;
           const off=Math.max(0,c.bufferOffset||0), avail=Math.max(0,c.audioBuffer.duration-off), dur=Math.min(end-start,avail); if(dur<=0)return;
-          const src=ctx.createBufferSource(); src.buffer=c.audioBuffer; src.playbackRate.value=speed; src.connect(fxInput); src.start(start/speed,off,dur);
+          const src=ctx.createBufferSource(); src.buffer=c.audioBuffer; src.playbackRate.value=speed;
+          if(c.fx){
+            const clipFxInput=ctx.createGain(); clipFxInput.gain.value=1;
+            this._buildStemFxChain(ctx,i,clipFxInput,fxInput,c.fx);
+            src.connect(clipFxInput);
+          }else{
+            src.connect(fxInput);
+          }
+          src.start(start/speed,off,dur);
         });
       }
       const rendered=await ctx.startRendering();
@@ -14682,17 +14692,86 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
         return;
       }
 
-      this.showToast('Exporting 5 individual stem WAV files…', 'info');
+      this.showToast('Rendering edited stems with FX, Slices, Fades & Speed…', 'info');
       const names = ['stem_original_master.wav', 'stem_vocals.wav', 'stem_drums.wav', 'stem_bass.wav', 'stem_instruments.wav'];
+      const duration = Math.max(0.001, this.stemDuration || this.stemBuffers[0].duration);
+      const speed = this.stemSpeed || 1;
+
       for (let i = 0; i < 5; i++) {
         if (!this.stemBuffers[i]) continue;
+
         const sampleRate = this.stemBuffers[i].sampleRate;
-        const left = this.stemBuffers[i].getChannelData(0);
-        const right = this.stemBuffers[i].numberOfChannels > 1 ? this.stemBuffers[i].getChannelData(1) : left;
+        const length = Math.max(1, Math.ceil((duration / speed) * sampleRate));
+        const ctx = new OfflineAudioContext(2, length, sampleRate);
+
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(1, 0);
+        master.connect(ctx.destination);
+
+        const trackGain = ctx.createGain();
+        const trackTargetGain = this.stemMuted[i] ? 0 : (this.stemGains[i] ?? 1);
+        const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+
+        if (pan) {
+          pan.pan.value = this.stemPans[i] || 0;
+          trackGain.connect(pan);
+          pan.connect(master);
+        } else {
+          trackGain.connect(master);
+        }
+
+        this._applyRampsForTrackOffline(ctx, i, trackGain, trackTargetGain, duration, speed);
+
+        const fxInput = ctx.createGain();
+        fxInput.gain.value = 1;
+        this._buildStemFxChain(ctx, i, fxInput, trackGain);
+
+        const clips = (this.stemClips && this.stemClips[i]) ? this.stemClips[i] : [];
+
+        if (clips.length) {
+          clips.forEach(c => {
+            if (!c || c.isSilenced || !c.audioBuffer || c.duration <= 0) return;
+
+            const start = Math.max(0, c.startTime);
+            const end = Math.min(duration, c.startTime + c.duration);
+            if (end <= start) return;
+
+            const off = Math.max(0, c.bufferOffset || 0);
+            const avail = Math.max(0, c.audioBuffer.duration - off);
+            const dur = Math.min(end - start, avail);
+            if (dur <= 0) return;
+
+            const srcNode = ctx.createBufferSource();
+            srcNode.buffer = c.audioBuffer;
+            srcNode.playbackRate.value = speed;
+
+            if (c.fx) {
+              const clipFxInput = ctx.createGain();
+              clipFxInput.gain.value = 1;
+              this._buildStemFxChain(ctx, i, clipFxInput, fxInput, c.fx);
+              srcNode.connect(clipFxInput);
+            } else {
+              srcNode.connect(fxInput);
+            }
+
+            srcNode.start(start / speed, off, dur);
+          });
+        } else {
+          const srcNode = ctx.createBufferSource();
+          srcNode.buffer = this.stemBuffers[i];
+          srcNode.playbackRate.value = speed;
+          srcNode.connect(fxInput);
+          srcNode.start(0, 0, Math.min(this.stemBuffers[i].duration, duration));
+        }
+
+        const rendered = await ctx.startRendering();
+        const left = rendered.getChannelData(0);
+        const right = rendered.numberOfChannels > 1 ? rendered.getChannelData(1) : left;
         const blob = this._stereoPcmToWav(left, right, sampleRate);
         this._downloadFile(blob, names[i], 'audio/wav');
       }
-      this.showToast('Exported all 5 individual stem files!', 'success');
+
+      this.showToast('Exported all 5 edited stem files!', 'success');
     }
 
     _stereoPcmToWav(left, right, sampleRate) {
