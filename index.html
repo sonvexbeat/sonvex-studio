@@ -4650,6 +4650,7 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SONVEX STUDIO — Audio &amp; Music Studio">
 <meta name="twitter:description" content="SONVEX STUDIO is a free professional audio and music workspace for lyrics, stems, mastering, trimming, analysis, and format conversion.">
+<link rel="icon" type="image/svg+xml" href="assets/sonvex-monogram-gold.svg"/>
 </head>
 <body class="min-h-screen font-sans transition-colors duration-300 selection:bg-indigo-200 selection:text-black">
 <!-- SONVEX CUSTOM CONFIRMATION MODAL -->
@@ -4708,10 +4709,12 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
 </div>
 </div>
 <!-- CENTER BRANDING: SONVEX STUDIO (CLEAN POLISHED METALLIC SILVER) -->
-<div class="flex items-center cursor-pointer" onclick="app.showHome()">
-<h1 lang="en" dir="ltr" class="text-xl md:text-2xl font-black tracking-wider uppercase font-sans metallic-silver-text">
-          SONVEX STUDIO
-        </h1>
+<div class="sonvex-header-brand flex items-center cursor-pointer" onclick="app.showHome()" aria-label="SONVEX STUDIO home">
+<img class="sonvex-header-mark" src="assets/sonvex-monogram-gold.svg" alt="SONVEX monogram"/>
+<div class="sonvex-header-brand-copy">
+<h1 lang="en" dir="ltr" class="font-black tracking-wider uppercase font-sans metallic-silver-text">SONVEX STUDIO</h1>
+<span>POWERED BY SONVEX BEAT</span>
+</div>
 </div>
 <!-- Right Controls: Language, Theme -->
 <div class="flex items-center gap-2">
@@ -4742,6 +4745,7 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
 <img alt="Professional music studio" class="sonvex-hero-bg" loading="eager" src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&amp;fit=crop&amp;w=2200&amp;q=90"/>
 <div class="sonvex-hero-content">
 <div class="sonvex-hero-copy">
+<div class="sonvex-hero-identity"><img src="assets/sonvex-monogram-gold.svg" alt="SONVEX monogram"/><span>SONVEX BEAT <i>—</i> CREATIVE DIVISION</span></div>
 <div lang="en" dir="ltr" class="sonvex-hero-brand">SONVEX <span>STUDIO</span></div>
 <div lang="en" dir="ltr" class="sonvex-hero-tagline">DEFINE YOUR SOUND</div>
 <p lang="en" dir="ltr" class="sonvex-hero-desc">A professional creative workspace for audio, video subtitles, and visual content — all in one place</p>
@@ -15689,7 +15693,7 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
 <div class="glass-panel rounded-2xl px-6 py-7 border border-indigo-500/10 light:border-indigo-200">
 <div class="sonvex-footer-grid">
 <div class="sonvex-footer-col">
-<div class="sonvex-footer-heading text-lg">SONVEX <span class="text-purple-400">STUDIO</span></div>
+<div class="sonvex-footer-brand"><img src="assets/sonvex-monogram-gold.svg" alt="SONVEX monogram"/><div><div class="sonvex-footer-heading text-lg">SONVEX STUDIO</div><small>POWERED BY SONVEX BEAT</small></div></div>
 <div class="sonvex-footer-copy">Free tools for creators, musicians, and audio enthusiasts</div>
 </div>
 <div class="sonvex-footer-col">
@@ -15758,6 +15762,197 @@ html[lang="ar"] .sonvex-vocal-separator .vs-disclaimer i{
   new MutationObserver(initSonvexEnhanceCompare).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
+
+<!-- SONVEX STUDIO — Unified Gold Identity / visual-only layer -->
+<style id="sonvex-gold-identity-v1">
+:root{
+  --sx-black:#050607;--sx-carbon:#0b0d0f;--sx-panel:#101214;
+  --sx-gold:#c9a45d;--sx-gold-light:#f1dfad;--sx-gold-deep:#8d672f;
+  --sx-line:rgba(201,164,93,.22);--sx-muted:#a8a39a;
+}
+html:not(.light){background:#050607!important;color-scheme:dark}
+html:not(.light) body{background:transparent!important;color:#ece8df!important}
+#bgGradientLayer{
+  background:
+    radial-gradient(ellipse at 18% 0%,rgba(173,132,62,.10),transparent 38%),
+    radial-gradient(ellipse at 85% 78%,rgba(173,132,62,.055),transparent 34%),
+    linear-gradient(145deg,#050607 0%,#090a0b 48%,#050607 100%)!important;
+}
+.deco-orb{background:radial-gradient(circle,rgba(201,164,93,.12),transparent 68%)!important;opacity:.65}
+.glass-panel{
+  background:linear-gradient(145deg,rgba(17,19,21,.92),rgba(9,10,11,.88))!important;
+  border:1px solid rgba(201,164,93,.19)!important;
+  box-shadow:0 22px 58px rgba(0,0,0,.46),inset 0 1px 0 rgba(255,241,207,.035)!important;
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+}
+.glass-input{
+  background:rgba(20,20,19,.76)!important;
+  border:1px solid rgba(201,164,93,.20)!important;
+  color:#eee8da!important;
+}
+.glass-input:hover{border-color:rgba(221,190,123,.5)!important;background:rgba(31,27,20,.82)!important}
+.glass-input:focus,.glass-input:focus-visible{
+  border-color:#c9a45d!important;box-shadow:0 0 0 3px rgba(201,164,93,.13),0 0 22px rgba(201,164,93,.10)!important;
+}
+header.sticky{
+  background:rgba(6,7,8,.91)!important;border-bottom:1px solid rgba(201,164,93,.22)!important;
+  box-shadow:0 12px 38px rgba(0,0,0,.32)!important;backdrop-filter:blur(22px)!important;
+}
+.sonvex-header-brand{gap:12px;min-width:0;justify-content:center;text-decoration:none}
+.sonvex-header-mark{width:42px;height:42px;object-fit:contain;flex:0 0 42px;filter:drop-shadow(0 0 13px rgba(201,164,93,.22))}
+.sonvex-header-brand-copy{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.sonvex-header-brand-copy h1{margin:0;font-size:clamp(15px,1.7vw,21px);line-height:1;letter-spacing:.095em}
+.sonvex-header-brand-copy span{font-size:7px;line-height:1;letter-spacing:.24em;color:#b89a61;font-weight:800}
+.metallic-silver-text{
+  background:linear-gradient(112deg,#fff4cf 0%,#d9bd7d 24%,#9e783d 50%,#f4e3b2 75%,#b18a4b 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important;
+  filter:drop-shadow(0 2px 8px rgba(201,164,93,.16))!important;
+}
+.sonvex-hero-identity{display:flex;align-items:center;gap:13px;margin-bottom:24px}
+.sonvex-hero-identity img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 0 15px rgba(201,164,93,.23))}
+.sonvex-hero-identity span{font-size:8px;font-weight:900;letter-spacing:.23em;color:#d8bd83}
+.sonvex-hero-identity i{font-style:normal;color:#806334;margin:0 4px}
+#sonvexHomeView .sonvex-home-wrap{max-width:1480px;padding:24px 30px 88px}
+#sonvexHomeView .sonvex-home-hero{
+  min-height:650px;border-radius:28px;border:1px solid rgba(201,164,93,.25);
+  background:#070808;box-shadow:0 36px 100px rgba(0,0,0,.54),0 0 55px rgba(201,164,93,.035);
+}
+#sonvexHomeView .sonvex-home-hero::after{
+  background:
+    radial-gradient(ellipse at 77% 58%,rgba(173,132,62,.16),transparent 38%),
+    linear-gradient(90deg,rgba(3,4,4,.99) 0%,rgba(5,6,6,.92) 40%,rgba(5,6,6,.47) 70%,rgba(3,4,4,.78) 100%);
+}
+#sonvexHomeView .sonvex-home-hero img.sonvex-hero-bg{opacity:.62;filter:grayscale(.48) sepia(.13) saturate(.76) contrast(1.08)}
+#sonvexHomeView .sonvex-hero-content{min-height:650px;padding:78px 7.3% 66px}
+#sonvexHomeView .sonvex-hero-brand{font-size:clamp(3.4rem,6.5vw,6.6rem);letter-spacing:-.06em;color:#f6f2e8;text-shadow:0 10px 45px rgba(0,0,0,.5)}
+#sonvexHomeView .sonvex-hero-brand span{
+  background:linear-gradient(110deg,#fff1c5 0%,#d5b46c 34%,#967039 67%,#f0d99a 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+#sonvexHomeView .sonvex-hero-tagline{color:#d8bd83;letter-spacing:.30em}
+#sonvexHomeView .sonvex-hero-desc{color:rgba(235,230,218,.78);max-width:590px}
+#sonvexHomeView .sonvex-hero-pill{background:rgba(12,13,12,.58);border-color:rgba(201,164,93,.22);color:#ddd4c1}
+#sonvexHomeView .sonvex-hero-pill i{color:#d2b16c}
+#sonvexHomeView .sonvex-hero-float{
+  border-color:rgba(201,164,93,.30);background:rgba(8,9,9,.78);
+  box-shadow:0 28px 75px rgba(0,0,0,.52),0 0 32px rgba(201,164,93,.07);
+}
+#sonvexHomeView .sonvex-hero-float-caption{border-top:1px solid rgba(201,164,93,.15)}
+#sonvexHomeView .sonvex-workspaces{gap:20px;margin-top:28px}
+#sonvexHomeView .sonvex-domain-card{
+  min-height:370px;border-radius:22px;border-color:rgba(201,164,93,.19);
+  background:#0a0b0b;box-shadow:0 20px 58px rgba(0,0,0,.33);
+}
+#sonvexHomeView .sonvex-domain-card::after{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  box-shadow:inset 0 1px 0 rgba(255,239,200,.07);z-index:1;
+}
+#sonvexHomeView .sonvex-domain-card:hover{
+  border-color:rgba(225,194,125,.58);box-shadow:0 28px 72px rgba(0,0,0,.42),0 0 28px rgba(201,164,93,.09);
+}
+#sonvexHomeView .sonvex-domain-art::after{
+  background:linear-gradient(180deg,rgba(5,6,6,.05) 10%,rgba(5,6,6,.30) 42%,rgba(5,6,6,.97) 100%);
+}
+#sonvexHomeView .sonvex-domain-icon{
+  color:#e5c985;background:rgba(78,59,29,.58);border:1px solid rgba(214,181,111,.34);
+  box-shadow:0 12px 28px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,239,200,.10);
+}
+#sonvexHomeView .sonvex-domain-card.video .sonvex-domain-icon,
+#sonvexHomeView .sonvex-domain-card.image .sonvex-domain-icon{background:rgba(78,59,29,.48)}
+#sonvexHomeView .sonvex-domain-card h4{color:#f1eadb!important;letter-spacing:.005em}
+#sonvexHomeView .sonvex-domain-card p{color:rgba(227,220,205,.74)}
+#sonvexHomeView .sonvex-domain-btn{
+  min-height:44px;border:1px solid rgba(247,225,176,.38);border-radius:12px;
+  background:linear-gradient(125deg,#f0dfb1 0%,#c5a15b 48%,#8b642d 100%);
+  color:#17120a!important;box-shadow:0 10px 28px rgba(157,117,52,.22);
+  transition:transform .2s ease,filter .2s ease,box-shadow .2s ease;
+}
+#sonvexHomeView .sonvex-domain-btn:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 14px 34px rgba(157,117,52,.31)}
+#sonvexHomeView #sonvexWorkspaces::before{background:linear-gradient(90deg,#f0d99a,#9a7138)!important;box-shadow:0 0 20px rgba(201,164,93,.18)}
+#sonvexHomeView .sonvex-feature-strip{
+  border-color:rgba(201,164,93,.19);
+  background:linear-gradient(145deg,rgba(18,18,17,.94),rgba(8,9,9,.94));
+}
+#sonvexHomeView .sonvex-feature{border-color:rgba(201,164,93,.12)}
+#sonvexHomeView .sonvex-feature i{color:#d4b36f!important}
+#sonvexHomeView .sonvex-feature .feature-title{color:#eee6d5}
+#sonvexHomeView .sonvex-feature .feature-sub{color:#9e9788}
+#sonvexHomeView .sonvex-audio-showcase,#sonvexHomeView .sonvex-stem-feature{
+  border-color:rgba(201,164,93,.23);
+  background:linear-gradient(135deg,rgba(25,22,16,.97),rgba(8,9,9,.98));
+}
+#sonvexHomeView .sonvex-audio-showcase::before{background:radial-gradient(circle,rgba(201,164,93,.17),transparent 62%)}
+#sonvexHomeView .sonvex-audio-showcase-copy h3,#sonvexHomeView .sonvex-stem-feature h3{color:#f2ead9}
+#sonvexHomeView .sonvex-audio-showcase-copy p,#sonvexHomeView .sonvex-stem-feature p{color:#bcb4a4}
+#sonvexHomeView .sonvex-audio-tool i,#sonvexHomeView .sonvex-stem-feature-icon{color:#dfbf77}
+#sonvexHomeView .sonvex-wave{border-color:rgba(201,164,93,.24);background:rgba(5,6,6,.82);box-shadow:inset 0 0 45px rgba(201,164,93,.05)}
+#sonvexHomeView .sonvex-wave span{background:linear-gradient(180deg,#f0d99a,#a77c3d)}
+.sonvex-footer-brand{display:flex;align-items:center;gap:12px}
+.sonvex-footer-brand img{width:42px;height:42px;object-fit:contain}
+.sonvex-footer-brand small{display:block;margin-top:4px;font-size:7px;letter-spacing:.22em;color:#b89a61;font-weight:900}
+.sonvex-footer-heading{color:#f0e7d5!important}
+.sonvex-footer-copy{color:#a8a093!important}
+.sonvex-footer-links a{color:#c9b98f!important}
+.sonvex-footer-links a:hover{color:#f1dfad!important}
+.sonvex-footer-divider{border-top-color:rgba(201,164,93,.15)!important;color:#837b6d!important}
+.sonvex-tool-card{border-color:rgba(201,164,93,.20)!important;background:linear-gradient(145deg,rgba(19,18,15,.90),rgba(8,9,9,.94))!important}
+.sonvex-tool-preview{border-color:rgba(201,164,93,.18)!important;background:linear-gradient(135deg,rgba(201,164,93,.10),rgba(35,28,17,.16))!important;color:#e4c37d}
+.sonvex-stem-feature-icon{background:rgba(201,164,93,.10)!important;border-color:rgba(201,164,93,.27)!important}
+.sonvex-stem-feature-btn{background:linear-gradient(125deg,#f0dfb1,#c5a15b 52%,#8b642d)!important;color:#17120a!important}
+.sonvex-image-tool-launch{border-color:rgba(201,164,93,.34)!important;background:linear-gradient(125deg,#ead6a0,#b9914d)!important;color:#17120a!important;box-shadow:0 10px 26px rgba(157,117,52,.22)!important}
+.sonvex-image-tool-launch-arrow{background:rgba(26,19,9,.15)!important;border-color:rgba(26,19,9,.12)!important}
+body button[class*="from-purple-"],body button[class*="from-indigo-"],body button[class*="from-violet-"],
+body a[class*="from-purple-"],body a[class*="from-indigo-"],body a[class*="from-violet-"]{
+  background-image:linear-gradient(125deg,#f0dfb1 0%,#c5a15b 52%,#8b642d 100%)!important;
+  background-color:#c5a15b!important;color:#17120a!important;border-color:rgba(247,225,176,.42)!important;
+  box-shadow:0 9px 24px rgba(157,117,52,.20)!important;
+}
+body [class*="text-indigo-"],body [class*="text-purple-"],body [class*="text-violet-"],body [class*="text-cyan-"]{color:#d5b875!important}
+body [class*="border-indigo-"],body [class*="border-purple-"],body [class*="border-violet-"],body [class*="border-cyan-"]{border-color:rgba(201,164,93,.25)!important}
+body [class*="bg-indigo-"],body [class*="bg-purple-"],body [class*="bg-violet-"]{background-color:rgba(201,164,93,.085)!important}
+body [class*="shadow-indigo-"],body [class*="shadow-purple-"],body [class*="shadow-violet-"]{--tw-shadow-color:rgba(201,164,93,.18)!important}
+.scrollbar-thumb-indigo-500\/30{background:rgba(201,164,93,.32)!important}
+.light #bgGradientLayer{background:linear-gradient(145deg,#f6f3eb,#e9e2d3)!important}
+.light header.sticky{background:rgba(250,248,242,.94)!important;border-bottom-color:rgba(157,117,52,.25)!important}
+.light .glass-panel{background:rgba(255,253,247,.90)!important;border-color:rgba(157,117,52,.22)!important;box-shadow:0 14px 40px rgba(47,37,19,.08)!important}
+.light .glass-input{background:rgba(255,255,255,.95)!important;border-color:rgba(157,117,52,.28)!important;color:#282318!important}
+.light .glass-input:focus{border-color:#b58b45!important;box-shadow:0 0 0 3px rgba(181,139,69,.13)!important}
+.light .metallic-silver-text{background:linear-gradient(110deg,#88652d,#c29b52,#6f5126)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
+.light .sonvex-header-brand-copy span,.light .sonvex-footer-brand small{color:#8d672f!important}
+.light .sonvex-home-hero{background:#efebe2!important;border-color:rgba(157,117,52,.32)!important}
+.light .sonvex-home-hero::after{background:linear-gradient(90deg,rgba(248,245,237,.96),rgba(248,245,237,.78) 44%,rgba(248,245,237,.25) 72%,rgba(248,245,237,.55))!important}
+.light .sonvex-hero-brand{color:#272115!important;text-shadow:none!important}
+.light .sonvex-hero-brand span{background:linear-gradient(110deg,#88652d,#c29b52,#6f5126)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+.light .sonvex-hero-desc{color:#514a3d!important}
+.light .sonvex-hero-pill{background:rgba(255,255,255,.66)!important;border-color:rgba(157,117,52,.20)!important;color:#51452d!important}
+.light .sonvex-domain-card{border-color:rgba(157,117,52,.25)!important}
+.light .sonvex-feature-strip,.light .sonvex-audio-showcase,.light .sonvex-stem-feature{background:linear-gradient(145deg,#fffdf7,#f0eadc)!important;border-color:rgba(157,117,52,.22)!important}
+.light .sonvex-feature .feature-title,.light .sonvex-audio-showcase-copy h3,.light .sonvex-stem-feature h3{color:#292318!important}
+.light .sonvex-feature .feature-sub,.light .sonvex-audio-showcase-copy p,.light .sonvex-stem-feature p{color:#6f6655!important}
+.light .sonvex-footer-heading{color:#292318!important}
+@media(max-width:900px){
+  .sonvex-header-mark{width:36px;height:36px;flex-basis:36px}
+  .sonvex-header-brand-copy span{font-size:6px;letter-spacing:.16em}
+  #sonvexHomeView .sonvex-home-hero,#sonvexHomeView .sonvex-hero-content{min-height:640px}
+  #sonvexHomeView .sonvex-hero-float{right:3%;width:31%}
+}
+@media(max-width:720px){
+  #sonvexHomeView .sonvex-home-wrap{padding:14px 14px 52px}
+  #sonvexHomeView .sonvex-home-hero,#sonvexHomeView .sonvex-hero-content{min-height:650px}
+  #sonvexHomeView .sonvex-hero-content{padding:42px 22px 36px;align-items:flex-end}
+  #sonvexHomeView .sonvex-hero-brand{font-size:clamp(3rem,14vw,4.5rem)}
+  .sonvex-hero-identity{gap:9px;margin-bottom:18px}
+  .sonvex-hero-identity img{width:36px;height:36px}
+  .sonvex-hero-identity span{font-size:7px;letter-spacing:.16em}
+  .sonvex-header-brand{gap:8px}
+  .sonvex-header-mark{width:31px;height:31px;flex-basis:31px}
+  .sonvex-header-brand-copy h1{font-size:14px!important;letter-spacing:.055em}
+  .sonvex-header-brand-copy span{font-size:5px;letter-spacing:.11em}
+  header.sticky{padding-left:10px!important;padding-right:10px!important}
+}
+</style>
+<!-- /SONVEX STUDIO — Unified Gold Identity -->
+
 </body>
 </html>
 
